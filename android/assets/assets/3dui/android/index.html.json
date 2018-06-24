@@ -1,0 +1,389 @@
+{
+    "FireBoxRoom": {
+        "Assets": {
+            "AssetImage": [
+                {
+                    "id": "__CUBEMAP_RADIANCE",
+                    "ou3d": false,
+                    "reverse3d": false,
+                    "sbs3d": false,
+                    "src": "./-1429861740227725632_cubemap_radiance256.dds",
+                    "tex_alpha": "undefined",
+                    "tex_clamp": true,
+                    "tex_colorspace": "sRGB",
+                    "tex_compress": false,
+                    "tex_linear": true,
+                    "tex_mipmap": true,
+                    "tex_premultiply": true
+                },
+                {
+                    "id": "t1",
+                    "ou3d": false,
+                    "reverse3d": false,
+                    "sbs3d": false,
+                    "src": "thumbs/1.jpg",
+                    "tex_alpha": "undefined",
+                    "tex_clamp": "true",
+                    "tex_colorspace": "sRGB",
+                    "tex_compress": false,
+                    "tex_linear": true,
+                    "tex_mipmap": true,
+                    "tex_premultiply": true
+                },
+                {
+                    "id": "bgup",
+                    "ou3d": false,
+                    "reverse3d": false,
+                    "sbs3d": false,
+                    "src": "bgup.png",
+                    "tex_alpha": "undefined",
+                    "tex_clamp": true,
+                    "tex_colorspace": "sRGB",
+                    "tex_compress": false,
+                    "tex_linear": true,
+                    "tex_mipmap": true,
+                    "tex_premultiply": true
+                },
+                {
+                    "id": "controls2d",
+                    "ou3d": false,
+                    "reverse3d": false,
+                    "sbs3d": false,
+                    "src": "infograph-02-02.png",
+                    "tex_alpha": "undefined",
+                    "tex_clamp": "true",
+                    "tex_colorspace": "sRGB",
+                    "tex_compress": false,
+                    "tex_linear": true,
+                    "tex_mipmap": true,
+                    "tex_premultiply": true
+                },
+                {
+                    "id": "t3",
+                    "ou3d": false,
+                    "reverse3d": false,
+                    "sbs3d": false,
+                    "src": "thumbs/3.jpg",
+                    "tex_alpha": "undefined",
+                    "tex_clamp": "true",
+                    "tex_colorspace": "sRGB",
+                    "tex_compress": false,
+                    "tex_linear": true,
+                    "tex_mipmap": true,
+                    "tex_premultiply": true
+                },
+                {
+                    "id": "__CUBEMAP_IRRADIANCE",
+                    "ou3d": false,
+                    "reverse3d": false,
+                    "sbs3d": false,
+                    "src": "./-1429861740227725632_cubemap_irradiance64.dds",
+                    "tex_alpha": "undefined",
+                    "tex_clamp": true,
+                    "tex_colorspace": "sRGB",
+                    "tex_compress": false,
+                    "tex_linear": true,
+                    "tex_mipmap": true,
+                    "tex_premultiply": true
+                },
+                {
+                    "id": "t2",
+                    "ou3d": false,
+                    "reverse3d": false,
+                    "sbs3d": false,
+                    "src": "thumbs/2.jpg",
+                    "tex_alpha": "undefined",
+                    "tex_clamp": "true",
+                    "tex_colorspace": "sRGB",
+                    "tex_compress": false,
+                    "tex_linear": true,
+                    "tex_mipmap": true,
+                    "tex_premultiply": true
+                },
+                {
+                    "id": "t6",
+                    "ou3d": false,
+                    "reverse3d": false,
+                    "sbs3d": false,
+                    "src": "thumbs/13.jpg",
+                    "tex_alpha": "undefined",
+                    "tex_clamp": "true",
+                    "tex_colorspace": "sRGB",
+                    "tex_compress": false,
+                    "tex_linear": true,
+                    "tex_mipmap": true,
+                    "tex_premultiply": true
+                },
+                {
+                    "id": "t7",
+                    "ou3d": false,
+                    "reverse3d": false,
+                    "sbs3d": false,
+                    "src": "thumbs/11.jpg",
+                    "tex_alpha": "undefined",
+                    "tex_clamp": "true",
+                    "tex_colorspace": "sRGB",
+                    "tex_compress": false,
+                    "tex_linear": true,
+                    "tex_mipmap": true,
+                    "tex_premultiply": true
+                },
+                {
+                    "id": "bgloop",
+                    "ou3d": false,
+                    "reverse3d": false,
+                    "sbs3d": false,
+                    "src": "bgloop.png",
+                    "tex_alpha": "undefined",
+                    "tex_clamp": true,
+                    "tex_colorspace": "sRGB",
+                    "tex_compress": false,
+                    "tex_linear": true,
+                    "tex_mipmap": true,
+                    "tex_premultiply": true
+                },
+                {
+                    "id": "t5",
+                    "ou3d": false,
+                    "reverse3d": false,
+                    "sbs3d": false,
+                    "src": "thumbs/5.jpg",
+                    "tex_alpha": "undefined",
+                    "tex_clamp": "true",
+                    "tex_colorspace": "sRGB",
+                    "tex_compress": false,
+                    "tex_linear": true,
+                    "tex_mipmap": true,
+                    "tex_premultiply": true
+                },
+                {
+                    "id": "t4",
+                    "ou3d": false,
+                    "reverse3d": false,
+                    "sbs3d": false,
+                    "src": "thumbs/4.jpg",
+                    "tex_alpha": "undefined",
+                    "tex_clamp": "true",
+                    "tex_colorspace": "sRGB",
+                    "tex_compress": false,
+                    "tex_linear": true,
+                    "tex_mipmap": true,
+                    "tex_premultiply": true
+                },
+                {
+                    "id": "t8",
+                    "ou3d": false,
+                    "reverse3d": false,
+                    "sbs3d": false,
+                    "src": "thumbs/8.jpg",
+                    "tex_alpha": "undefined",
+                    "tex_clamp": "true",
+                    "tex_colorspace": "sRGB",
+                    "tex_compress": false,
+                    "tex_linear": true,
+                    "tex_mipmap": true,
+                    "tex_premultiply": true
+                },
+                {
+                    "id": "bgdown",
+                    "ou3d": false,
+                    "reverse3d": false,
+                    "sbs3d": false,
+                    "src": "bgdown.png",
+                    "tex_alpha": "undefined",
+                    "tex_clamp": true,
+                    "tex_colorspace": "sRGB",
+                    "tex_compress": false,
+                    "tex_linear": true,
+                    "tex_mipmap": true,
+                    "tex_premultiply": true
+                },
+                {
+                    "id": "controlsVR",
+                    "ou3d": false,
+                    "reverse3d": false,
+                    "sbs3d": false,
+                    "src": "infograph-02-01.png",
+                    "tex_alpha": "undefined",
+                    "tex_clamp": "true",
+                    "tex_colorspace": "sRGB",
+                    "tex_compress": false,
+                    "tex_linear": true,
+                    "tex_mipmap": true,
+                    "tex_premultiply": true
+                }
+            ],
+            "AssetObject": [
+                {
+                    "id": "obj3",
+                    "src": "3.dae"
+                },
+                {
+                    "id": "obj2",
+                    "src": "2.dae"
+                },
+                {
+                    "id": "obj4",
+                    "src": "4.dae"
+                },
+                {
+                    "id": "obj1",
+                    "src": "1.dae"
+                }
+            ],
+            "AssetScript": [
+                {
+                    "src": "main.js"
+                }
+            ]
+        },
+        "Room": {
+            "Link": [
+                {
+                    "col": "#c08040",
+                    "draw_glow": false,
+                    "js_id": "2",
+                    "lighting": false,
+                    "pos": "1.29 0.4 2.2",
+                    "scale": "1.3 2.3 1",
+                    "thumb_id": "t7",
+                    "title": "TrinityTestSite",
+                    "url": "http://demos.janusvr.com/joseph/android/tsv/index.html",
+                    "xdir": "-0.965925 0 0.258821",
+                    "zdir": "-0.258821 0 -0.965925"
+                },
+                {
+                    "col": "#c08040",
+                    "draw_glow": false,
+                    "js_id": "3",
+                    "lighting": false,
+                    "pos": "-0.54 0.4 2.02",
+                    "scale": "1.3 2.3 1",
+                    "thumb_id": "t5",
+                    "title": "360 Images",
+                    "url": "http://demos.janusvr.com/joseph/android/images/index.html",
+                    "xdir": "-0.866026 0 -0.5",
+                    "zdir": "0.5 0 -0.866026"
+                },
+                {
+                    "col": "#c08040",
+                    "draw_glow": false,
+                    "js_id": "4",
+                    "lighting": false,
+                    "pos": "-1.3 0.4 -1.9",
+                    "scale": "1.3 2.3 1",
+                    "thumb_id": "t6",
+                    "title": "Compassion",
+                    "url": "http://demos.janusvr.com/joseph/android/gallery/index.html",
+                    "xdir": "0.5 0.000001 -0.866025",
+                    "ydir": "-0 1 0.000001",
+                    "zdir": "0.866025 0 0.5"
+                },
+                {
+                    "col": "#c08040",
+                    "draw_glow": false,
+                    "js_id": "1",
+                    "lighting": false,
+                    "pos": "2.04 0.4 -2.7",
+                    "scale": "1.3 2.3 1",
+                    "thumb_id": "t1",
+                    "title": "Dark Side of the Moon",
+                    "url": "http://demos.janusvr.com/joseph/android/soundscape/index.html",
+                    "xdir": "0.882948 0 0.469472",
+                    "zdir": "-0.469472 0 0.882948"
+                },
+                {
+                    "col": "#c08040",
+                    "draw_glow": false,
+                    "js_id": "5",
+                    "lighting": false,
+                    "pos": "0.18 0.4 -3.01",
+                    "scale": "1.3 2.3 1",
+                    "thumb_id": "t8",
+                    "title": "Piano",
+                    "url": "http://demos.janusvr.com/joseph/android/piano/index.html",
+                    "xdir": "0.965926 0 -0.258819",
+                    "zdir": "0.258819 0 0.965926"
+                },
+                {
+                    "col": "#c08040",
+                    "draw_glow": false,
+                    "js_id": "0",
+                    "lighting": false,
+                    "pos": "2.7 0.4 1.08",
+                    "scale": "1.3 2.3 1",
+                    "thumb_id": "t2",
+                    "title": "Crafting Sandbox",
+                    "url": "http://demos.janusvr.com/joseph/android/sandbox/index.html",
+                    "xdir": "-0.500001 0 0.866025",
+                    "zdir": "-0.866025 0 -0.500001"
+                }
+            ],
+            "Object": [
+                {
+                    "id": "obj1",
+                    "js_id": "6",
+                    "lighting": false,
+                    "pos": "0.8 0 -0.4",
+                    "xdir": "-0.000005 0 -1",
+                    "zdir": "1 0 -0.000005"
+                },
+                {
+                    "id": "obj2",
+                    "js_id": "foam",
+                    "lighting": false,
+                    "scale": "1.249882 1 1.249882"
+                },
+                {
+                    "id": "obj3",
+                    "js_id": "7",
+                    "lighting": false,
+                    "rotate_deg_per_sec": 0.25
+                },
+                {
+                    "id": "obj4",
+                    "js_id": "8",
+                    "lighting": false,
+                    "pos": "0 -518 0",
+                    "rotate_deg_per_sec": 0.25
+                },
+                {
+                    "collision_id": "plane",
+                    "id": "plane",
+                    "image_id": "controls2d",
+                    "js_id": "controls",
+                    "lighting": false,
+                    "pos": "2.93 1.59 -0.93",
+                    "scale": "1.85 1.85 1",
+                    "xdir": "0.211842 -0.005109 0.977291",
+                    "ydir": "-0.005561 0.999964 0.006433",
+                    "zdir": "-0.977288 -0.006797 0.211806"
+                },
+                {
+                    "collision_id": "cube",
+                    "id": "cube",
+                    "js_id": "Magic_Super_dizz-7-1504462622",
+                    "locked": true,
+                    "pos": "0.622089 0 -0.523396",
+                    "scale": "500 1.1 500",
+                    "visible": false,
+                    "xdir": "0 0 -1",
+                    "zdir": "1 0 0"
+                }
+            ],
+            "cubemap_irradiance_id": "__CUBEMAP_IRRADIANCE",
+            "cubemap_radiance_id": "__CUBEMAP_RADIANCE",
+            "far_dist": 10000,
+            "pos": "-1.54 0.4 0.31",
+            "skybox_back_id": "bgloop",
+            "skybox_down_id": "bgdown",
+            "skybox_front_id": "bgloop",
+            "skybox_left_id": "bgloop",
+            "skybox_right_id": "bgloop",
+            "skybox_up_id": "bgup",
+            "xdir": "-0.249939 -0.009682 -0.968213",
+            "ydir": "0.036217 0.999157 -0.019341",
+            "zdir": "0.967584 -0.0399 -0.249377"
+        }
+    }
+}

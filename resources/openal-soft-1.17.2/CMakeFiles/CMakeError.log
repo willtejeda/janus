@@ -1,0 +1,462 @@
+Performing C SOURCE FILE Test HAVE_C11_ATOMIC failed with the following output:
+Change Dir: C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:/Qt/Tools/mingw492_32/bin/mingw32-make.exe" "cmTC_71913/fast"
+C:/Qt/Tools/mingw492_32/bin/mingw32-make.exe -f CMakeFiles\cmTC_71913.dir\build.make CMakeFiles/cmTC_71913.dir/build
+mingw32-make.exe[1]: Entering directory 'C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_71913.dir/src.c.o
+C:\android-ndk-r16b\toolchains\llvm\prebuilt\windows-x86_64\bin\clang.exe  --target=x86_64-none-linux-android --gcc-toolchain=C:/android-ndk-r16b/toolchains/x86_64-4.9/prebuilt/windows-x86_64 --sysroot=C:/android-ndk-r16b/sysroot   -std=c11 -isystem C:/android-ndk-r16b/sysroot/usr/include/x86_64-linux-android -D__ANDROID_API__=21 -g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -Wa,--noexecstack -Wformat -Werror=format-security  -DHAVE_C11_ATOMIC  -D_LARGEFILE_SOURCE -D_LARGE_FILES -fPIE   -o CMakeFiles\cmTC_71913.dir\src.c.o   -c C:\Users\Joseph\Documents\JanusVR\janus-vr\resources\openal-soft-1.17.2\CMakeFiles\CMakeTmp\src.c
+C:\Users\Joseph\Documents\JanusVR\janus-vr\resources\openal-soft-1.17.2\CMakeFiles\CMakeTmp\src.c:5:13: error: address argument to atomic operation must be a pointer to non-const _Atomic type ('const _Atomic(int) *' invalid)
+     return atomic_load(&foo);
+            ^           ~~~~
+C:\android-ndk-r16b\toolchains\llvm\prebuilt\windows-x86_64\lib64\clang\5.0.300080\include\stdatomic.h:495:2: note: expanded from macro 'atomic_load'
+        atomic_load_explicit(object, memory_order_seq_cst)
+        ^                    ~~~~~~
+C:\android-ndk-r16b\toolchains\llvm\prebuilt\windows-x86_64\lib64\clang\5.0.300080\include\stdatomic.h:388:2: note: expanded from macro 'atomic_load_explicit'
+        __c11_atomic_load(object, order)
+        ^                 ~~~~~~
+1 error generated.
+CMakeFiles\cmTC_71913.dir\build.make:64: recipe for target 'CMakeFiles/cmTC_71913.dir/src.c.o' failed
+mingw32-make.exe[1]: *** [CMakeFiles/cmTC_71913.dir/src.c.o] Error 1
+mingw32-make.exe[1]: Leaving directory 'C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp'
+makefile:125: recipe for target 'cmTC_71913/fast' failed
+mingw32-make.exe: *** [cmTC_71913/fast] Error 2
+
+Source file was:
+#include <stdatomic.h>
+ const int _Atomic foo = ATOMIC_VAR_INIT(~0);
+ int main()
+ {
+     return atomic_load(&foo);
+ }
+Determining if the include file intrin.h exists failed with the following output:
+Change Dir: C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:/Qt/Tools/mingw492_32/bin/mingw32-make.exe" "cmTC_e902f/fast"
+C:/Qt/Tools/mingw492_32/bin/mingw32-make.exe -f CMakeFiles\cmTC_e902f.dir\build.make CMakeFiles/cmTC_e902f.dir/build
+mingw32-make.exe[1]: Entering directory 'C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_e902f.dir/CheckIncludeFile.c.o
+C:\android-ndk-r16b\toolchains\llvm\prebuilt\windows-x86_64\bin\clang.exe  --target=x86_64-none-linux-android --gcc-toolchain=C:/android-ndk-r16b/toolchains/x86_64-4.9/prebuilt/windows-x86_64 --sysroot=C:/android-ndk-r16b/sysroot   -std=c11 -isystem C:/android-ndk-r16b/sysroot/usr/include/x86_64-linux-android -D__ANDROID_API__=21 -g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -Wa,--noexecstack -Wformat -Werror=format-security   -D_LARGEFILE_SOURCE -D_LARGE_FILES -fPIE   -o CMakeFiles\cmTC_e902f.dir\CheckIncludeFile.c.o   -c C:\Users\Joseph\Documents\JanusVR\janus-vr\resources\openal-soft-1.17.2\CMakeFiles\CMakeTmp\CheckIncludeFile.c
+In file included from C:\Users\Joseph\Documents\JanusVR\janus-vr\resources\openal-soft-1.17.2\CMakeFiles\CMakeTmp\CheckIncludeFile.c:1:
+C:\android-ndk-r16b\toolchains\llvm\prebuilt\windows-x86_64\lib64\clang\5.0.300080\include\intrin.h:26:15: fatal error: 'intrin.h' file not found
+#include_next <intrin.h>
+              ^~~~~~~~~~
+1 error generated.
+CMakeFiles\cmTC_e902f.dir\build.make:64: recipe for target 'CMakeFiles/cmTC_e902f.dir/CheckIncludeFile.c.o' failed
+mingw32-make.exe[1]: *** [CMakeFiles/cmTC_e902f.dir/CheckIncludeFile.c.o] Error 1
+mingw32-make.exe[1]: Leaving directory 'C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp'
+makefile:125: recipe for target 'cmTC_e902f/fast' failed
+mingw32-make.exe: *** [cmTC_e902f/fast] Error 2
+
+
+Determining if the include file ieeefp.h exists failed with the following output:
+Change Dir: C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:/Qt/Tools/mingw492_32/bin/mingw32-make.exe" "cmTC_3ca28/fast"
+C:/Qt/Tools/mingw492_32/bin/mingw32-make.exe -f CMakeFiles\cmTC_3ca28.dir\build.make CMakeFiles/cmTC_3ca28.dir/build
+mingw32-make.exe[1]: Entering directory 'C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_3ca28.dir/CheckIncludeFile.c.o
+C:\android-ndk-r16b\toolchains\llvm\prebuilt\windows-x86_64\bin\clang.exe  --target=x86_64-none-linux-android --gcc-toolchain=C:/android-ndk-r16b/toolchains/x86_64-4.9/prebuilt/windows-x86_64 --sysroot=C:/android-ndk-r16b/sysroot   -std=c11 -isystem C:/android-ndk-r16b/sysroot/usr/include/x86_64-linux-android -D__ANDROID_API__=21 -g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -Wa,--noexecstack -Wformat -Werror=format-security   -D_LARGEFILE_SOURCE -D_LARGE_FILES -fPIE   -o CMakeFiles\cmTC_3ca28.dir\CheckIncludeFile.c.o   -c C:\Users\Joseph\Documents\JanusVR\janus-vr\resources\openal-soft-1.17.2\CMakeFiles\CMakeTmp\CheckIncludeFile.c
+C:\Users\Joseph\Documents\JanusVR\janus-vr\resources\openal-soft-1.17.2\CMakeFiles\CMakeTmp\CheckIncludeFile.c:1:10: fatal error: 'ieeefp.h' file not found
+#include <ieeefp.h>
+         ^~~~~~~~~~
+1 error generated.
+CMakeFiles\cmTC_3ca28.dir\build.make:64: recipe for target 'CMakeFiles/cmTC_3ca28.dir/CheckIncludeFile.c.o' failed
+mingw32-make.exe[1]: *** [CMakeFiles/cmTC_3ca28.dir/CheckIncludeFile.c.o] Error 1
+mingw32-make.exe[1]: Leaving directory 'C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp'
+makefile:125: recipe for target 'cmTC_3ca28/fast' failed
+mingw32-make.exe: *** [cmTC_3ca28/fast] Error 2
+
+
+Determining if the include file guiddef.h exists failed with the following output:
+Change Dir: C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:/Qt/Tools/mingw492_32/bin/mingw32-make.exe" "cmTC_0397c/fast"
+C:/Qt/Tools/mingw492_32/bin/mingw32-make.exe -f CMakeFiles\cmTC_0397c.dir\build.make CMakeFiles/cmTC_0397c.dir/build
+mingw32-make.exe[1]: Entering directory 'C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_0397c.dir/CheckIncludeFile.c.o
+C:\android-ndk-r16b\toolchains\llvm\prebuilt\windows-x86_64\bin\clang.exe  --target=x86_64-none-linux-android --gcc-toolchain=C:/android-ndk-r16b/toolchains/x86_64-4.9/prebuilt/windows-x86_64 --sysroot=C:/android-ndk-r16b/sysroot   -std=c11 -isystem C:/android-ndk-r16b/sysroot/usr/include/x86_64-linux-android -D__ANDROID_API__=21 -g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -Wa,--noexecstack -Wformat -Werror=format-security   -D_LARGEFILE_SOURCE -D_LARGE_FILES -fPIE   -o CMakeFiles\cmTC_0397c.dir\CheckIncludeFile.c.o   -c C:\Users\Joseph\Documents\JanusVR\janus-vr\resources\openal-soft-1.17.2\CMakeFiles\CMakeTmp\CheckIncludeFile.c
+C:\Users\Joseph\Documents\JanusVR\janus-vr\resources\openal-soft-1.17.2\CMakeFiles\CMakeTmp\CheckIncludeFile.c:1:10: fatal error: 'guiddef.h' file not found
+#include <guiddef.h>
+         ^~~~~~~~~~~
+1 error generated.
+CMakeFiles\cmTC_0397c.dir\build.make:64: recipe for target 'CMakeFiles/cmTC_0397c.dir/CheckIncludeFile.c.o' failed
+mingw32-make.exe[1]: *** [CMakeFiles/cmTC_0397c.dir/CheckIncludeFile.c.o] Error 1
+mingw32-make.exe[1]: Leaving directory 'C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp'
+makefile:125: recipe for target 'cmTC_0397c/fast' failed
+mingw32-make.exe: *** [cmTC_0397c/fast] Error 2
+
+
+Determining if the include file initguid.h exists failed with the following output:
+Change Dir: C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:/Qt/Tools/mingw492_32/bin/mingw32-make.exe" "cmTC_f2648/fast"
+C:/Qt/Tools/mingw492_32/bin/mingw32-make.exe -f CMakeFiles\cmTC_f2648.dir\build.make CMakeFiles/cmTC_f2648.dir/build
+mingw32-make.exe[1]: Entering directory 'C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_f2648.dir/CheckIncludeFile.c.o
+C:\android-ndk-r16b\toolchains\llvm\prebuilt\windows-x86_64\bin\clang.exe  --target=x86_64-none-linux-android --gcc-toolchain=C:/android-ndk-r16b/toolchains/x86_64-4.9/prebuilt/windows-x86_64 --sysroot=C:/android-ndk-r16b/sysroot   -std=c11 -isystem C:/android-ndk-r16b/sysroot/usr/include/x86_64-linux-android -D__ANDROID_API__=21 -g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -Wa,--noexecstack -Wformat -Werror=format-security   -D_LARGEFILE_SOURCE -D_LARGE_FILES -fPIE   -o CMakeFiles\cmTC_f2648.dir\CheckIncludeFile.c.o   -c C:\Users\Joseph\Documents\JanusVR\janus-vr\resources\openal-soft-1.17.2\CMakeFiles\CMakeTmp\CheckIncludeFile.c
+C:\Users\Joseph\Documents\JanusVR\janus-vr\resources\openal-soft-1.17.2\CMakeFiles\CMakeTmp\CheckIncludeFile.c:1:10: fatal error: 'initguid.h' file not found
+#include <initguid.h>
+         ^~~~~~~~~~~~
+1 error generated.
+CMakeFiles\cmTC_f2648.dir\build.make:64: recipe for target 'CMakeFiles/cmTC_f2648.dir/CheckIncludeFile.c.o' failed
+mingw32-make.exe[1]: *** [CMakeFiles/cmTC_f2648.dir/CheckIncludeFile.c.o] Error 1
+mingw32-make.exe[1]: Leaving directory 'C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp'
+makefile:125: recipe for target 'cmTC_f2648/fast' failed
+mingw32-make.exe: *** [cmTC_f2648/fast] Error 2
+
+
+Determining if the aligned_alloc exist failed with the following output:
+Change Dir: C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:/Qt/Tools/mingw492_32/bin/mingw32-make.exe" "cmTC_459f5/fast"
+C:/Qt/Tools/mingw492_32/bin/mingw32-make.exe -f CMakeFiles\cmTC_459f5.dir\build.make CMakeFiles/cmTC_459f5.dir/build
+mingw32-make.exe[1]: Entering directory 'C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_459f5.dir/CheckSymbolExists.c.o
+C:\android-ndk-r16b\toolchains\llvm\prebuilt\windows-x86_64\bin\clang.exe  --target=x86_64-none-linux-android --gcc-toolchain=C:/android-ndk-r16b/toolchains/x86_64-4.9/prebuilt/windows-x86_64 --sysroot=C:/android-ndk-r16b/sysroot   -std=c11 -isystem C:/android-ndk-r16b/sysroot/usr/include/x86_64-linux-android -D__ANDROID_API__=21 -g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -Wa,--noexecstack -Wformat -Werror=format-security   -D_LARGEFILE_SOURCE -D_LARGE_FILES -fPIE   -o CMakeFiles\cmTC_459f5.dir\CheckSymbolExists.c.o   -c C:\Users\Joseph\Documents\JanusVR\janus-vr\resources\openal-soft-1.17.2\CMakeFiles\CMakeTmp\CheckSymbolExists.c
+C:\Users\Joseph\Documents\JanusVR\janus-vr\resources\openal-soft-1.17.2\CMakeFiles\CMakeTmp\CheckSymbolExists.c:8:19: error: use of undeclared identifier 'aligned_alloc'
+  return ((int*)(&aligned_alloc))[argc];
+                  ^
+1 error generated.
+CMakeFiles\cmTC_459f5.dir\build.make:64: recipe for target 'CMakeFiles/cmTC_459f5.dir/CheckSymbolExists.c.o' failed
+mingw32-make.exe[1]: *** [CMakeFiles/cmTC_459f5.dir/CheckSymbolExists.c.o] Error 1
+mingw32-make.exe[1]: Leaving directory 'C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp'
+makefile:125: recipe for target 'cmTC_459f5/fast' failed
+mingw32-make.exe: *** [cmTC_459f5/fast] Error 2
+
+File C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <stdlib.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef aligned_alloc
+  return ((int*)(&aligned_alloc))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the _aligned_malloc exist failed with the following output:
+Change Dir: C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:/Qt/Tools/mingw492_32/bin/mingw32-make.exe" "cmTC_4f87e/fast"
+C:/Qt/Tools/mingw492_32/bin/mingw32-make.exe -f CMakeFiles\cmTC_4f87e.dir\build.make CMakeFiles/cmTC_4f87e.dir/build
+mingw32-make.exe[1]: Entering directory 'C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_4f87e.dir/CheckSymbolExists.c.o
+C:\android-ndk-r16b\toolchains\llvm\prebuilt\windows-x86_64\bin\clang.exe  --target=x86_64-none-linux-android --gcc-toolchain=C:/android-ndk-r16b/toolchains/x86_64-4.9/prebuilt/windows-x86_64 --sysroot=C:/android-ndk-r16b/sysroot   -std=c11 -isystem C:/android-ndk-r16b/sysroot/usr/include/x86_64-linux-android -D__ANDROID_API__=21 -g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -Wa,--noexecstack -Wformat -Werror=format-security   -D_LARGEFILE_SOURCE -D_LARGE_FILES -fPIE   -o CMakeFiles\cmTC_4f87e.dir\CheckSymbolExists.c.o   -c C:\Users\Joseph\Documents\JanusVR\janus-vr\resources\openal-soft-1.17.2\CMakeFiles\CMakeTmp\CheckSymbolExists.c
+C:\Users\Joseph\Documents\JanusVR\janus-vr\resources\openal-soft-1.17.2\CMakeFiles\CMakeTmp\CheckSymbolExists.c:8:19: error: use of undeclared identifier '_aligned_malloc'
+  return ((int*)(&_aligned_malloc))[argc];
+                  ^
+1 error generated.
+CMakeFiles\cmTC_4f87e.dir\build.make:64: recipe for target 'CMakeFiles/cmTC_4f87e.dir/CheckSymbolExists.c.o' failed
+mingw32-make.exe[1]: *** [CMakeFiles/cmTC_4f87e.dir/CheckSymbolExists.c.o] Error 1
+mingw32-make.exe[1]: Leaving directory 'C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp'
+makefile:125: recipe for target 'cmTC_4f87e/fast' failed
+mingw32-make.exe: *** [cmTC_4f87e/fast] Error 2
+
+File C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <malloc.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef _aligned_malloc
+  return ((int*)(&_aligned_malloc))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the _controlfp exist failed with the following output:
+Change Dir: C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:/Qt/Tools/mingw492_32/bin/mingw32-make.exe" "cmTC_3f467/fast"
+C:/Qt/Tools/mingw492_32/bin/mingw32-make.exe -f CMakeFiles\cmTC_3f467.dir\build.make CMakeFiles/cmTC_3f467.dir/build
+mingw32-make.exe[1]: Entering directory 'C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_3f467.dir/CheckSymbolExists.c.o
+C:\android-ndk-r16b\toolchains\llvm\prebuilt\windows-x86_64\bin\clang.exe  --target=x86_64-none-linux-android --gcc-toolchain=C:/android-ndk-r16b/toolchains/x86_64-4.9/prebuilt/windows-x86_64 --sysroot=C:/android-ndk-r16b/sysroot   -std=c11 -isystem C:/android-ndk-r16b/sysroot/usr/include/x86_64-linux-android -D__ANDROID_API__=21 -g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -Wa,--noexecstack -Wformat -Werror=format-security   -D_LARGEFILE_SOURCE -D_LARGE_FILES -fPIE   -o CMakeFiles\cmTC_3f467.dir\CheckSymbolExists.c.o   -c C:\Users\Joseph\Documents\JanusVR\janus-vr\resources\openal-soft-1.17.2\CMakeFiles\CMakeTmp\CheckSymbolExists.c
+C:\Users\Joseph\Documents\JanusVR\janus-vr\resources\openal-soft-1.17.2\CMakeFiles\CMakeTmp\CheckSymbolExists.c:8:19: error: use of undeclared identifier '_controlfp'
+  return ((int*)(&_controlfp))[argc];
+                  ^
+1 error generated.
+CMakeFiles\cmTC_3f467.dir\build.make:64: recipe for target 'CMakeFiles/cmTC_3f467.dir/CheckSymbolExists.c.o' failed
+mingw32-make.exe[1]: *** [CMakeFiles/cmTC_3f467.dir/CheckSymbolExists.c.o] Error 1
+mingw32-make.exe[1]: Leaving directory 'C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp'
+makefile:125: recipe for target 'cmTC_3f467/fast' failed
+mingw32-make.exe: *** [cmTC_3f467/fast] Error 2
+
+File C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <float.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef _controlfp
+  return ((int*)(&_controlfp))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the __control87_2 exist failed with the following output:
+Change Dir: C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:/Qt/Tools/mingw492_32/bin/mingw32-make.exe" "cmTC_d5e7c/fast"
+C:/Qt/Tools/mingw492_32/bin/mingw32-make.exe -f CMakeFiles\cmTC_d5e7c.dir\build.make CMakeFiles/cmTC_d5e7c.dir/build
+mingw32-make.exe[1]: Entering directory 'C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_d5e7c.dir/CheckSymbolExists.c.o
+C:\android-ndk-r16b\toolchains\llvm\prebuilt\windows-x86_64\bin\clang.exe  --target=x86_64-none-linux-android --gcc-toolchain=C:/android-ndk-r16b/toolchains/x86_64-4.9/prebuilt/windows-x86_64 --sysroot=C:/android-ndk-r16b/sysroot   -std=c11 -isystem C:/android-ndk-r16b/sysroot/usr/include/x86_64-linux-android -D__ANDROID_API__=21 -g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -Wa,--noexecstack -Wformat -Werror=format-security   -D_LARGEFILE_SOURCE -D_LARGE_FILES -fPIE   -o CMakeFiles\cmTC_d5e7c.dir\CheckSymbolExists.c.o   -c C:\Users\Joseph\Documents\JanusVR\janus-vr\resources\openal-soft-1.17.2\CMakeFiles\CMakeTmp\CheckSymbolExists.c
+C:\Users\Joseph\Documents\JanusVR\janus-vr\resources\openal-soft-1.17.2\CMakeFiles\CMakeTmp\CheckSymbolExists.c:8:19: error: use of undeclared identifier '__control87_2'
+  return ((int*)(&__control87_2))[argc];
+                  ^
+1 error generated.
+CMakeFiles\cmTC_d5e7c.dir\build.make:64: recipe for target 'CMakeFiles/cmTC_d5e7c.dir/CheckSymbolExists.c.o' failed
+mingw32-make.exe[1]: *** [CMakeFiles/cmTC_d5e7c.dir/CheckSymbolExists.c.o] Error 1
+mingw32-make.exe[1]: Leaving directory 'C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp'
+makefile:125: recipe for target 'cmTC_d5e7c/fast' failed
+mingw32-make.exe: *** [cmTC_d5e7c/fast] Error 2
+
+File C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <float.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef __control87_2
+  return ((int*)(&__control87_2))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the include file windows.h exists failed with the following output:
+Change Dir: C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:/Qt/Tools/mingw492_32/bin/mingw32-make.exe" "cmTC_bd1dc/fast"
+C:/Qt/Tools/mingw492_32/bin/mingw32-make.exe -f CMakeFiles\cmTC_bd1dc.dir\build.make CMakeFiles/cmTC_bd1dc.dir/build
+mingw32-make.exe[1]: Entering directory 'C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_bd1dc.dir/CheckIncludeFile.c.o
+C:\android-ndk-r16b\toolchains\llvm\prebuilt\windows-x86_64\bin\clang.exe  --target=x86_64-none-linux-android --gcc-toolchain=C:/android-ndk-r16b/toolchains/x86_64-4.9/prebuilt/windows-x86_64 --sysroot=C:/android-ndk-r16b/sysroot   -std=c11 -isystem C:/android-ndk-r16b/sysroot/usr/include/x86_64-linux-android -D__ANDROID_API__=21 -g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -Wa,--noexecstack -Wformat -Werror=format-security  -D_WIN32_WINNT=0x0502  -D_LARGEFILE_SOURCE -D_LARGE_FILES -fPIE   -o CMakeFiles\cmTC_bd1dc.dir\CheckIncludeFile.c.o   -c C:\Users\Joseph\Documents\JanusVR\janus-vr\resources\openal-soft-1.17.2\CMakeFiles\CMakeTmp\CheckIncludeFile.c
+C:\Users\Joseph\Documents\JanusVR\janus-vr\resources\openal-soft-1.17.2\CMakeFiles\CMakeTmp\CheckIncludeFile.c:1:10: fatal error: 'windows.h' file not found
+#include <windows.h>
+         ^~~~~~~~~~~
+1 error generated.
+CMakeFiles\cmTC_bd1dc.dir\build.make:64: recipe for target 'CMakeFiles/cmTC_bd1dc.dir/CheckIncludeFile.c.o' failed
+mingw32-make.exe[1]: *** [CMakeFiles/cmTC_bd1dc.dir/CheckIncludeFile.c.o] Error 1
+mingw32-make.exe[1]: Leaving directory 'C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp'
+makefile:125: recipe for target 'cmTC_bd1dc/fast' failed
+mingw32-make.exe: *** [cmTC_bd1dc/fast] Error 2
+
+
+Determining if files pthread.h;pthread_np.h exist failed with the following output:
+Change Dir: C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:/Qt/Tools/mingw492_32/bin/mingw32-make.exe" "cmTC_34015/fast"
+C:/Qt/Tools/mingw492_32/bin/mingw32-make.exe -f CMakeFiles\cmTC_34015.dir\build.make CMakeFiles/cmTC_34015.dir/build
+mingw32-make.exe[1]: Entering directory 'C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_34015.dir/CheckIncludeFiles.c.o
+C:\android-ndk-r16b\toolchains\llvm\prebuilt\windows-x86_64\bin\clang.exe  --target=x86_64-none-linux-android --gcc-toolchain=C:/android-ndk-r16b/toolchains/x86_64-4.9/prebuilt/windows-x86_64 --sysroot=C:/android-ndk-r16b/sysroot   -std=c11 -isystem C:/android-ndk-r16b/sysroot/usr/include/x86_64-linux-android -D__ANDROID_API__=21 -g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -Wa,--noexecstack -Wformat -Werror=format-security   -D_LARGEFILE_SOURCE -D_LARGE_FILES -fPIE   -o CMakeFiles\cmTC_34015.dir\CheckIncludeFiles.c.o   -c C:\Users\Joseph\Documents\JanusVR\janus-vr\resources\openal-soft-1.17.2\CMakeFiles\CMakeTmp\CheckIncludeFiles.c
+C:\Users\Joseph\Documents\JanusVR\janus-vr\resources\openal-soft-1.17.2\CMakeFiles\CMakeTmp\CheckIncludeFiles.c:3:10: fatal error: 'pthread_np.h' file not found
+#include <pthread_np.h>
+         ^~~~~~~~~~~~~~
+1 error generated.
+CMakeFiles\cmTC_34015.dir\build.make:64: recipe for target 'CMakeFiles/cmTC_34015.dir/CheckIncludeFiles.c.o' failed
+mingw32-make.exe[1]: *** [CMakeFiles/cmTC_34015.dir/CheckIncludeFiles.c.o] Error 1
+mingw32-make.exe[1]: Leaving directory 'C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp'
+makefile:125: recipe for target 'cmTC_34015/fast' failed
+mingw32-make.exe: *** [cmTC_34015/fast] Error 2
+
+Source:
+/* */
+#include <pthread.h>
+#include <pthread_np.h>
+
+
+int main(void){return 0;}
+
+Determining if the function pthread_create exists in the pthread failed with the following output:
+Change Dir: C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:/Qt/Tools/mingw492_32/bin/mingw32-make.exe" "cmTC_feb38/fast"
+C:/Qt/Tools/mingw492_32/bin/mingw32-make.exe -f CMakeFiles\cmTC_feb38.dir\build.make CMakeFiles/cmTC_feb38.dir/build
+mingw32-make.exe[1]: Entering directory 'C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_feb38.dir/CheckFunctionExists.c.o
+C:\android-ndk-r16b\toolchains\llvm\prebuilt\windows-x86_64\bin\clang.exe  --target=x86_64-none-linux-android --gcc-toolchain=C:/android-ndk-r16b/toolchains/x86_64-4.9/prebuilt/windows-x86_64 --sysroot=C:/android-ndk-r16b/sysroot   -std=c11 -isystem C:/android-ndk-r16b/sysroot/usr/include/x86_64-linux-android -D__ANDROID_API__=21 -g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -Wa,--noexecstack -Wformat -Werror=format-security  -DCHECK_FUNCTION_EXISTS=pthread_create  -D_LARGEFILE_SOURCE -D_LARGE_FILES -pthread -fPIE   -o CMakeFiles\cmTC_feb38.dir\CheckFunctionExists.c.o   -c C:\Android\sdk\cmake\3.6.3155560\share\cmake-3.6\Modules\CheckFunctionExists.c
+Linking C executable cmTC_feb38
+C:\Android\sdk\cmake\3.6.3155560\bin\cmake.exe -E cmake_link_script CMakeFiles\cmTC_feb38.dir\link.txt --verbose=1
+C:\android-ndk-r16b\toolchains\llvm\prebuilt\windows-x86_64\bin\clang.exe  --target=x86_64-none-linux-android --gcc-toolchain=C:/android-ndk-r16b/toolchains/x86_64-4.9/prebuilt/windows-x86_64 --sysroot=C:/android-ndk-r16b/sysroot -std=c11 -isystem C:/android-ndk-r16b/sysroot/usr/include/x86_64-linux-android -D__ANDROID_API__=21 -g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -Wa,--noexecstack -Wformat -Werror=format-security  -DCHECK_FUNCTION_EXISTS=pthread_create  -D_LARGEFILE_SOURCE -D_LARGE_FILES -pthread  -Wl,--exclude-libs,libgcc.a -Wl,--exclude-libs,libatomic.a --sysroot C:/android-ndk-r16b/platforms/android-21/arch-x86_64 -Wl,--build-id -Wl,--warn-shared-textrel -Wl,--fatal-warnings -Wl,--no-undefined -Wl,-z,noexecstack -Qunused-arguments -Wl,-z,relro -Wl,-z,now -Wl,--gc-sections -Wl,-z,nocopyreloc -pie -fPIE   CMakeFiles/cmTC_feb38.dir/CheckFunctionExists.c.o  -o cmTC_feb38 -lpthread -lm -ldl -latomic -lm 
+C:/android-ndk-r16b/toolchains/x86_64-4.9/prebuilt/windows-x86_64/lib/gcc/x86_64-linux-android/4.9.x/../../../../x86_64-linux-android/bin\ld: error: cannot find -lpthread
+clang.exe: error: linker command failed with exit code 1 (use -v to see invocation)
+CMakeFiles\cmTC_feb38.dir\build.make:96: recipe for target 'cmTC_feb38' failed
+mingw32-make.exe[1]: *** [cmTC_feb38] Error 1
+mingw32-make.exe[1]: Leaving directory 'C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp'
+makefile:125: recipe for target 'cmTC_feb38/fast' failed
+mingw32-make.exe: *** [cmTC_feb38/fast] Error 2
+
+
+Performing C SOURCE FILE Test PTHREAD_SETNAME_NP_ONE_PARAM failed with the following output:
+Change Dir: C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:/Qt/Tools/mingw492_32/bin/mingw32-make.exe" "cmTC_06425/fast"
+C:/Qt/Tools/mingw492_32/bin/mingw32-make.exe -f CMakeFiles\cmTC_06425.dir\build.make CMakeFiles/cmTC_06425.dir/build
+mingw32-make.exe[1]: Entering directory 'C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_06425.dir/src.c.o
+C:\android-ndk-r16b\toolchains\llvm\prebuilt\windows-x86_64\bin\clang.exe  --target=x86_64-none-linux-android --gcc-toolchain=C:/android-ndk-r16b/toolchains/x86_64-4.9/prebuilt/windows-x86_64 --sysroot=C:/android-ndk-r16b/sysroot   -std=c11 -isystem C:/android-ndk-r16b/sysroot/usr/include/x86_64-linux-android -D__ANDROID_API__=21 -g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -Wa,--noexecstack -Wformat -Werror=format-security  -DPTHREAD_SETNAME_NP_ONE_PARAM  -D_LARGEFILE_SOURCE -D_LARGE_FILES -pthread -fPIE   -o CMakeFiles\cmTC_06425.dir\src.c.o   -c C:\Users\Joseph\Documents\JanusVR\janus-vr\resources\openal-soft-1.17.2\CMakeFiles\CMakeTmp\src.c
+C:\Users\Joseph\Documents\JanusVR\janus-vr\resources\openal-soft-1.17.2\CMakeFiles\CMakeTmp\src.c:5:34: error: too few arguments to function call, expected 2, have 1
+    pthread_setname_np("testname");
+    ~~~~~~~~~~~~~~~~~~           ^
+C:/android-ndk-r16b/sysroot/usr/include\pthread.h:248:1: note: 'pthread_setname_np' declared here
+int pthread_setname_np(pthread_t __pthread, const char* __name);
+^
+1 error generated.
+CMakeFiles\cmTC_06425.dir\build.make:64: recipe for target 'CMakeFiles/cmTC_06425.dir/src.c.o' failed
+mingw32-make.exe[1]: *** [CMakeFiles/cmTC_06425.dir/src.c.o] Error 1
+mingw32-make.exe[1]: Leaving directory 'C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp'
+makefile:125: recipe for target 'cmTC_06425/fast' failed
+mingw32-make.exe: *** [cmTC_06425/fast] Error 2
+
+Source file was:
+
+#include <pthread.h>
+int main()
+{
+    pthread_setname_np("testname");
+    return 0;
+}
+Determining if the pthread_mutexattr_setkind_np exist failed with the following output:
+Change Dir: C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:/Qt/Tools/mingw492_32/bin/mingw32-make.exe" "cmTC_53169/fast"
+C:/Qt/Tools/mingw492_32/bin/mingw32-make.exe -f CMakeFiles\cmTC_53169.dir\build.make CMakeFiles/cmTC_53169.dir/build
+mingw32-make.exe[1]: Entering directory 'C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_53169.dir/CheckSymbolExists.c.o
+C:\android-ndk-r16b\toolchains\llvm\prebuilt\windows-x86_64\bin\clang.exe  --target=x86_64-none-linux-android --gcc-toolchain=C:/android-ndk-r16b/toolchains/x86_64-4.9/prebuilt/windows-x86_64 --sysroot=C:/android-ndk-r16b/sysroot   -std=c11 -isystem C:/android-ndk-r16b/sysroot/usr/include/x86_64-linux-android -D__ANDROID_API__=21 -g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -Wa,--noexecstack -Wformat -Werror=format-security   -D_LARGEFILE_SOURCE -D_LARGE_FILES -pthread -fPIE   -o CMakeFiles\cmTC_53169.dir\CheckSymbolExists.c.o   -c C:\Users\Joseph\Documents\JanusVR\janus-vr\resources\openal-soft-1.17.2\CMakeFiles\CMakeTmp\CheckSymbolExists.c
+C:\Users\Joseph\Documents\JanusVR\janus-vr\resources\openal-soft-1.17.2\CMakeFiles\CMakeTmp\CheckSymbolExists.c:8:19: error: use of undeclared identifier 'pthread_mutexattr_setkind_np'
+  return ((int*)(&pthread_mutexattr_setkind_np))[argc];
+                  ^
+1 error generated.
+CMakeFiles\cmTC_53169.dir\build.make:64: recipe for target 'CMakeFiles/cmTC_53169.dir/CheckSymbolExists.c.o' failed
+mingw32-make.exe[1]: *** [CMakeFiles/cmTC_53169.dir/CheckSymbolExists.c.o] Error 1
+mingw32-make.exe[1]: Leaving directory 'C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp'
+makefile:125: recipe for target 'cmTC_53169/fast' failed
+mingw32-make.exe: *** [cmTC_53169/fast] Error 2
+
+File C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_mutexattr_setkind_np
+  return ((int*)(&pthread_mutexattr_setkind_np))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the function clock_gettime exists in the rt failed with the following output:
+Change Dir: C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:/Qt/Tools/mingw492_32/bin/mingw32-make.exe" "cmTC_f6b18/fast"
+C:/Qt/Tools/mingw492_32/bin/mingw32-make.exe -f CMakeFiles\cmTC_f6b18.dir\build.make CMakeFiles/cmTC_f6b18.dir/build
+mingw32-make.exe[1]: Entering directory 'C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_f6b18.dir/CheckFunctionExists.c.o
+C:\android-ndk-r16b\toolchains\llvm\prebuilt\windows-x86_64\bin\clang.exe  --target=x86_64-none-linux-android --gcc-toolchain=C:/android-ndk-r16b/toolchains/x86_64-4.9/prebuilt/windows-x86_64 --sysroot=C:/android-ndk-r16b/sysroot   -std=c11 -isystem C:/android-ndk-r16b/sysroot/usr/include/x86_64-linux-android -D__ANDROID_API__=21 -g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -Wa,--noexecstack -Wformat -Werror=format-security  -DCHECK_FUNCTION_EXISTS=clock_gettime  -D_LARGEFILE_SOURCE -D_LARGE_FILES -pthread -fPIE   -o CMakeFiles\cmTC_f6b18.dir\CheckFunctionExists.c.o   -c C:\Android\sdk\cmake\3.6.3155560\share\cmake-3.6\Modules\CheckFunctionExists.c
+Linking C executable cmTC_f6b18
+C:\Android\sdk\cmake\3.6.3155560\bin\cmake.exe -E cmake_link_script CMakeFiles\cmTC_f6b18.dir\link.txt --verbose=1
+C:\android-ndk-r16b\toolchains\llvm\prebuilt\windows-x86_64\bin\clang.exe  --target=x86_64-none-linux-android --gcc-toolchain=C:/android-ndk-r16b/toolchains/x86_64-4.9/prebuilt/windows-x86_64 --sysroot=C:/android-ndk-r16b/sysroot -std=c11 -isystem C:/android-ndk-r16b/sysroot/usr/include/x86_64-linux-android -D__ANDROID_API__=21 -g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -Wa,--noexecstack -Wformat -Werror=format-security  -DCHECK_FUNCTION_EXISTS=clock_gettime  -D_LARGEFILE_SOURCE -D_LARGE_FILES -pthread  -Wl,--exclude-libs,libgcc.a -Wl,--exclude-libs,libatomic.a --sysroot C:/android-ndk-r16b/platforms/android-21/arch-x86_64 -Wl,--build-id -Wl,--warn-shared-textrel -Wl,--fatal-warnings -Wl,--no-undefined -Wl,-z,noexecstack -Qunused-arguments -Wl,-z,relro -Wl,-z,now -Wl,--gc-sections -Wl,-z,nocopyreloc -pie -fPIE   CMakeFiles/cmTC_f6b18.dir/CheckFunctionExists.c.o  -o cmTC_f6b18 -lrt -lm -ldl -latomic -lm 
+C:/android-ndk-r16b/toolchains/x86_64-4.9/prebuilt/windows-x86_64/lib/gcc/x86_64-linux-android/4.9.x/../../../../x86_64-linux-android/bin\ld: error: cannot find -lrt
+clang.exe: error: linker command failed with exit code 1 (use -v to see invocation)
+CMakeFiles\cmTC_f6b18.dir\build.make:96: recipe for target 'cmTC_f6b18' failed
+mingw32-make.exe[1]: *** [cmTC_f6b18] Error 1
+mingw32-make.exe[1]: Leaving directory 'C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp'
+makefile:125: recipe for target 'cmTC_f6b18/fast' failed
+mingw32-make.exe: *** [cmTC_f6b18/fast] Error 2
+
+
+Determining if the include file arm_neon.h exists failed with the following output:
+Change Dir: C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:/Qt/Tools/mingw492_32/bin/mingw32-make.exe" "cmTC_10f7c/fast"
+C:/Qt/Tools/mingw492_32/bin/mingw32-make.exe -f CMakeFiles\cmTC_10f7c.dir\build.make CMakeFiles/cmTC_10f7c.dir/build
+mingw32-make.exe[1]: Entering directory 'C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_10f7c.dir/CheckIncludeFile.c.o
+C:\android-ndk-r16b\toolchains\llvm\prebuilt\windows-x86_64\bin\clang.exe  --target=x86_64-none-linux-android --gcc-toolchain=C:/android-ndk-r16b/toolchains/x86_64-4.9/prebuilt/windows-x86_64 --sysroot=C:/android-ndk-r16b/sysroot   -std=c11 -isystem C:/android-ndk-r16b/sysroot/usr/include/x86_64-linux-android -D__ANDROID_API__=21 -g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -Wa,--noexecstack -Wformat -Werror=format-security   -D_LARGEFILE_SOURCE -D_LARGE_FILES -pthread -fPIE   -o CMakeFiles\cmTC_10f7c.dir\CheckIncludeFile.c.o   -c C:\Users\Joseph\Documents\JanusVR\janus-vr\resources\openal-soft-1.17.2\CMakeFiles\CMakeTmp\CheckIncludeFile.c
+In file included from C:\Users\Joseph\Documents\JanusVR\janus-vr\resources\openal-soft-1.17.2\CMakeFiles\CMakeTmp\CheckIncludeFile.c:1:
+C:\android-ndk-r16b\toolchains\llvm\prebuilt\windows-x86_64\lib64\clang\5.0.300080\include\arm_neon.h:28:2: error: "NEON support not enabled"
+#error "NEON support not enabled"
+ ^
+C:\android-ndk-r16b\toolchains\llvm\prebuilt\windows-x86_64\lib64\clang\5.0.300080\include\arm_neon.h:48:24: error: 'neon_vector_type' attribute is not supported for this target
+typedef __attribute__((neon_vector_type(8))) int8_t int8x8_t;
+                       ^
+C:\android-ndk-r16b\toolchains\llvm\prebuilt\windows-x86_64\lib64\clang\5.0.300080\include\arm_neon.h:49:24: error: 'neon_vector_type' attribute is not supported for this target
+typedef __attribute__((neon_vector_type(16))) int8_t int8x16_t;
+                       ^
+C:\android-ndk-r16b\toolchains\llvm\prebuilt\windows-x86_64\lib64\clang\5.0.300080\include\arm_neon.h:50:24: error: 'neon_vector_type' attribute is not supported for this target
+typedef __attribute__((neon_vector_type(4))) int16_t int16x4_t;
+                       ^
+C:\android-ndk-r16b\toolchains\llvm\prebuilt\windows-x86_64\lib64\clang\5.0.300080\include\arm_neon.h:51:24: error: 'neon_vector_type' attribute is not supported for this target
+typedef __attribute__((neon_vector_type(8))) int16_t int16x8_t;
+                       ^
+C:\android-ndk-r16b\toolchains\llvm\prebuilt\windows-x86_64\lib64\clang\5.0.300080\include\arm_neon.h:52:24: error: 'neon_vector_type' attribute is not supported for this target
+typedef __attribute__((neon_vector_type(2))) int32_t int32x2_t;
+                       ^
+C:\android-ndk-r16b\toolchains\llvm\prebuilt\windows-x86_64\lib64\clang\5.0.300080\include\arm_neon.h:53:24: error: 'neon_vector_type' attribute is not supported for this target
+typedef __attribute__((neon_vector_type(4))) int32_t int32x4_t;
+                       ^
+C:\android-ndk-r16b\toolchains\llvm\prebuilt\windows-x86_64\lib64\clang\5.0.300080\include\arm_neon.h:54:24: error: 'neon_vector_type' attribute is not supported for this target
+typedef __attribute__((neon_vector_type(1))) int64_t int64x1_t;
+                       ^
+C:\android-ndk-r16b\toolchains\llvm\prebuilt\windows-x86_64\lib64\clang\5.0.300080\include\arm_neon.h:55:24: error: 'neon_vector_type' attribute is not supported for this target
+typedef __attribute__((neon_vector_type(2))) int64_t int64x2_t;
+                       ^
+C:\android-ndk-r16b\toolchains\llvm\prebuilt\windows-x86_64\lib64\clang\5.0.300080\include\arm_neon.h:56:24: error: 'neon_vector_type' attribute is not supported for this target
+typedef __attribute__((neon_vector_type(8))) uint8_t uint8x8_t;
+                       ^
+C:\android-ndk-r16b\toolchains\llvm\prebuilt\windows-x86_64\lib64\clang\5.0.300080\include\arm_neon.h:57:24: error: 'neon_vector_type' attribute is not supported for this target
+typedef __attribute__((neon_vector_type(16))) uint8_t uint8x16_t;
+                       ^
+C:\android-ndk-r16b\toolchains\llvm\prebuilt\windows-x86_64\lib64\clang\5.0.300080\include\arm_neon.h:58:24: error: 'neon_vector_type' attribute is not supported for this target
+typedef __attribute__((neon_vector_type(4))) uint16_t uint16x4_t;
+                       ^
+C:\android-ndk-r16b\toolchains\llvm\prebuilt\windows-x86_64\lib64\clang\5.0.300080\include\arm_neon.h:59:24: error: 'neon_vector_type' attribute is not supported for this target
+typedef __attribute__((neon_vector_type(8))) uint16_t uint16x8_t;
+                       ^
+C:\android-ndk-r16b\toolchains\llvm\prebuilt\windows-x86_64\lib64\clang\5.0.300080\include\arm_neon.h:60:24: error: 'neon_vector_type' attribute is not supported for this target
+typedef __attribute__((neon_vector_type(2))) uint32_t uint32x2_t;
+                       ^
+C:\android-ndk-r16b\toolchains\llvm\prebuilt\windows-x86_64\lib64\clang\5.0.300080\include\arm_neon.h:61:24: error: 'neon_vector_type' attribute is not supported for this target
+typedef __attribute__((neon_vector_type(4))) uint32_t uint32x4_t;
+                       ^
+C:\android-ndk-r16b\toolchains\llvm\prebuilt\windows-x86_64\lib64\clang\5.0.300080\include\arm_neon.h:62:24: error: 'neon_vector_type' attribute is not supported for this target
+typedef __attribute__((neon_vector_type(1))) uint64_t uint64x1_t;
+                       ^
+C:\android-ndk-r16b\toolchains\llvm\prebuilt\windows-x86_64\lib64\clang\5.0.300080\include\arm_neon.h:63:24: error: 'neon_vector_type' attribute is not supported for this target
+typedef __attribute__((neon_vector_type(2))) uint64_t uint64x2_t;
+                       ^
+C:\android-ndk-r16b\toolchains\llvm\prebuilt\windows-x86_64\lib64\clang\5.0.300080\include\arm_neon.h:64:24: error: 'neon_vector_type' attribute is not supported for this target
+typedef __attribute__((neon_vector_type(4))) float16_t float16x4_t;
+                       ^
+C:\android-ndk-r16b\toolchains\llvm\prebuilt\windows-x86_64\lib64\clang\5.0.300080\include\arm_neon.h:65:24: error: 'neon_vector_type' attribute is not supported for this target
+typedef __attribute__((neon_vector_type(8))) float16_t float16x8_t;
+                       ^
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+20 errors generated.
+CMakeFiles\cmTC_10f7c.dir\build.make:64: recipe for target 'CMakeFiles/cmTC_10f7c.dir/CheckIncludeFile.c.o' failed
+mingw32-make.exe[1]: *** [CMakeFiles/cmTC_10f7c.dir/CheckIncludeFile.c.o] Error 1
+mingw32-make.exe[1]: Leaving directory 'C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/CMakeFiles/CMakeTmp'
+makefile:125: recipe for target 'cmTC_10f7c/fast' failed
+mingw32-make.exe: *** [cmTC_10f7c/fast] Error 2
+
+

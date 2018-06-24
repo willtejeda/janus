@@ -1,0 +1,2 @@
+C:\android-ndk-r16b\toolchains\x86_64-4.9\prebuilt\windows-x86_64\bin\x86_64-linux-android-ar.exe qc libtest-common.a  CMakeFiles/test-common.dir/examples/common/alhelpers.c.o
+C:\android-ndk-r16b\toolchains\x86_64-4.9\prebuilt\windows-x86_64\bin\x86_64-linux-android-ranlib.exe libtest-common.a

@@ -1,0 +1,2 @@
+C:\android-ndk-r16b\toolchains\x86_64-4.9\prebuilt\windows-x86_64\bin\x86_64-linux-android-ar.exe qc libcommon.a  CMakeFiles/common.dir/common/atomic.c.o CMakeFiles/common.dir/common/rwlock.c.o CMakeFiles/common.dir/common/threads.c.o CMakeFiles/common.dir/common/uintmap.c.o
+C:\android-ndk-r16b\toolchains\x86_64-4.9\prebuilt\windows-x86_64\bin\x86_64-linux-android-ranlib.exe libcommon.a

@@ -1,0 +1,16 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/openal-soft-1.17.2/utils/bsincgen.c
+stdio.h
+-
+math.h
+-
+string.h
+-
+

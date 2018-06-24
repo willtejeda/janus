@@ -1,0 +1,14 @@
+ImfVersion.lo: ImfVersion.cpp /usr/include/stdc-predef.h ImfVersion.h \
+ ImfExport.h ImfNamespace.h ../config/OpenEXRConfig.h ImfNamespace.h
+
+/usr/include/stdc-predef.h:
+
+ImfVersion.h:
+
+ImfExport.h:
+
+ImfNamespace.h:
+
+../config/OpenEXRConfig.h:
+
+ImfNamespace.h:

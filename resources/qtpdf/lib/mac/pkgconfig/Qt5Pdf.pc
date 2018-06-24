@@ -1,0 +1,14 @@
+prefix=/Users/mccrae/Qt/5.5/clang_64
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+
+Name: Qt5 Pdf
+Description: Qt Pdf module
+Version: 5.9.0
+Libs: -F${libdir} '-framework QtPdf ' 
+Libs.private: -F/Users/mccrae/Qt/5.5/clang_64/lib -framework QtGui -framework QtCore -framework DiskArbitration -framework IOKit -L/Users/mccrae/Downloads/qtpdf/lib -lqtpdfium_debug -framework AppKit -framework CoreFoundation -framework QtNetwork -F/Users/mccrae/Qt/5.5/clang_64/lib -framework QtCore -framework DiskArbitration -framework IOKit -framework OpenGL -framework AGL  
+Cflags: -I${includedir}/QtPdf -I${includedir}
+Requires: Qt5Core Qt5Gui
+
