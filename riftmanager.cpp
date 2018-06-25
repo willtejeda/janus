@@ -24,7 +24,7 @@ RiftManager::RiftManager()
     m_eye_projection_matrices.resize(4);
 
 #ifdef OCULUS_SUBMISSION_BUILD
-    if (ovr_PlatformInitializeWindows("***RIFT APP ID HERE***") != ovrPlatformInitialize_Success) {
+    if (ovr_PlatformInitializeWindows(RIFT_ID) != ovrPlatformInitialize_Success) {
         qDebug() << "ovr_PlatformInitializeWindows failed!";
         entitled = false;
     }    

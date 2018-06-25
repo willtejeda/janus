@@ -6,10 +6,11 @@ https://www.gnu.org/licenses/gpl.html
 
 Additional deployment notes:
 
-Updates are needed to riftmanager.cpp, gearmanager.cpp, 
-and analytics.cpp with specific app IDs where necessary
-(for publishing to platforms like Oculus Home or 
-Android/Google Play storefronts).  Generate a key store 
+Before building, copy and rename the following: riftid.txt.sample
+to riftid.txt, gearid.txt.sample to gearid.txt, and
+googleanalyticsid.txt.sample to googleanalytics.txt. Update these files
+with specific app IDs where necessary (for publishing to platforms
+like Oculus Home or Android/Google Play storefronts).  Generate a key store 
 file to build a signed version for Android.
 
 Building on windows
