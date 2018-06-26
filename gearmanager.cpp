@@ -72,7 +72,7 @@ GearManager::GearManager()
     java.ActivityObject = jniEnv->NewGlobalRef(objAct);
 
 #ifdef OCULUS_SUBMISSION_BUILD
-    if (ovr_PlatformInitializeAndroid("***GEARVR APP ID HERE***", java.ActivityObject, java.Env) != ovrPlatformInitialize_Success) {
+    if (ovr_PlatformInitializeAndroid(GEAR_ID, java.ActivityObject, java.Env) != ovrPlatformInitialize_Success) {
         qDebug() << "ovr_PlatformInitializeWindows failed!";
         entitled = false;
     }

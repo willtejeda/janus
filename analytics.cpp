@@ -83,7 +83,7 @@ void Analytics::Post(QHash<QString, QString> analytics)
         QUrlQuery query;
         query.addQueryItem("v", "1"); // Version
 
-        query.addQueryItem("tid", "***GOOGLE ANALYTICS TRACKING ID HERE***"); // Tracking ID use value assigned by Google Analytics
+        query.addQueryItem("tid", GOOGLE_ANALYTICS_ID); // Tracking ID use value assigned by Google Analytics
         query.addQueryItem("cid", client_id.toString().remove("{").remove("}")); // Client ID
 
         if (analytics.contains("t")){

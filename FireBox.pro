@@ -14,6 +14,9 @@ DEFINES += DAYDREAM_SUBMISSION_BUILD
 
 DEFINES += __JANUS_VERSION=\\\"$$__VERSION\\\"
 DEFINES += __JANUS_VERSION_COMPLETE=__JANUS_VERSION\\\".$$system(git --git-dir ./.git --work-tree . describe --always --tags --abbrev=7)\\\"
+DEFINES += RIFT_ID=\\\"$$system(more riftid.txt)\\\"
+DEFINES += GEAR_ID=\\\"$$system(more gearid.txt)\\\"
+DEFINES += GOOGLE_ANALYTICS_ID=\\\"$$system(more googleanalyticsid.txt)\\\"
 
 # Default rules for deployment.
 android:include(deployment.pri)
