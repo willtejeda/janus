@@ -17,6 +17,7 @@ Makefile
 riftid.txt
 gearid.txt
 googleanalyticsid.txt
+/android/keystore.properties
 
 dependencies/android/arm64-v8a/libxul.so
 

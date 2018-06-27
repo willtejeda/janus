@@ -6,12 +6,15 @@ https://www.gnu.org/licenses/gpl.html
 
 Additional deployment notes:
 
-Before building, copy and rename the following: riftid.txt.sample
+- Before building, copy and rename the following: riftid.txt.sample
 to riftid.txt, gearid.txt.sample to gearid.txt, and
 googleanalyticsid.txt.sample to googleanalytics.txt. Update these files
 with specific app IDs where necessary (for publishing to platforms
-like Oculus Home or Android/Google Play storefronts).  Generate a key store 
-file to build a signed version for Android.
+like Oculus Home or Android/Google Play storefronts).
+- In order to build a signed version for Android, a key store file
+must be generated. Copy and rename the following:
+android/keystore.properties.sample to android/keystore.properties.
+Update this file with the correct values of the generated keystore.
 
 Building on windows
 ===================

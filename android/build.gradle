@@ -29,6 +29,13 @@ dependencies {
     //compile 'org.mozilla:geckoview-nightly-armeabi-v7a:61.0.20180427102247'
 }
 
+/*
+//Used to sign Gear/Go build
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+*/
+
 android {
     /*******************************************************
      * The following variables:
@@ -72,14 +79,15 @@ android {
         versionName "60.00"
     }
 
-    /*signingConfigs {
+    /*
+    //Used to sign Gear/Go build
+    signingConfigs {
         release {
-            storeFile file("../../android_release.keystore")
-            storePassword "***STORE PASSWORD HERE***"
-            keyAlias "***KEY ALIAS HERE***"
-            keyPassword "***KEY PASSWORD HERE***"
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
 
-            //For Go build
             v2SigningEnabled false
         }
     }
@@ -88,5 +96,6 @@ android {
         release {
             signingConfig signingConfigs.release
         }
-    }*/
+    }
+    */
 }
