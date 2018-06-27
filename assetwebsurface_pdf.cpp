@@ -254,7 +254,7 @@ void AssetWebSurface_PDF::UpdateGL()
         if (!temp_image.isNull()) {
             //tex = MathUtil::CreateTextureGL(QSize(width, height), true, true, true); //100+ms
             if (!m_texture_handle) {
-                m_texture_handle = RendererInterface::m_pimpl->CreateTextureQImage(temp_image, true, true, true, TextureHandle::ALPHA_TYPE::BLENDED, TextureHandle::COLOR_SPACE::SRGB);
+                m_texture_handle = RendererInterface::m_pimpl->CreateTextureQImage(temp_image, true, true, false, TextureHandle::ALPHA_TYPE::BLENDED, TextureHandle::COLOR_SPACE::SRGB);
             }
             else {
                 RendererInterface::m_pimpl->UpdateTextureHandleData(m_texture_handle.get(), 0 ,0, 0,

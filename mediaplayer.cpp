@@ -322,7 +322,7 @@ void MediaPlayer::UpdateTexture(MediaContext * ctx)
         {
             if (ctx->m_texture_handles[0] == nullptr || ctx->m_texture_handles[0] == AssetImage::null_image_tex_handle)
             {
-                ctx->m_texture_handles[0] = RendererInterface::m_pimpl->CreateTextureQImage(ctx->img[0], true, true, true, TextureHandle::ALPHA_TYPE::NONE, TextureHandle::COLOR_SPACE::SRGB);
+                ctx->m_texture_handles[0] = RendererInterface::m_pimpl->CreateTextureQImage(ctx->img[0], true, true, false, TextureHandle::ALPHA_TYPE::NONE, TextureHandle::COLOR_SPACE::SRGB);
             }
             else
             {
@@ -352,7 +352,7 @@ void MediaPlayer::UpdateLeftRightTextures(MediaContext * ctx)
             {
                 if (!ctx->m_texture_handles[i] || ctx->m_texture_handles[i] == AssetImage::null_image_tex_handle)
                 {
-                    ctx->m_texture_handles[i] = RendererInterface::m_pimpl->CreateTextureQImage(ctx->img[i], true, true, true, TextureHandle::ALPHA_TYPE::NONE, TextureHandle::COLOR_SPACE::SRGB);
+                    ctx->m_texture_handles[i] = RendererInterface::m_pimpl->CreateTextureQImage(ctx->img[i], true, true, false, TextureHandle::ALPHA_TYPE::NONE, TextureHandle::COLOR_SPACE::SRGB);
                 }
                 else
                 {
