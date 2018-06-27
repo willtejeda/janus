@@ -51,6 +51,7 @@ public:
   CEFApp();
 
   CefRefPtr<CefRenderProcessHandler> GetRenderProcessHandler();
+  void OnBeforeCommandLineProcessing(const CefString& process_type, CefRefPtr<CefCommandLine> command_line);
 
 public:
   // Provide the reference counting implementation for this class.

@@ -36,6 +36,19 @@ CefRefPtr<CefRenderProcessHandler> CEFApp::GetRenderProcessHandler()
     return renderProcessHandler;
 }
 
+void CEFApp::OnBeforeCommandLineProcessing(
+        const CefString& process_type,
+        CefRefPtr<CefCommandLine> command_line)
+{
+    //Use AppendSwitch if the switch doesn't need a value to be set
+    command_line->AppendSwitchWithValue("--limit-fps", "60");
+    command_line->AppendSwitchWithValue("--renderer-process-limit", "3");
+    command_line->AppendSwitchWithValue("--memory-pressure-thresholds-mb", "512");
+    command_line->AppendSwitchWithValue("--force-gpu-mem-available-mb", "512");
+    command_line->AppendSwitchWithValue("--process-per-site", "1");
+    CefApp::OnBeforeCommandLineProcessing(process_type, command_line);
+}
+
 bool CEFV8Handler::Execute(const CefString& name,
                            CefRefPtr<CefV8Value> object,
                            const CefV8ValueList& arguments,
