@@ -58,9 +58,6 @@ public slots:
     void SlotSetShowLoadingIcon();
     void SlotSetShowViewJoystick();
 
-    void SlotSetDefaultHeadsetDaydream();
-    void SlotSetDefaultHeadsetGear();
-
     QTabWidget * GetTabWidget();
 
 protected:
@@ -119,9 +116,6 @@ private:
     QCheckBox * checkbox_showsplash;
     QCheckBox * checkbox_showloadingicon;
     QCheckBox * checkbox_showviewjoystick;
-
-    QRadioButton * radiobutton_daydream;
-    QRadioButton * radiobutton_gear;
 #endif
 
     QTabWidget * tab_widget;

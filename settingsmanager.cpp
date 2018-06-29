@@ -83,11 +83,6 @@ void SettingsManager::LoadSettings()
     settings["websurfaceurl"] = QString("https://google.com");
 #ifdef __ANDROID__
     settings["renderportalrooms"] = false;
-#ifdef OCULUS_SUBMISSION_BUILD
-    settings["defaultheadset"] = "gear"; //Gear and Go
-#else
-    settings["defaultheadset"] = "daydream"; // Daydream and Cardboard
-#endif
 #else
     settings["renderportalrooms"] = true;
 #endif
@@ -552,10 +547,3 @@ bool SettingsManager::GetRenderPortalRooms()
 {
     return settings["renderportalrooms"].toBool();
 }
-
-#ifdef __ANDROID__
-QString SettingsManager::GetDefaultHeadset()
-{
-    return settings["defaultheadset"].toString();
-}
-#endif

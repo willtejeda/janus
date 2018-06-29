@@ -79,7 +79,6 @@ public:
     static bool GetShowSplash();
     static bool GetShowLoadingIcon();
     static bool GetShowViewJoystick();
-    static QString GetDefaultHeadset();
 #endif
 
     //demo-mode specific (from demo.json in app binary dir)

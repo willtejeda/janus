@@ -243,14 +243,6 @@ QWidget * SettingsWindow::GetVRWidget()
     checkbox_usevr = new QCheckBox();
     checkbox_usevr->setText("Launch in VR");
     connect(checkbox_usevr, SIGNAL(clicked(bool)), this, SLOT(SlotSetLaunchInVR()));
-
-    radiobutton_daydream = new QRadioButton();
-    radiobutton_daydream->setText("Daydream/Cardboard");
-    connect(radiobutton_daydream, SIGNAL(clicked(bool)), this, SLOT(SlotSetDefaultHeadsetDaydream()));
-
-    radiobutton_gear = new QRadioButton();
-    radiobutton_gear->setText("Gear");
-    connect(radiobutton_gear, SIGNAL(clicked(bool)), this, SLOT(SlotSetDefaultHeadsetGear()));
 #endif
 
     QFormLayout * vr_layout = new QFormLayout();
@@ -260,15 +252,6 @@ QWidget * SettingsWindow::GetVRWidget()
     vr_layout->addRow(checkbox_vivetrackpadmovement);
 #else
     vr_layout->addRow(checkbox_usevr);
-
-#if !defined(OCULUS_SUBMISSION_BUILD) && !defined(DAYDREAM_SUBMISSION_BUILD)
-    QGroupBox *default_headset_groupbox = new QGroupBox(tr("Default Headset"));
-    QVBoxLayout *vbox = new QVBoxLayout();
-    vbox->addWidget(radiobutton_daydream);
-    vbox->addWidget(radiobutton_gear);
-    default_headset_groupbox->setLayout(vbox);
-    vr_layout->addRow(default_headset_groupbox);
-#endif
 #endif
 
     QWidget * w = new QWidget();
@@ -368,11 +351,6 @@ void SettingsWindow::Update()
     checkbox_showloadingicon->setChecked(SettingsManager::GetShowLoadingIcon());
     checkbox_showviewjoystick->setChecked(SettingsManager::GetShowViewJoystick());
     checkbox_usevr->setChecked(SettingsManager::GetUseVR());
-
-    if (SettingsManager::settings["defaultheadset"].toString() == "daydream")
-        radiobutton_daydream->setChecked(true);
-    else if (SettingsManager::settings["defaultheadset"].toString() == "gear")
-        radiobutton_gear->setChecked(true);
 #endif
 }
 
@@ -596,18 +574,6 @@ void SettingsWindow::SlotSetShowViewJoystick()
 void SettingsWindow::SlotSetLaunchInVR()
 {
     SettingsManager::settings["usevr"] = checkbox_usevr->isChecked();
-    SettingsManager::SaveSettings();
-}
-
-void SettingsWindow::SlotSetDefaultHeadsetDaydream()
-{
-    SettingsManager::settings["defaultheadset"] = "daydream";
-    SettingsManager::SaveSettings();
-}
-
-void SettingsWindow::SlotSetDefaultHeadsetGear()
-{
-    SettingsManager::settings["defaultheadset"] = "gear";
     SettingsManager::SaveSettings();
 }
 
