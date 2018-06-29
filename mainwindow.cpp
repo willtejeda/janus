@@ -194,8 +194,11 @@ MainWindow::MainWindow()
             disp_mode = MODE_2D;
         }
 #elif defined(DAYDREAM_SUBMISSION_BUILD)
-        hmd_manager = new GVRManager();
-        bool enabled = hmd_manager->Initialize();
+        bool enabled = false;
+        if (!require_permissions || SettingsManager::GetUseVR() || JNIUtil::GetLaunchInVR()) {
+            hmd_manager = new GVRManager();
+            enabled = hmd_manager->Initialize();
+        }
 
         if (SettingsManager::GetUseVR() || JNIUtil::GetLaunchInVR()){
             disp_mode = MODE_GVR;
@@ -221,16 +224,19 @@ MainWindow::MainWindow()
         }
 #else
         //qDebug() << "HEADSET" <<SettingsManager::GetDefaultHeadset();
+        bool enabled = false;
         if (SettingsManager::GetDefaultHeadset() == "daydream"){
-            hmd_manager = new GVRManager();
+            if (!require_permissions || SettingsManager::GetUseVR() || JNIUtil::GetLaunchInVR()) {
+                hmd_manager = new GVRManager();
+                enabled = hmd_manager->Initialize();
+            }
         }
         else if (SettingsManager::GetDefaultHeadset() == "gear"){
             hmd_manager = new GearManager();
+            enabled = hmd_manager->Initialize();
         }
 
-        bool enabled = hmd_manager->Initialize();
-
-        if (SettingsManager::GetUseVR() || JNIUtil::GetLaunchInVR() || hmd_manager->GetHMDType() == "go"){
+        if (SettingsManager::GetUseVR() || JNIUtil::GetLaunchInVR() || (hmd_manager && hmd_manager->GetHMDType() == "go")){
             if (SettingsManager::GetDefaultHeadset() == "daydream"){
                 disp_mode = MODE_GVR;
             }
@@ -243,13 +249,15 @@ MainWindow::MainWindow()
                 hmd_manager.clear();
                 if (SettingsManager::GetDefaultHeadset() == "daydream"){
                     hmd_manager = new GearManager();
+                    enabled = hmd_manager->Initialize();
                 }
                 else if (SettingsManager::GetDefaultHeadset() == "gear"){
-                    hmd_manager = new GVRManager();
+                    if (!require_permissions) {
+                        hmd_manager = new GVRManager();
+                        enabled = hmd_manager->Initialize();
+                    }
                 }
-                enabled = hmd_manager->Initialize();
 
-                hmd_manager.clear();
                 if (SettingsManager::GetDefaultHeadset() == "daydream"){
                     disp_mode = MODE_GEAR;
                 }
@@ -273,11 +281,14 @@ MainWindow::MainWindow()
                 hmd_manager.clear();
                 if (SettingsManager::GetDefaultHeadset() == "daydream"){
                     hmd_manager = new GearManager();
+                    enabled = hmd_manager->Initialize();
                 }
                 else if (SettingsManager::GetDefaultHeadset() == "gear"){
-                    hmd_manager = new GVRManager();
+                    if (!require_permissions) {
+                        hmd_manager = new GVRManager();
+                        enabled = hmd_manager->Initialize();
+                    }
                 }
-                enabled = hmd_manager->Initialize();
 
                 if (!enabled) {
                     qDebug() << "MainWindow::MainWindow() - Failed to initialize headset";
@@ -739,6 +750,17 @@ void MainWindow::Update()
 
             if (GLWidget::GetDisplayMode() == MODE_GEAR) {
                 EnterVR();
+            }
+            else if (!hmd_manager && GLWidget::GetDisplayMode() == MODE_2D){
+                hmd_manager = new GVRManager();
+                bool enabled = hmd_manager->Initialize();
+                if (enabled){
+                    glwidget->SetHMDManager(hmd_manager);
+                    game->GetControllerManager()->SetHMDManager(hmd_manager);
+                }
+                else{
+                    hmd_manager.clear();
+                }
             }
         }
     }
