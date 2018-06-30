@@ -589,6 +589,10 @@ void Environment::MovePlayer(QPointer <RoomObject> portal, QPointer <Player> pla
 //        player->SetV("impulse_vel", QVector3D(0,0,0));
     }
 
+    if (curnode != rootnode && curnode->GetParent() != room) {
+        curnode->SetLastChild(room);
+    }
+
     SetCurRoom(player, room);
 
 /*#ifdef __ANDROID__

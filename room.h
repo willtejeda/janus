@@ -264,6 +264,8 @@ public:
     QPointer <Room> GetParent() const;
     QList <QPointer <Room> > & GetChildren();
     QList <QPointer <Room> > GetAllChildren();
+    QPointer <Room> GetLastChild() const;
+    void SetLastChild(QPointer <Room> r);
 
     void AddChild(QPointer <Room> r);
     void RemoveChild(QPointer <Room> r);    
@@ -373,6 +375,7 @@ private:
 
     QPointer <Room> parent; //my parent's node
     QList <QPointer <Room> > children; //my children nodes
+    QPointer <Room> last_child; //last visited child node
 
     bool scripts_ready;
     bool custom_elements_processed;

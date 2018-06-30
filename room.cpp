@@ -5001,6 +5001,14 @@ QList <QPointer <Room> > Room::GetAllChildren() {
     return cs;
 }
 
+QPointer <Room> Room::GetLastChild() const {
+    return last_child;
+}
+
+void Room::SetLastChild(QPointer <Room> r) {
+    last_child = r;
+}
+
 void Room::AddChild(QPointer <Room> r) {
     children.push_back(r);
 }

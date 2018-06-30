@@ -727,7 +727,12 @@ void Game::DrawFadingGL()
                 fade_time.start();
                 fadestate = FADE_FORWARD_PLAYER2;
 
-                ResetPlayer();
+                if (env->GetCurRoom() && env->GetCurRoom()->GetLastChild()) {
+                    env->NavigateToRoom(player, env->GetCurRoom()->GetLastChild());
+                }
+                else {
+                    ResetPlayer();
+                }
             }
                 break;
             case FADE_FORWARD_PLAYER2:
