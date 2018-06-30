@@ -5585,7 +5585,7 @@ void Game::UpdateAudio()
 void Game::UpdateMultiplayer()
 {
     QPointer <Room> r = env->GetCurRoom();
-    if (r) {
+    if (r && multi_players) {
         //determine URL adjacency
         const QString room_url = r->GetS("url");
         const QString room_name = r->GetS("title");
