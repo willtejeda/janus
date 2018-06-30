@@ -182,7 +182,9 @@ bool Environment::ClearRoom(QPointer <RoomObject> p)
         return true;
     }
     else if (r && r != curnode && r != rootnode && r->GetReady()) {
-        curnode->RemoveChild(r);
+        if (r != curnode->GetLastChild()) {
+            curnode->RemoveChild(r);
+        }
         r->Clear();
         emit RoomsChanged();
         return true;
@@ -589,7 +591,7 @@ void Environment::MovePlayer(QPointer <RoomObject> portal, QPointer <Player> pla
 //        player->SetV("impulse_vel", QVector3D(0,0,0));
     }
 
-    if (curnode != rootnode && curnode->GetParent() != room) {
+    if (curnode->GetParent() != room) {
         curnode->SetLastChild(room);
     }
 
