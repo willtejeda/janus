@@ -124,8 +124,7 @@ SOURCES += \
     src/renderergl33_renderthread.cpp \    
     src/renderergl44_loadingthread.cpp \
     src/renderergl44_renderthread.cpp \    
-    src/rendererinterface.cpp \
-    src/riftmanager.cpp \
+    src/rendererinterface.cpp \    
     src/room.cpp \
     src/roomobject.cpp \
     src/roomphysics.cpp \
@@ -205,8 +204,7 @@ HEADERS += \
     src/renderergl33_renderthread.h \    
     src/renderergl44_loadingthread.h \
     src/renderergl44_renderthread.h \    
-    src/rendererinterface.h \
-    src/riftmanager.h \
+    src/rendererinterface.h \    
     src/room.h \
     src/roomobject.h \
     src/roomphysics.h \
