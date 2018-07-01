@@ -28,9 +28,6 @@ class AbstractHMDManager; // Forward Declare for interface
 #include <QOpenGLShaderProgram>
 #include <cmath>
 #include "half.hpp"
-#ifdef WIN32
-//#include "slughelper.h"
-#endif
 
 enum VAO_ATTRIB
 {

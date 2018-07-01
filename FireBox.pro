@@ -154,8 +154,6 @@ SOURCES += \
     src/webview.cpp \
     src/gamepad.c
 
-win32:SOURCES += src/slughelper.cpp
-
 unix:!macx:SOURCES += ./resources/cef/linux/libcef_dll/base/cef_atomicops_x86_gcc.cc
 
 HEADERS += \
@@ -240,8 +238,6 @@ HEADERS += \
     src/vivemanager.h \
     src/webasset.h \
     src/webview.h
-
-win32:HEADERS += slughelper.h
 
 # NVIDIA HBAO
 #win32:INCLUDEPATH += "./resources/HBAOPlus/include"
