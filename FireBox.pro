@@ -14,8 +14,15 @@ DEFINES += DAYDREAM_SUBMISSION_BUILD
 
 DEFINES += __JANUS_VERSION=\\\"$$__VERSION\\\"
 DEFINES += __JANUS_VERSION_COMPLETE=__JANUS_VERSION\\\".$$system(git --git-dir ./.git --work-tree . describe --always --tags --abbrev=7)\\\"
-DEFINES += RIFT_ID=\\\"$$system(more riftid.txt)\\\"
-DEFINES += GEAR_ID=\\\"$$system(more gearid.txt)\\\"
+win32{
+DEFINES += RIFT_ID=\\\"$$system(type riftid.txt)\\\"
+DEFINES += GEAR_ID=\\\"$$system(type gearid.txt)\\\"
+}
+!win32{
+DEFINES += RIFT_ID=\\\"$$system(cat riftid.txt)\\\"
+DEFINES += GEAR_ID=\\\"$$system(cat gearid.txt)\\\"
+}
+
 
 # Default rules for deployment.
 android:include(deployment.pri)
