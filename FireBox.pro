@@ -452,9 +452,8 @@ unix:!macx:!android:LIBS += -lopenvr_api
 
 # OpenAL
 INCLUDEPATH += "./resources/openal-soft-1.17.2/include"
-win32:LIBS += -L"$$PWD/resources/OpenAL/libs/Win64"
-win32:LIBS += -L"$$PWD/resources/OpenAL/libs/Win64/EFX-Util_MT"
-win32:LIBS += -lOpenAL32 -lEFX-Util
+win32:LIBS += -L"$$PWD/resources/openal-soft-1.17.2/libs/Win64"
+win32:LIBS += -lOpenAL32
 unix:macx:LIBS += -L"$$PWD/resources/openal-soft-1.17.2/bin"
 unix:macx:LIBS += -lopenal
 
