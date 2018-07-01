@@ -103,8 +103,7 @@ SOURCES += \
     src/debugrenderer.cpp \
     src/domnode.cpp \
     src/environment.cpp \
-    src/filteredcubemapmanager.cpp \
-    src/framebuffermanager.cpp \
+    src/filteredcubemapmanager.cpp \    
     src/frustumcullingmanager.cpp \
     src/game.cpp \
     src/geom.cpp \
@@ -194,8 +193,7 @@ HEADERS += \
     src/debugrenderer.h \
     src/domnode.h \
     src/environment.h \
-    src/filteredcubemapmanager.h \
-    src/framebuffermanager.h \
+    src/filteredcubemapmanager.h \    
     src/frustumcullingmanager.h \
     src/game.h \
     src/gamepad.h \
