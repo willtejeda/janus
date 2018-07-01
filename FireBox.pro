@@ -97,12 +97,10 @@ SOURCES += \
     src/codeeditorwindow.cpp \
     src/contentimporter.cpp \
     src/controllermanager.cpp \
-    src/cookiejar.cpp \
-    src/debugrenderer.cpp \
+    src/cookiejar.cpp \    
     src/domnode.cpp \
     src/environment.cpp \
-    src/filteredcubemapmanager.cpp \    
-    src/frustumcullingmanager.cpp \
+    src/filteredcubemapmanager.cpp \        
     src/game.cpp \
     src/geom.cpp \
     src/glwidget.cpp \
@@ -183,12 +181,10 @@ HEADERS += \
     src/codeeditorwindow.h \
     src/contentimporter.h \
     src/controllermanager.h \
-    src/cookiejar.h \
-    src/debugrenderer.h \
+    src/cookiejar.h \    
     src/domnode.h \
     src/environment.h \
-    src/filteredcubemapmanager.h \    
-    src/frustumcullingmanager.h \
+    src/filteredcubemapmanager.h \        
     src/game.h \
     src/gamepad.h \
     src/geom.h \

@@ -3,7 +3,6 @@
 
 #include <QtCore>
 #include <QtScript>
-#include <tuple>
 
 #include "assetscript.h"
 #include "assetskybox.h"
@@ -14,7 +13,6 @@
 #include "multiplayermanager.h"
 #include "htmlpage.h"
 #include "domnode.h"
-#include "frustumcullingmanager.h"
 #include "lightmanager.h"
 #include "filteredcubemapmanager.h"
 #include "roomphysics.h"

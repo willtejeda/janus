@@ -22,3 +22,4 @@ dependencies/android/arm64-v8a/libxul.so
 dependencies/android/armeabi-v7a/libxul.so
 dependencies/android/armeabi/libxul.so
 **/.DS_Store
+*.pro.user.*
