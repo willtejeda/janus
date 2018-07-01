@@ -820,25 +820,6 @@ void RendererGL44_RenderThread::DecoupledRender()
             m_hmd_initialized = true;
         }
 
-#ifdef WIN32
-        // RenderDoc Capture code
-        RENDERDOC_API_1_0_0* rdoc_api = nullptr;
-        if (MathUtil::m_capture_frame == true)
-        {
-            // RenderDoc Capture code
-            if(HMODULE mod = GetModuleHandleA("renderdoc.dll"))
-            {
-                pRENDERDOC_GetAPI RENDERDOC_GetAPI = (pRENDERDOC_GetAPI)GetProcAddress(mod, "RENDERDOC_GetAPI");
-
-                RENDERDOC_GetAPI(eRENDERDOC_API_Version_1_0_0, (void **)&rdoc_api);
-            }
-
-            if (rdoc_api != nullptr)
-            {
-                rdoc_api->StartFrameCapture(NULL, NULL);
-            }
-        }
-#endif
         // Prevents main-thread from reallocating vectors read by render-thread during use
         m_reallocation_guard.lock();
 
@@ -1012,18 +993,7 @@ void RendererGL44_RenderThread::DecoupledRender()
             }
 
             m_main_thread_renderer->LockFrameSyncObject();
-            m_main_thread_renderer->EndFrame();
-
-    #ifdef WIN32
-            if (MathUtil::m_capture_frame == true)
-            {
-                if (rdoc_api != nullptr)
-                {
-                    rdoc_api->EndFrameCapture(NULL, NULL);
-                }
-                MathUtil::m_capture_frame = false;
-            }
-    #endif
+            m_main_thread_renderer->EndFrame();   
         }
 
         // Prevents main-thread from reallocating vectors read by render-thread during use

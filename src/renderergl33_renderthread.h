@@ -4,10 +4,7 @@
 #include <QObject>
 #include <QImage>
 #include <QWindow>
-//#if  !defined(__APPLE__) && !defined(__ANDROID__) && !defined(__linux__)
-//#include <QtPlatformSupport/QtPlatformSupport>
-//#endif
-#include "renderdoc_app.h"
+
 #include "abstractrenderer.h"
 #include "jniutil.h"
 

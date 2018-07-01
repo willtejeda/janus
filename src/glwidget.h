@@ -16,7 +16,6 @@
 #include "game.h"
 #include "assetobject.h"
 #include "renderer.h"
-#include "renderdoc_app.h"
 
 enum DisplayMode {
     MODE_2D,

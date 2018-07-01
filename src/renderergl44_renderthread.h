@@ -6,10 +6,7 @@
 #include <QObject>
 #include <QImage>
 #include <QWindow>
-#if !defined(__APPLE__) && !defined(__ANDROID__)
-//#include <QtPlatformSupport/QtPlatformSupport>
-#endif
-#include "renderdoc_app.h"
+
 #include "abstractrenderer.h"
 //#include "GFSDK_SSAO.h"
 

@@ -651,9 +651,6 @@ contains(ANDROID_TARGET_ARCH,x86) {
         $$PWD/dependencies/android/x86/libassimp.so
 }
 
-# RenderDoc
-INCLUDEPATH += "./resources/RenderDoc"
-
 # Generic Windows libs
 win32:LIBS += -lopengl32 -lglu32 -ladvapi32 -lwinmm
 
