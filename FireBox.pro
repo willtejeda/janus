@@ -72,185 +72,185 @@ CONFIG += -opengl desktop -no-angle
 TARGET = janusvr
 TEMPLATE = app
 
-SOURCES += main.cpp \
-    mainwindow.cpp \
-    mathutil.cpp \
-    game.cpp \
-    player.cpp \
-    htmlpage.cpp \
-    spinanimation.cpp \
-    textgeom.cpp \
-    soundmanager.cpp \
-    assetimage.cpp \
-    assetobject.cpp \
-    assetsound.cpp \
-    assetskybox.cpp \
-    assetvideo.cpp \
-    assetscript.cpp \
-    assetshader.cpp \
-    assetghost.cpp \
-    multiplayermanager.cpp \
-    scriptbuiltins.cpp \
-    scriptvalueconversions.cpp \
-    cookiejar.cpp \
-    assetwebsurface.cpp \
-    leaphands.cpp \
-    webview.cpp \
-    room.cpp \
-    roomtemplate.cpp \
-    environment.cpp \
-    roomobject.cpp \
-    menu.cpp \
-    webasset.cpp \
-    particlesystem.cpp \
-    unittests.cpp \
-    domnode.cpp \
-    framebuffermanager.cpp \
-    audioutil.cpp \
-    gamepad.c \
-    abstractrenderer.cpp \
-    renderer.cpp \
-    renderergl33_renderthread.cpp \
-    renderergl44.cpp \
-    renderergl44_viewportinstancing.cpp \
-    frustumcullingmanager.cpp \
-    debugrenderer.cpp \
-    lightmanager.cpp \
-    virtualkeyboard.cpp \
-    bookmarkmanager.cpp \
-    asset.cpp \
-    controllermanager.cpp \
-    hierarchywindow.cpp \
-    propertieswindow.cpp \
-    filteredcubemapmanager.cpp \
-    abstractwebsurface.cpp \
-    mem_istream.cpp \   
-    contentimporter.cpp \
-    baseassetdata.cpp \
-    assetimagedata.cpp \
-    abstracthmdmanager.cpp \
-    geom.cpp \
-    roomphysics.cpp \
-    performancelogger.cpp \
-    texturemanager.cpp \
-    assetimagedataq.cpp \
-    textureimporterexr.cpp \
-    textureimportergli.cpp \
-    textureimporterqimage.cpp \
-    analytics.cpp \
-    assetwebsurface_pdf.cpp \
-    glwidget.cpp \
-    settingswindow.cpp \
-    settingsmanager.cpp \
-    assetwindow.cpp \
-    socialwindow.cpp \
-    assetrecording.cpp \
-    rendererinterface.cpp \
-    codeeditorwindow.cpp \
-    navigationwindow.cpp \
-    scriptablexmlhttprequest.cpp \
-    renderergl44_loadingthread.cpp \
-    renderergl33_loadingthread.cpp \
-    renderergl44_renderthread.cpp \
-    textureimportercmft.cpp \
-    assetvideo3d.cpp \
-    abstractwebview.cpp \
-    mediaplayer.cpp \
-    scriptablevector.cpp \
-    cefwebview.cpp
+SOURCES += \
+    src/abstracthmdmanager.cpp \
+    src/abstractrenderer.cpp \
+    src/abstractwebsurface.cpp \
+    src/abstractwebview.cpp \
+    src/analytics.cpp \
+    src/asset.cpp \
+    src/assetghost.cpp \
+    src/assetimage.cpp \
+    src/assetimagedata.cpp \
+    src/assetimagedataq.cpp \
+    src/assetobject.cpp \
+    src/assetrecording.cpp \
+    src/assetscript.cpp \
+    src/assetshader.cpp \
+    src/assetskybox.cpp \
+    src/assetsound.cpp \
+    src/assetvideo.cpp \
+    src/assetvideo3d.cpp \
+    src/assetwebsurface.cpp \
+    src/assetwebsurface_pdf.cpp \
+    src/assetwindow.cpp \
+    src/audioutil.cpp \
+    src/baseassetdata.cpp \
+    src/bookmarkmanager.cpp \
+    src/cefwebview.cpp \
+    src/codeeditorwindow.cpp \
+    src/contentimporter.cpp \
+    src/controllermanager.cpp \
+    src/cookiejar.cpp \
+    src/debugrenderer.cpp \
+    src/domnode.cpp \
+    src/environment.cpp \
+    src/filteredcubemapmanager.cpp \
+    src/framebuffermanager.cpp \
+    src/frustumcullingmanager.cpp \
+    src/game.cpp \
+    src/geom.cpp \
+    src/glwidget.cpp \
+    src/hierarchywindow.cpp \
+    src/htmlpage.cpp \    
+    src/leaphands.cpp \
+    src/lightmanager.cpp \
+    src/main.cpp \
+    src/mainwindow.cpp \
+    src/mathutil.cpp \
+    src/mediaplayer.cpp \
+    src/mem_istream.cpp \
+    src/menu.cpp \
+    src/multiplayermanager.cpp \
+    src/navigationwindow.cpp \
+    src/particlesystem.cpp \
+    src/performancelogger.cpp \
+    src/player.cpp \
+    src/propertieswindow.cpp \
+    src/renderer.cpp \
+    src/renderergl33_loadingthread.cpp \
+    src/renderergl33_renderthread.cpp \    
+    src/renderergl44_loadingthread.cpp \
+    src/renderergl44_renderthread.cpp \    
+    src/rendererinterface.cpp \
+    src/riftmanager.cpp \
+    src/room.cpp \
+    src/roomobject.cpp \
+    src/roomphysics.cpp \
+    src/roomtemplate.cpp \
+    src/scriptablevector.cpp \
+    src/scriptablexmlhttprequest.cpp \
+    src/scriptbuiltins.cpp \
+    src/scriptvalueconversions.cpp \
+    src/settingsmanager.cpp \
+    src/settingswindow.cpp \
+    src/socialwindow.cpp \
+    src/soundmanager.cpp \
+    src/spinanimation.cpp \
+    src/textgeom.cpp \
+    src/textureimportercmft.cpp \
+    src/textureimporterexr.cpp \
+    src/textureimportergli.cpp \
+    src/textureimporterqimage.cpp \
+    src/texturemanager.cpp \
+    src/unittests.cpp \
+    src/virtualkeyboard.cpp \
+    src/vivemanager.cpp \
+    src/webasset.cpp \
+    src/webview.cpp \
+    src/gamepad.c
 
-win32:SOURCES += slughelper.cpp
-
+win32:SOURCES += src/slughelper.cpp
 
 unix:!macx:SOURCES += ./resources/cef/linux/libcef_dll/base/cef_atomicops_x86_gcc.cc
 
 HEADERS += \
-    mainwindow.h \
-    mathutil.h \
-    game.h \
-    player.h \
-    htmlpage.h \
-    spinanimation.h \
-    textgeom.h \
-    soundmanager.h \
-    assetimage.h \
-    assetobject.h \
-    assetsound.h \
-    assetskybox.h \
-    assetvideo.h \
-    assetscript.h \
-    assetshader.h \
-    assetghost.h \
-    multiplayermanager.h \
-    scriptbuiltins.h \
-    scriptvalueconversions.h \
-    cookiejar.h \
-    assetwebsurface.h \
-    leaphands.h \
-    webview.h \
-    room.h \
-    roomtemplate.h \
-    environment.h \
-    roomobject.h \
-    menu.h \
-    webasset.h \
-    particlesystem.h \
-    unittests.h \
-    domnode.h \
-    framebuffermanager.h \
-    audioutil.h \
-    gamepad.h \
-    rendererinterface.h \
-    abstractrenderer.h \
-    renderer.h \
-    renderergl33_renderthread.h \
-    renderergl44.h \
-    renderergl44_viewportinstancing.h \
-    frustumcullingmanager.h \
-    debugrenderer.h \
-    lightmanager.h \
-    virtualkeyboard.h \
-    bookmarkmanager.h \
-    asset.h \
-    controllermanager.h \
-    hierarchywindow.h \
-    propertieswindow.h \
-    filteredcubemapmanager.h \
-    abstractwebsurface.h \
-    abstracthmdmanager.h \
-    geom.h \
-    roomphysics.h \
-    mem_istream.h \
-    contentimporter.h \
-    baseassetdata.h \
-    assetimagedata.h \
-    roomphysics.h \
-    performancelogger.h \
-    assetimagedataq.h \
-    textureimporterqimage.h \
-    textureimporterexr.h \
-    textureimportergli.h \
-    texturemanager.h \
-    analytics.h \
-    assetwebsurface_pdf.h \
-    glwidget.h \
-    settingswindow.h \
-    settingsmanager.h \
-    assetwindow.h \
-    socialwindow.h \
-    assetrecording.h \
-    codeeditorwindow.h \
-    navigationwindow.h \
-    scriptablexmlhttprequest.h \
-    renderergl44_loadingthread.h \
-    renderergl44_renderthread.h \
-    renderergl33_loadingthread.h \
-    textureimportercmft.h \
-    assetvideo3d.h \
-    abstractwebview.h \
-    mediaplayer.h \
-    scriptablevector.h \
-    cefwebview.h
+    src/abstracthmdmanager.h \
+    src/abstractrenderer.h \
+    src/abstracttexture.h \
+    src/abstractwebsurface.h \
+    src/abstractwebview.h \
+    src/analytics.h \
+    src/asset.h \
+    src/assetghost.h \
+    src/assetimage.h \
+    src/assetimagedata.h \
+    src/assetimagedataq.h \
+    src/assetobject.h \
+    src/assetrecording.h \
+    src/assetscript.h \
+    src/assetshader.h \
+    src/assetskybox.h \
+    src/assetsound.h \
+    src/assetvideo.h \
+    src/assetvideo3d.h \
+    src/assetwebsurface.h \
+    src/assetwebsurface_pdf.h \
+    src/assetwindow.h \
+    src/audioutil.h \
+    src/baseassetdata.h \
+    src/bookmarkmanager.h \
+    src/cefwebview.h \
+    src/codeeditorwindow.h \
+    src/contentimporter.h \
+    src/controllermanager.h \
+    src/cookiejar.h \
+    src/debugrenderer.h \
+    src/domnode.h \
+    src/environment.h \
+    src/filteredcubemapmanager.h \
+    src/framebuffermanager.h \
+    src/frustumcullingmanager.h \
+    src/game.h \
+    src/gamepad.h \
+    src/geom.h \
+    src/glwidget.h \
+    src/hierarchywindow.h \
+    src/htmlpage.h \
+    src/leaphands.h \
+    src/lightmanager.h \
+    src/mainwindow.h \
+    src/mathutil.h \
+    src/mediaplayer.h \
+    src/mem_istream.h \
+    src/menu.h \
+    src/multiplayermanager.h \
+    src/navigationwindow.h \
+    src/particlesystem.h \
+    src/performancelogger.h \
+    src/player.h \
+    src/propertieswindow.h \
+    src/renderer.h \
+    src/renderergl33_loadingthread.h \
+    src/renderergl33_renderthread.h \    
+    src/renderergl44_loadingthread.h \
+    src/renderergl44_renderthread.h \    
+    src/rendererinterface.h \
+    src/riftmanager.h \
+    src/room.h \
+    src/roomobject.h \
+    src/roomphysics.h \
+    src/roomtemplate.h \
+    src/scriptablevector.h \
+    src/scriptablexmlhttprequest.h \
+    src/scriptbuiltins.h \
+    src/scriptvalueconversions.h \
+    src/settingsmanager.h \
+    src/settingswindow.h \
+    src/socialwindow.h \
+    src/soundmanager.h \
+    src/spinanimation.h \
+    src/textgeom.h \
+    src/textureimportercmft.h \
+    src/textureimporterexr.h \
+    src/textureimportergli.h \
+    src/textureimporterqimage.h \
+    src/texturemanager.h \
+    src/unittests.h \
+    src/virtualkeyboard.h \
+    src/vivemanager.h \
+    src/webasset.h \
+    src/webview.h
 
 win32:HEADERS += slughelper.h
 
@@ -261,49 +261,49 @@ win32:HEADERS += slughelper.h
 
 # Vive support (if not an Oculus Submission)
 !contains(DEFINES, OCULUS_SUBMISSION_BUILD) {
-    win32:HEADERS += vivemanager.h
-    win32:SOURCES += vivemanager.cpp   
+    win32:HEADERS += src/vivemanager.h
+    win32:SOURCES += src/vivemanager.cpp
 }
 
-unix:!macx:HEADERS += vivemanager.h
-unix:!macx:SOURCES += vivemanager.cpp
+unix:!macx:HEADERS += src/vivemanager.h
+unix:!macx:SOURCES += src/vivemanager.cpp
 
 #Gamepad not working on OSX
-unix:macx:SOURCES -= "gamepad.c"
-unix:macx:HEADERS -= "gamepad.h"
+unix:macx:SOURCES -= "src/gamepad.c"
+unix:macx:HEADERS -= "src/gamepad.h"
 
 #Remove dependencies unused by Android
-android:SOURCES -= "webview.cpp" \
-    "assetwebsurface_pdf.cpp" \
-    "gamepad.c" \
-    "unittests.cpp" \
-    "vivemanager.cpp" \
-    "mem_istream.cpp" \
-    "textureimporterexr.cpp" \
-    "cefwebview.cpp"
+android:SOURCES -= "src/webview.cpp" \
+    "src/assetwebsurface_pdf.cpp" \
+    "src/gamepad.c" \
+    "src/unittests.cpp" \
+    "src/vivemanager.cpp" \
+    "src/mem_istream.cpp" \
+    "src/textureimporterexr.cpp" \
+    "src/cefwebview.cpp"
 android:HEADERS -= "webview.h" \
-    "assetwebsurface_pdf.h" \
-    "gamepad.h" \
-    "unittests.h" \
-    "vivemanager.h" \
-    "mem_istream.h" \
-    "textureimporterexr.h" \
-    "cefwebview.h"
-android:SOURCES += "androidwebview.cpp" \
-    "slidingtabwidget.cpp" \
-    "jniutil.cpp" \
-    "gvrmanager.cpp"
-android:HEADERS += "androidwebview.h" \
-    "slidingtabwidget.h" \
-    "jniutil.h" \
-    "gvrmanager.h"
+    "src/assetwebsurface_pdf.h" \
+    "src/gamepad.h" \
+    "src/unittests.h" \
+    "src/vivemanager.h" \
+    "src/mem_istream.h" \
+    "src/textureimporterexr.h" \
+    "src/cefwebview.h"
+android:SOURCES += "src/androidwebview.cpp" \
+    "src/slidingtabwidget.cpp" \
+    "src/jniutil.cpp" \
+    "src/gvrmanager.cpp"
+android:HEADERS += "src/androidwebview.h" \
+    "src/slidingtabwidget.h" \
+    "src/jniutil.h" \
+    "src/gvrmanager.h"
 
 contains(ANDROID_TARGET_ARCH,armeabi-v7a) {
-    android:SOURCES += "gearmanager.cpp"
+    android:SOURCES += "src/gearmanager.cpp"
 }
 
 contains(ANDROID_TARGET_ARCH,armeabi) {
-    android:HEADERS += "gearmanager.h"
+    android:HEADERS += "src/gearmanager.h"
 }
 
 # Chromium Embedded Framework CEF
@@ -434,8 +434,8 @@ win32:LIBS += -L"$$PWD/resources/SlugLib/lib"
 win32:LIBS += -lSlug
 
 #OVR Platform on Windows
-win32:HEADERS += riftmanager.h
-win32:SOURCES += riftmanager.cpp
+win32:HEADERS += src/riftmanager.h
+win32:SOURCES += src/riftmanager.cpp
 
 # OVR Platform SDK (essential for Oculus Home build)
 win32:SOURCES += "./resources/OVRPlatformSDK_v1.24.0/Windows/OVR_PlatformLoader.cpp"

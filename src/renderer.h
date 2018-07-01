@@ -10,8 +10,6 @@
 #include "rendererinterface.h"
 #include "assetimagedata.h"
 #include "jniutil.h"
-//#include "renderergl44_viewportinstancing.h"
-//#include "renderergl44.h"
 #include "renderergl33_loadingthread.h"
 #include "renderergl44_loadingthread.h"
 
