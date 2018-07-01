@@ -76,9 +76,7 @@ MainWindow::MainWindow()
     setStyleSheet(style);  //Mainwindow
 
     setMouseTracking(true);
-    setAcceptDrops(true);
-
-    Analytics::PostEvent("session", "start", NULL, "start");
+    setAcceptDrops(true);   
 
     CloseEventFilter *closeFilter = new CloseEventFilter(this);
     installEventFilter(closeFilter);
@@ -242,43 +240,7 @@ MainWindow::MainWindow()
     if (disp_mode == MODE_AUTO || disp_mode == MODE_RIFT || disp_mode == MODE_VIVE) {
         disp_mode = MODE_2D;
     }
-#endif
-
-    switch (disp_mode){
-
-    case MODE_2D:
-        Analytics::PostEvent("vr", "detected", "2d");
-        break;
-    case MODE_SBS:
-        Analytics::PostEvent("vr", "detected", "sbs");
-        break;
-    case MODE_SBS_REVERSE:
-        Analytics::PostEvent("vr", "detected", "sbs_reverse");
-        break;
-    case MODE_OU3D:
-        Analytics::PostEvent("vr", "detected", "ou3d");
-        break;
-    case MODE_CUBE:
-        Analytics::PostEvent("vr", "detected", "cube");
-        break;
-    case MODE_EQUI:
-        Analytics::PostEvent("vr", "detected", "equi");
-        break;
-    case MODE_RIFT:
-        Analytics::PostEvent("vr", "detected", "rift");
-        break;
-    case MODE_VIVE:        
-        Analytics::PostEvent("vr", "detected", hmd_manager->GetHMDString());
-        break;
-    case MODE_GVR:
-        Analytics::PostEvent("vr", "detected", "gvr");
-        break;
-    case MODE_GEAR:
-        Analytics::PostEvent("vr", "detected", "gear");
-        break;
-    default:
-        break;
-    }
+#endif   
 
     GLWidget::SetDisplayMode(disp_mode);
 

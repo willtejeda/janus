@@ -13,7 +13,6 @@
 #include "cookiejar.h"
 #include "rendererinterface.h"
 #include "renderergl33_loadingthread.h"
-#include "analytics.h"
 #include "assetimage.h"
 #include "scriptbuiltins.h"
 

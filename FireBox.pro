@@ -16,7 +16,6 @@ DEFINES += __JANUS_VERSION=\\\"$$__VERSION\\\"
 DEFINES += __JANUS_VERSION_COMPLETE=__JANUS_VERSION\\\".$$system(git --git-dir ./.git --work-tree . describe --always --tags --abbrev=7)\\\"
 DEFINES += RIFT_ID=\\\"$$system(more riftid.txt)\\\"
 DEFINES += GEAR_ID=\\\"$$system(more gearid.txt)\\\"
-DEFINES += GOOGLE_ANALYTICS_ID=\\\"$$system(more googleanalyticsid.txt)\\\"
 
 # Default rules for deployment.
 android:include(deployment.pri)
@@ -76,8 +75,7 @@ SOURCES += \
     src/abstracthmdmanager.cpp \
     src/abstractrenderer.cpp \
     src/abstractwebsurface.cpp \
-    src/abstractwebview.cpp \
-    src/analytics.cpp \
+    src/abstractwebview.cpp \    
     src/asset.cpp \
     src/assetghost.cpp \
     src/assetimage.cpp \
@@ -168,8 +166,7 @@ HEADERS += \
     src/abstractrenderer.h \
     src/abstracttexture.h \
     src/abstractwebsurface.h \
-    src/abstractwebview.h \
-    src/analytics.h \
+    src/abstractwebview.h \    
     src/asset.h \
     src/assetghost.h \
     src/assetimage.h \

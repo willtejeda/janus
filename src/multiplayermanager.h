@@ -11,7 +11,6 @@
 #include "assetrecording.h"
 #include "soundmanager.h"
 #include "audioutil.h"
-#include "analytics.h"
 #include "settingsmanager.h"
 
 class RoomObject;

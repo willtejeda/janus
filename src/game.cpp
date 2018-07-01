@@ -4963,8 +4963,7 @@ void Game::SaveBookmark()
         SoundManager::Play(SOUND_DELETING, false, pos, 1.0f);
     }
     else {
-        const QString thumb_url = QUrl::fromLocalFile(GetRoomScreenshotPath(r)).toString();
-        Analytics::PostEvent("bookmark", "add", url);
+        const QString thumb_url = QUrl::fromLocalFile(GetRoomScreenshotPath(r)).toString();        
         bookmarks->AddBookmark(url, title, thumb_url);
         SoundManager::Play(SOUND_SAVED, false, pos, 1.0f);
     }

@@ -41,7 +41,6 @@
 #include "bookmarkmanager.h"
 #include "controllermanager.h"
 #include "filteredcubemapmanager.h"
-#include "analytics.h"
 #include "soundmanager.h"
 #ifndef __ANDROID__
     #include "assetwebsurface_pdf.h"

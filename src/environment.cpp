@@ -975,18 +975,7 @@ void Environment::SetCurRoom(QPointer <Player> player, QPointer <Room> r)
 {
     if (r.isNull()) {
         return;
-    }
-
-    QString url = r->GetS("url");
-    if (url.left(7).toLower() == "file://" && url.contains("assets/3dui/index.html")) {
-        Analytics::PostPageview(NULL, "/pocketspace");
-    }
-    else if (url.left(7).toLower() == "http://" || url.left(8).toLower() == "https://") {
-        Analytics::PostPageview(QUrl(url).host(), (QUrl(url).path() == "")?"/":QUrl(url).path());
-    }
-    else {
-        Analytics::PostPageview(NULL, "/localfile");
-    }
+    }   
 
     //silence/reset sounds for all rooms
     QList <QPointer <Room> > nodes = rootnode->GetAllChildren();

@@ -24,7 +24,6 @@
 #include "performancelogger.h"
 
 #include "controllermanager.h"
-#include "analytics.h"
 
 #include "hierarchywindow.h"
 #include "propertieswindow.h"

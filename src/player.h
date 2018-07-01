@@ -7,7 +7,6 @@
 #include "settingsmanager.h"
 #include "assetshader.h"
 #include "leaphands.h"
-#include "analytics.h"
 
 class Player : public QObject
 {

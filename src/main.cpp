@@ -3,7 +3,6 @@
 #include "mainwindow.h"
 #include "mathutil.h"
 #include "multiplayermanager.h"
-#include "analytics.h"
 
 #ifdef __ANDROID__
 #include "jniutil.h"
@@ -334,9 +333,7 @@ int main(int argc, char *argv[])
     qDebug() << "WebAsset initialize";
     WebAsset::Initialize();
     qDebug() << "MathUtil initialize";
-    MathUtil::Initialize();
-    qDebug() << "Analytics initialize";
-    Analytics::Initialize();
+    MathUtil::Initialize();    
 
     ProcessCmdLineArgs1(argc, argv);
 
