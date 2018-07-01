@@ -87,8 +87,7 @@ SOURCES += \
     src/assetshader.cpp \
     src/assetskybox.cpp \
     src/assetsound.cpp \
-    src/assetvideo.cpp \
-    src/assetvideo3d.cpp \
+    src/assetvideo.cpp \    
     src/assetwebsurface.cpp \
     src/assetwebsurface_pdf.cpp \
     src/assetwindow.cpp \
@@ -177,8 +176,7 @@ HEADERS += \
     src/assetshader.h \
     src/assetskybox.h \
     src/assetsound.h \
-    src/assetvideo.h \
-    src/assetvideo3d.h \
+    src/assetvideo.h \    
     src/assetwebsurface.h \
     src/assetwebsurface_pdf.h \
     src/assetwindow.h \

@@ -7,7 +7,6 @@
 
 #include "assetscript.h"
 #include "assetskybox.h"
-#include "assetvideo3d.h"
 #include "soundmanager.h"
 #include "roomtemplate.h"
 #include "roomobject.h"
@@ -31,7 +30,6 @@ class AssetObject;
 class AssetScript;
 class AssetSkybox;
 class AssetVideo;
-class AssetVideo3D;
 class AbstractWebSurface;
 class MultiPlayerManager;
 
@@ -101,8 +99,7 @@ public:
     void AddAssetScript(QPointer <AssetScript> a);
     void AddAssetShader(QPointer <AssetShader> a);
     void AddAssetSound(QPointer <AssetSound> a);
-    void AddAssetVideo(QPointer <AssetVideo> a);
-    void AddAssetVideo3D(QPointer <AssetVideo3D> a);
+    void AddAssetVideo(QPointer <AssetVideo> a);    
     void AddAssetWebSurface(QPointer <AbstractWebSurface> a);
 
     void RemoveAsset(QPointer <Asset> a);
@@ -116,8 +113,7 @@ public:
     QHash <QString, QPointer <AssetScript> > & GetAssetScripts();
     QHash <QString, QPointer <AssetShader> > & GetAssetShaders();
     QHash <QString, QPointer <AssetSound> > & GetAssetSounds();
-    QHash <QString, QPointer <AssetVideo> > & GetAssetVideos();
-    QHash <QString, QPointer <AssetVideo3D> > & GetAssetVideo3Ds();
+    QHash <QString, QPointer <AssetVideo> > & GetAssetVideos();    
     QHash <QString, QPointer <AbstractWebSurface> > & GetAssetWebSurfaces();
 
     QPointer <Asset> GetAsset(const QString id) const;
@@ -128,8 +124,7 @@ public:
     QPointer <AssetScript> GetAssetScript(const QString id) const;
     QPointer <AssetShader> GetAssetShader(const QString id) const;
     QPointer <AssetSound> GetAssetSound(const QString id) const;
-    QPointer <AssetVideo> GetAssetVideo(const QString id) const;
-    QPointer <AssetVideo3D> GetAssetVideo3D(const QString id) const;
+    QPointer <AssetVideo> GetAssetVideo(const QString id) const;    
     QPointer <AbstractWebSurface> GetAssetWebSurface(const QString id) const;
 
     QString AddRoomObject(QPointer <RoomObject> o);
@@ -336,8 +331,7 @@ private:
     QHash <QString, QPointer <AssetScript> > assetscripts;
     QHash <QString, QPointer <AssetShader> > assetshaders;
     QHash <QString, QPointer <AssetSound> > assetsounds;
-    QHash <QString, QPointer <AssetVideo> > assetvideos;
-    QHash <QString, QPointer <AssetVideo3D> > assetvideo3ds;
+    QHash <QString, QPointer <AssetVideo> > assetvideos;    
     QHash <QString, QPointer <AbstractWebSurface> > assetwebsurfaces;
 
     QHash <QString, QPointer <RoomObject> > envobjects; //indexes to envobject via js_id    

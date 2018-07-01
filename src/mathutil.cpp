@@ -2460,10 +2460,7 @@ QString MathUtil::AssetTypeFromFilename(const QString filename)
     }
     else if (suffix == "rec") {
         return "assetrecording";
-    }
-    else if (suffix == "mvx") {
-        return "assetvideo3d";
-    }
+    }    
     else { //if format is unrecognized or all else, assume an image
         return "asseterror";
     }

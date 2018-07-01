@@ -244,8 +244,7 @@ void HTMLPage::ConstructData()
     assets.insert("assetshader", assetshaderlist);
     assets.insert("assetscript", assetscriptlist);
     assets.insert("assetsound", assetsoundlist);
-    assets.insert("assetvideo", assetvideolist);
-    assets.insert("assetvideo3d", assetvideolist);
+    assets.insert("assetvideo", assetvideolist);    
     assets.insert("assetwebsurface", assetwebsurfacelist);
 
     //do room

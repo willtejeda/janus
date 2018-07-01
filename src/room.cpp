@@ -161,13 +161,6 @@ void Room::Clear()
     }
     assetvideos.clear();
 
-    for (QPointer <AssetVideo3D> & a : assetvideo3ds) {
-        if (a) {
-            delete a;
-        }
-    }
-    assetvideo3ds.clear();
-
     for (QPointer <AbstractWebSurface> & a : assetwebsurfaces) {
         if (a) {
             delete a;
@@ -2297,8 +2290,7 @@ QVariantMap Room::GetJSONCode(const bool show_defaults) const
     QVariantList assetshaderlist;
     QVariantList assetscriptlist;
     QVariantList assetsoundlist;
-    QVariantList assetvideolist;
-    QVariantList assetvideo3dlist;
+    QVariantList assetvideolist;    
     QVariantList assetwebsurfacelist;
 
     QVariantMap room;
@@ -2350,13 +2342,7 @@ QVariantMap Room::GetJSONCode(const bool show_defaults) const
         if (a && a->GetB("_save_to_markup")) {
             assetvideolist.push_back(a->GetJSONCode());
         }
-    }
-
-    for (const QPointer <AssetVideo3D> & a : assetvideo3ds) {
-        if (a && a->GetB("_save_to_markup")) {
-            assetvideo3dlist.push_back(a->GetJSONCode());
-        }
-    }
+    }   
 
     for (const QPointer <AbstractWebSurface> & a : assetwebsurfaces) {
         if (a && a->GetB("_save_to_markup")) {
@@ -2387,10 +2373,7 @@ QVariantMap Room::GetJSONCode(const bool show_defaults) const
     }
     if (!assetvideolist.empty()) {
         assetsmap.insert("assetvideo", assetvideolist);
-    }
-    if (!assetvideo3dlist.empty()) {
-        assetsmap.insert("assetvideo3d", assetvideolist);
-    }
+    }    
     if (!assetwebsurfacelist.empty()) {
         assetsmap.insert("assetwebsurface", assetwebsurfacelist);
     }
@@ -4427,19 +4410,6 @@ void Room::AddAssetVideo(QPointer <AssetVideo> a)
     assetvideos[asset_id] = a;
 }
 
-void Room::AddAssetVideo3D(QPointer <AssetVideo3D> a)
-{
-    if (a.isNull()) {
-        return;
-    }
-
-    QString asset_id = a->GetS("id");
-    if (asset_id.isEmpty()) {
-        asset_id = a->GetS("_src_url");
-    }
-    assetvideo3ds[asset_id] = a;
-}
-
 void Room::AddAssetWebSurface(QPointer <AbstractWebSurface> a)
 {
     if (a.isNull()) {
@@ -4487,10 +4457,7 @@ void Room::RemoveAsset(QPointer <Asset> a)
     }
     if (assetvideos.contains(asset_id)) {
         assetvideos.remove(asset_id);
-    }
-    if (assetvideo3ds.contains(asset_id)) {
-        assetvideo3ds.remove(asset_id);
-    }
+    }    
     if (assetwebsurfaces.contains(asset_id)) {
         assetwebsurfaces.remove(asset_id);
     }
@@ -4522,10 +4489,7 @@ QList <QPointer <Asset> > Room::GetAllAssets()
     }
     for (QPointer <AssetVideo> & a: assetvideos) {
         as.push_back((Asset *)a.data());
-    }
-    for (QPointer <AssetVideo3D> & a: assetvideo3ds) {
-        as.push_back((Asset *)a.data());
-    }
+    }    
     for (QPointer <AbstractWebSurface> & a: assetwebsurfaces) {
         as.push_back((Asset *)a.data());
     }
@@ -4572,11 +4536,6 @@ QHash <QString, QPointer <AssetVideo> > & Room::GetAssetVideos()
     return assetvideos;
 }
 
-QHash <QString, QPointer <AssetVideo3D> > & Room::GetAssetVideo3Ds()
-{
-    return assetvideo3ds;
-}
-
 QHash <QString, QPointer <AbstractWebSurface> > & Room::GetAssetWebSurfaces()
 {
     return assetwebsurfaces;
@@ -4607,10 +4566,7 @@ QPointer <Asset> Room::GetAsset(const QString id) const
     }
     if (GetAssetVideo(id)) {
         return (Asset *)GetAssetVideo(id);
-    }
-    if (GetAssetVideo3D(id)) {
-        return (Asset *)GetAssetVideo3D(id);
-    }
+    }    
     if (GetAssetWebSurface(id)) {
         return (Asset *)GetAssetWebSurface(id);
     }
@@ -4679,14 +4635,6 @@ QPointer <AssetVideo> Room::GetAssetVideo(const QString id) const
         return assetvideos[id];
     }
     return QPointer <AssetVideo> ();
-}
-
-QPointer <AssetVideo3D> Room::GetAssetVideo3D(const QString id) const
-{
-    if (assetvideo3ds.contains(id)) {
-        return assetvideo3ds[id];
-    }
-    return QPointer <AssetVideo3D> ();
 }
 
 QPointer <AbstractWebSurface> Room::GetAssetWebSurface(const QString id) const
@@ -4768,15 +4716,7 @@ void Room::AddAsset(const QString asset_type, const QVariantMap & property_list,
         a->SetProperties(property_list);
         a->SetB("sync", do_sync);
         AddAssetVideo(a);
-    }
-    else if (t == "assetvideo3d") {
-        QPointer <AssetVideo3D> a = new AssetVideo3D();
-        a->SetSrc(url, property_list["src"].toString());
-        a->SetProperties(property_list);
-        a->SetB("sync", do_sync);
-        a->Load();
-        AddAssetVideo3D(a);
-    }
+    }    
     else if (t == "assetwebsurface") {
         QPointer <AbstractWebSurface> a;
         if (property_list["src"].toString().right(4) == ".pdf") {
