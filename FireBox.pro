@@ -409,11 +409,6 @@ INCLUDEPATH += "./resources/glm"
 # half
 INCLUDEPATH += "./resources/half_1.12/include"
 
-# Slug
-win32:INCLUDEPATH += "./resources/SlugLib/include"
-win32:LIBS += -L"$$PWD/resources/SlugLib/lib"
-win32:LIBS += -lSlug
-
 #OVR Platform on Windows
 win32:HEADERS += src/riftmanager.h
 win32:SOURCES += src/riftmanager.cpp
