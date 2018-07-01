@@ -156,8 +156,7 @@ unix:!macx:SOURCES += ./resources/cef/linux/libcef_dll/base/cef_atomicops_x86_gc
 
 HEADERS += \
     src/abstracthmdmanager.h \
-    src/abstractrenderer.h \
-    src/abstracttexture.h \
+    src/abstractrenderer.h \    
     src/abstractwebsurface.h \
     src/abstractwebview.h \    
     src/asset.h \
