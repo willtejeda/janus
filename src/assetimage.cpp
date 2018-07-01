@@ -8,10 +8,9 @@ QVector<ContentImporter*> AssetImage::importers;
 void AssetImage::InitializeImporters()
 {
 #ifndef __ANDROID__
-    AssetImage::importers = QVector<ContentImporter*>(3);
-    AssetImage::importers[0] = new TextureImporterQImage();
-    AssetImage::importers[1] = new TextureImporterEXR();
-    AssetImage::importers[2] = new TextureImporterCMFT();
+    AssetImage::importers = QVector<ContentImporter*>(2);
+    AssetImage::importers[0] = new TextureImporterQImage();    
+    AssetImage::importers[1] = new TextureImporterCMFT();
 #else
     AssetImage::importers = QVector<ContentImporter*>(1);
     AssetImage::importers[0] = new TextureImporterQImage();

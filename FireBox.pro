@@ -111,8 +111,7 @@ SOURCES += \
     src/main.cpp \
     src/mainwindow.cpp \
     src/mathutil.cpp \
-    src/mediaplayer.cpp \
-    src/mem_istream.cpp \
+    src/mediaplayer.cpp \    
     src/menu.cpp \
     src/multiplayermanager.cpp \
     src/navigationwindow.cpp \
@@ -141,8 +140,7 @@ SOURCES += \
     src/soundmanager.cpp \
     src/spinanimation.cpp \
     src/textgeom.cpp \
-    src/textureimportercmft.cpp \
-    src/textureimporterexr.cpp \
+    src/textureimportercmft.cpp \    
     src/textureimportergli.cpp \
     src/textureimporterqimage.cpp \
     src/texturemanager.cpp \    
@@ -194,8 +192,7 @@ HEADERS += \
     src/lightmanager.h \
     src/mainwindow.h \
     src/mathutil.h \
-    src/mediaplayer.h \
-    src/mem_istream.h \
+    src/mediaplayer.h \    
     src/menu.h \
     src/multiplayermanager.h \
     src/navigationwindow.h \
@@ -224,8 +221,7 @@ HEADERS += \
     src/soundmanager.h \
     src/spinanimation.h \
     src/textgeom.h \
-    src/textureimportercmft.h \
-    src/textureimporterexr.h \
+    src/textureimportercmft.h \    
     src/textureimportergli.h \
     src/textureimporterqimage.h \
     src/texturemanager.h \    
@@ -255,15 +251,11 @@ unix:macx:HEADERS -= "src/gamepad.h"
 #Remove dependencies unused by Android
 android:SOURCES -= "src/webview.cpp" \
     "src/gamepad.c" \
-    "src/vivemanager.cpp" \
-    "src/mem_istream.cpp" \
-    "src/textureimporterexr.cpp" \
+    "src/vivemanager.cpp" \    
     "src/cefwebview.cpp"
 android:HEADERS -= "webview.h" \    
     "src/gamepad.h" \
-    "src/vivemanager.h" \
-    "src/mem_istream.h" \
-    "src/textureimporterexr.h" \
+    "src/vivemanager.h" \    
     "src/cefwebview.h"
 android:SOURCES += "src/androidwebview.cpp" \
     "src/slidingtabwidget.cpp" \
@@ -730,16 +722,6 @@ android:DISTFILES += \
 ASSETS.path = /assets
 ASSETS.files = $$files($$PWD/android/assets/*)
 INSTALLS += ASSETS
-
-# OpenEXR
-win32:DEFINES += OPENEXR_DLL
-INCLUDEPATH += "./resources/openexr-2.2.0/build/include"
-
-win32:LIBS += -L"$$PWD/resources/openexr-2.2.0/build/win"
-win32:LIBS += half.lib Iex-2_2.lib IexMath-2_2.lib IlmImf-2_2.lib IlmImfUtil-2_2.lib IlmThread-2_2.lib Imath-2_2.lib
-
-unix:!android:INCLUDEPATH += "/usr/local/include/OpenEXR"
-unix:!android:LIBS += -lIlmImf -lImath -lHalf -lIex -lIexMath -lIlmThread -pthread
 
 # OpenGL
 DEFINES += OPENGL

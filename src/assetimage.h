@@ -16,9 +16,6 @@
 
 #include "contentimporter.h"
 #include "textureimporterqimage.h"
-#ifndef __ANDROID__
-    #include "textureimporterexr.h"
-#endif
 #include "textureimportercmft.h"
 #include "textureimportergli.h"
 
@@ -89,7 +86,6 @@ private:
         DDS,
         KTX,
         KMG,
-		EXR,
         UNINITIALIZED
     };
 
