@@ -3852,21 +3852,8 @@ void Room::Create_WebSurface()
 
     const QString url = GetS("url");
 
-    QPointer <AbstractWebSurface> new_asset_websurface;
-    if (url.right(4).toLower() == ".pdf") { //handle PDF in a special way
-#ifndef __ANDROID__
-        new_asset_websurface = (AbstractWebSurface*)new AssetWebSurface_PDF();
-#endif
-    }
-    else {
-        new_asset_websurface = (AbstractWebSurface*)new AssetWebSurface();
-    }
-    if (QFile::exists(url)) {
-        new_asset_websurface->SetSrc(url, url);
-    }
-    else {
-        new_asset_websurface->SetSrc(url, url);
-    }
+    QPointer <AbstractWebSurface> new_asset_websurface = (AbstractWebSurface*)new AssetWebSurface();
+    new_asset_websurface->SetSrc(url, url);
     new_asset_websurface->SetS("id", "web1");
     new_asset_websurface->SetWidth(1300);
     new_asset_websurface->SetHeight(768);
@@ -4719,35 +4706,28 @@ void Room::AddAsset(const QString asset_type, const QVariantMap & property_list,
     }    
     else if (t == "assetwebsurface") {
         QPointer <AbstractWebSurface> a;
-        if (property_list["src"].toString().right(4) == ".pdf") {
-#ifndef __ANDROID__
-            a = (AbstractWebSurface*)new AssetWebSurface_PDF();
-#endif
-        }
-        else {
 
 #if !defined(__APPLE__) && !defined(__ANDROID__)
-            a = (AbstractWebSurface*)new AssetWebSurface();
-            a->SetTextureAlpha(true);
-            a->GetWebView()->initializeNonMenu();
+        a = (AbstractWebSurface*)new AssetWebSurface();
+        a->SetTextureAlpha(true);
+        a->GetWebView()->initializeNonMenu();
 
-            //adjust background colour palette based on if menu is in focus or not
-            QPalette palette = a->GetWebView()->palette();
-            palette.setBrush(QPalette::Window, Qt::white);
-            palette.setBrush(QPalette::Base, QColor(0,0,0,0));
-            a->GetWebView()->setPalette(palette);
+        //adjust background colour palette based on if menu is in focus or not
+        QPalette palette = a->GetWebView()->palette();
+        palette.setBrush(QPalette::Window, Qt::white);
+        palette.setBrush(QPalette::Base, QColor(0,0,0,0));
+        a->GetWebView()->setPalette(palette);
 #else
-            a = (AbstractWebSurface*)new AssetWebSurface();            
-            a->SetTextureAlpha(true);
-            a->GetWebView()->initializeNonMenu();
+        a = (AbstractWebSurface*)new AssetWebSurface();
+        a->SetTextureAlpha(true);
+        a->GetWebView()->initializeNonMenu();
 
-            //adjust background colour palette based on if menu is in focus or not
-            QPalette palette = a->GetWebView()->palette();
-            palette.setBrush(QPalette::Window, Qt::white);
-            palette.setBrush(QPalette::Base, QColor(0,0,0,0));
-            a->GetWebView()->setPalette(palette);
-#endif
-        }       
+        //adjust background colour palette based on if menu is in focus or not
+        QPalette palette = a->GetWebView()->palette();
+        palette.setBrush(QPalette::Window, Qt::white);
+        palette.setBrush(QPalette::Base, QColor(0,0,0,0));
+        a->GetWebView()->setPalette(palette);
+#endif   
 
         a->SetSrc(url, property_list["src"].toString());
         a->SetProperties(property_list);

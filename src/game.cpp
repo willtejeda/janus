@@ -5003,15 +5003,8 @@ QPointer <Asset> Game::CreateAssetFromURL(const QString url_str)
     else if (t == "assetvideo") {
         new_asset = new AssetVideo();
     }
-    else if (t == "assetwebsurface") {
-        if (url_str.right(4).toLower() == ".pdf") {
-#ifndef __ANDROID__
-            new_asset = (AbstractWebSurface*)new AssetWebSurface_PDF();
-#endif
-        }
-        else {
-            new_asset = (AbstractWebSurface*)new AssetWebSurface();
-        }
+    else if (t == "assetwebsurface") {        
+        new_asset = (AbstractWebSurface*)new AssetWebSurface();
     }
 
     if (new_asset) {

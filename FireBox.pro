@@ -88,8 +88,7 @@ SOURCES += \
     src/assetskybox.cpp \
     src/assetsound.cpp \
     src/assetvideo.cpp \    
-    src/assetwebsurface.cpp \
-    src/assetwebsurface_pdf.cpp \
+    src/assetwebsurface.cpp \    
     src/assetwindow.cpp \
     src/audioutil.cpp \
     src/baseassetdata.cpp \
@@ -177,8 +176,7 @@ HEADERS += \
     src/assetskybox.h \
     src/assetsound.h \
     src/assetvideo.h \    
-    src/assetwebsurface.h \
-    src/assetwebsurface_pdf.h \
+    src/assetwebsurface.h \    
     src/assetwindow.h \
     src/audioutil.h \
     src/baseassetdata.h \
@@ -265,14 +263,12 @@ unix:macx:HEADERS -= "src/gamepad.h"
 
 #Remove dependencies unused by Android
 android:SOURCES -= "src/webview.cpp" \
-    "src/assetwebsurface_pdf.cpp" \
     "src/gamepad.c" \
     "src/vivemanager.cpp" \
     "src/mem_istream.cpp" \
     "src/textureimporterexr.cpp" \
     "src/cefwebview.cpp"
-android:HEADERS -= "webview.h" \
-    "src/assetwebsurface_pdf.h" \
+android:HEADERS -= "webview.h" \    
     "src/gamepad.h" \
     "src/vivemanager.h" \
     "src/mem_istream.h" \
@@ -602,13 +598,6 @@ contains(ANDROID_TARGET_ARCH,x86) {
     ANDROID_EXTRA_LIBS += \
         $$PWD/dependencies/android/x86/libvlcjni.so
 }
-
-# QtPdf
-!android:INCLUDEPATH +="./resources/qtpdf/include/QtPdf"
-win32:LIBS += -L"$$PWD/resources/qtpdf/lib"
-win32:LIBS += Qt5Pdf.lib
-unix:!macx:!android:LIBS += -L"$$PWD/resources/qtpdf/lib"
-unix:!macx:!android:LIBS += -lQt5Pdf
 
 # Bullet Physics - on Linux, this is 2.87 and installed via libbullet-dev
 win32:INCLUDEPATH +="./resources/bullet3/src"

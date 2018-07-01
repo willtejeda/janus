@@ -42,9 +42,8 @@
 #include "controllermanager.h"
 #include "filteredcubemapmanager.h"
 #include "soundmanager.h"
-#ifndef __ANDROID__
-    #include "assetwebsurface_pdf.h"
-#else
+
+#ifdef __ANDROID__
 #ifndef DAYDREAM_SUBMISSION_BUILD
     #include "gearmanager.h"
 #endif

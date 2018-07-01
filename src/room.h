@@ -21,10 +21,6 @@
 #include "performancelogger.h"
 #include "assetwebsurface.h"
 
-#ifndef __ANDROID__
-    #include "assetwebsurface_pdf.h"
-#endif
-
 //59.7 - note: circ dep with these classes
 class AssetObject;
 class AssetScript;
