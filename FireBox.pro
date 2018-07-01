@@ -152,8 +152,7 @@ SOURCES += \
     src/textureimporterexr.cpp \
     src/textureimportergli.cpp \
     src/textureimporterqimage.cpp \
-    src/texturemanager.cpp \
-    src/unittests.cpp \
+    src/texturemanager.cpp \    
     src/virtualkeyboard.cpp \
     src/vivemanager.cpp \
     src/webasset.cpp \
@@ -245,8 +244,7 @@ HEADERS += \
     src/textureimporterexr.h \
     src/textureimportergli.h \
     src/textureimporterqimage.h \
-    src/texturemanager.h \
-    src/unittests.h \
+    src/texturemanager.h \    
     src/virtualkeyboard.h \
     src/vivemanager.h \
     src/webasset.h \
@@ -276,7 +274,6 @@ unix:macx:HEADERS -= "src/gamepad.h"
 android:SOURCES -= "src/webview.cpp" \
     "src/assetwebsurface_pdf.cpp" \
     "src/gamepad.c" \
-    "src/unittests.cpp" \
     "src/vivemanager.cpp" \
     "src/mem_istream.cpp" \
     "src/textureimporterexr.cpp" \
@@ -284,7 +281,6 @@ android:SOURCES -= "src/webview.cpp" \
 android:HEADERS -= "webview.h" \
     "src/assetwebsurface_pdf.h" \
     "src/gamepad.h" \
-    "src/unittests.h" \
     "src/vivemanager.h" \
     "src/mem_istream.h" \
     "src/textureimporterexr.h" \

@@ -35,9 +35,7 @@
 #include "navigationwindow.h"
 #include "glwidget.h"
 
-#ifndef __ANDROID__
-#include "unittests.h"
-#else
+#ifdef __ANDROID__
 #include <unistd.h>
 #include "slidingtabwidget.h"
 #endif
