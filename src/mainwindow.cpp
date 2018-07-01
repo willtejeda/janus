@@ -326,17 +326,6 @@ MainWindow::MainWindow()
     button_bookmark_state = 0;
     default_window_flags = windowFlags();
 
-    //initialize leap motion SDK    
-#if defined(WIN32) || defined(__APPLE__) || defined(__ANDROID__)
-#else
-    leap_controller.setPolicyFlags(Leap::Controller::POLICY_OPTIMIZE_HMD);
-#endif   
-
-/*#if defined(QT_DEBUG) && !defined(__ANDROID__)
-    Unit_tests unit_tests = Unit_tests();
-    unit_tests.run_all_tests();
-#endif*/
-
 #ifdef __ANDROID__
     SetupWidgets();
     SetupMenuWidgets();
@@ -1090,116 +1079,16 @@ void MainWindow::UpdateHands()
     player->GetHand(0).is_active = false;
     player->GetHand(1).is_active = false;
 
-#if !defined(__APPLE__) && !defined(__ANDROID__)
-    //leap path
-    if (leap_controller.isConnected() && leap_controller.frame().hands().count() > 0) {
-
-        using namespace Leap;
-        const Frame frame = leap_controller.frame();
-
-        HandList hands = frame.hands();
-
-        const bool leap_on_hmd = SettingsManager::GetLeapOnHMDEnabled();
-
-//        qDebug() << "LEAP PATH" << hands.count();
-        for (int i=0; i<hands.count(); ++i) {
-
-            LeapHand & hand = player->GetHand((hands[i].isLeft() ? 0 : 1));
-            hand.is_active = true;
-            hand.finger_tracking = true;
-            hand.finger_tracking_leap_hmd = leap_on_hmd;
-
-            const Matrix basis = hands[i].basis();
-            Vector x = basis.xBasis.normalized();
-            Vector y = basis.yBasis.normalized();
-            Vector z = basis.zBasis.normalized();
-
-            if (hands[i].isLeft()) {
-                z = -z;
-            }
-            const Vector p = (hands[i].fingers()[2].bone(static_cast<Leap::Bone::Type>(0)).prevJoint()
-                //+ (hands[i].fingers()[2].bone(static_cast<Leap::Bone::Type>(0)).prevJoint() - hands[i].fingers()[2].bone(static_cast<Leap::Bone::Type>(0)).nextJoint())*0.5f))
-                )* 0.001f;
-
-            if (leap_on_hmd) {
-                hand.basis.setColumn(0, QVector4D(x.x, -x.z, x.y, 0.0f));
-                hand.basis.setColumn(1, QVector4D(y.x, -y.z, y.y, 0.0f));
-                hand.basis.setColumn(2, QVector4D(z.x, -z.z, z.y, 0.0f));
-                hand.basis.setColumn(3, QVector4D(p.x, -p.z, p.y + 0.07f, 1.0f));
-                hand.basis.rotate(-90.0, 0, 1, 0);
-            }
-            else {
-                hand.basis = QMatrix4x4(
-                            -x.x, x.y, -x.z, 0.0f,
-                            -y.x, y.y, -y.z, 0.0f,
-                            -z.x, z.y, -z.z, 0.0f,
-                            -p.x, p.y - 0.3f, -p.z + 0.4f, 1.0f).transposed();
-                hand.basis.rotate(-90.0, 0, 1, 0);
-            }
-
-            FingerList fingers = hands[i].fingers();
-
-            for (int j=0; j<5; ++j) {
-                for (int b=0; b<4; ++b) {
-                    Bone::Type boneType = static_cast<Leap::Bone::Type>(b);
-                    Bone bone = fingers[j].bone(boneType);
-
-                    const Matrix basis = bone.basis();
-                    Vector x = basis.xBasis.normalized();
-                    Vector y = basis.yBasis.normalized();
-                    Vector z = basis.zBasis.normalized();
-                    Vector p = bone.prevJoint() * 0.001f;
-
-                    if (hands[i].isLeft()) {
-                        z = -z;
-                    }
-
-                    if (leap_on_hmd) {
-                        hand.fingers[j][b].setColumn(0, QVector4D(x.x, -x.z, x.y, 0.0));
-                        hand.fingers[j][b].setColumn(1, QVector4D(y.x, -y.z, y.y, 0.0));
-                        hand.fingers[j][b].setColumn(2, QVector4D(z.x, -z.z, z.y, 0.0));
-                        hand.fingers[j][b].setColumn(3, QVector4D(p.x, -p.z, p.y + 0.07f, 1.0));
-                        hand.fingers[j][b].rotate(-90.0, 0, 1, 0);
-                    }
-                    else {
-                        hand.fingers[j][b].setColumn(0, QVector4D(-x.x, x.y, -x.z, 0.0));
-                        hand.fingers[j][b].setColumn(1, QVector4D(-y.x, y.y, -y.z, 0.0));
-                        hand.fingers[j][b].setColumn(2, QVector4D(-z.x, z.y, -z.z, 0.0));
-                        hand.fingers[j][b].setColumn(3, QVector4D(-p.x, p.y - 0.3f, -p.z + 0.4f, 1.0));
-                        hand.fingers[j][b].rotate(-90.0, 0, 1, 0);
-                    }
-                }
-            }
-        }
-    }
-    else if (game->GetControllerManager()->GetUsingSpatiallyTrackedControllers()) { //spatially tracked controller path
+    if (game->GetControllerManager()->GetUsingSpatiallyTrackedControllers()) { //spatially tracked controller path
         for (int i=0; i<2; ++i) {
             LeapHand & hand = player->GetHand(i);
-
             hand.is_active = false;
-            hand.finger_tracking = false;
-
             if (hmd_manager->GetControllerTracked(i)) {                                                
                 hand.is_active = true;          
                 hand.basis = hmd_manager->GetControllerTransform(i);
             }
         }
     }
-#else
-    if (game->GetControllerManager()->GetUsingSpatiallyTrackedControllers()) { //spatially tracked controller path
-            for (int i=0; i<2; ++i) {
-                LeapHand & hand = player->GetHand(i);
-
-                hand.is_active = false;
-                hand.finger_tracking = false;
-
-                if (hmd_manager->GetControllerTracked(i)) {
-                    hand.is_active = true;
-                    hand.basis = hmd_manager->GetControllerTransform(i);
-                }
-            }
-        }
-#endif
 }
 
 void MainWindow::Closed()

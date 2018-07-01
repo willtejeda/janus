@@ -13,10 +13,6 @@
 #include <QKeyEvent>
 #include <memory>
 
-#if !defined(__ANDROID__)  && !defined(__APPLE__)
-    #include <Leap.h>
-#endif
-
 #include "renderer.h"
 
 #include "soundmanager.h"
@@ -198,10 +194,6 @@ private:
     QTimer timer2;
     QTimer timer3;
     QMutex cef_mutex;
-
-#if !defined(__ANDROID__)  && !defined(__APPLE__)
-    Leap::Controller leap_controller;
-#endif
 
     QPointer <Game> game;
     QPointer <AbstractHMDManager> hmd_manager;

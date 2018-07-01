@@ -440,13 +440,6 @@ CONFIG(release) {
 }
 win32:LIBS += -llibOVR
 
-# LeapSDK
-win32:INCLUDEPATH += "./resources/LeapSDK/include" #note that Linux/OSX are built against an old gcc compatible version (2.2) of libLeap
-win32:LIBS += -L"$$PWD/resources/LeapSDK/lib/x64"
-win32:LIBS += -lleap
-unix:!android:!macx:INCLUDEPATH += "./resources/LeapSDK_2.2/include"
-unix:!android:!macx:LIBS += -L"$$PWD/resources/LeapSDK_2.2/lib/x64"
-
 # openVR (note that we only include it if OCULUS_SUBMISSION_BUILD is not defined)
 !contains(DEFINES, OCULUS_SUBMISSION_BUILD) {
 win32:INCLUDEPATH += "./resources/openvr/headers"
@@ -665,7 +658,7 @@ INCLUDEPATH += "./resources/RenderDoc"
 win32:LIBS += -lopengl32 -lglu32 -ladvapi32 -lwinmm
 
 # Other Linux libs (need to be separately installed via apt, etc.)
-unix:!macx:!android:LIBS += -lLeap -lX11 -ludev -lGLU -lrt -ldl -lopenal -lz #-lXrandr -lXinerama
+unix:!macx:!android:LIBS += -lX11 -ludev -lGLU -lrt -ldl -lopenal -lz #-lXrandr -lXinerama
 unix:!macx:!android:{
    QMAKE_LFLAGS += -Wl,-rpath,"'\$$ORIGIN'"
 }

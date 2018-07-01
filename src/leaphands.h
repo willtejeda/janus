@@ -11,9 +11,7 @@ class LeapHand
 public:
 
     LeapHand() :
-        is_active(false),        
-        finger_tracking(false),
-        finger_tracking_leap_hmd(false)
+        is_active(false)
     {
     }
 
@@ -22,11 +20,8 @@ public:
 
     static LeapHand Interpolate(const LeapHand & h1, const LeapHand & h2, const float t);
 
-    bool is_active;    
-    bool finger_tracking;
-    bool finger_tracking_leap_hmd;
-    QMatrix4x4 basis;    
-    QMatrix4x4 fingers[5][4]; //order is 0-thumb, 1-index, 2-middle, 3-third, 4-pinky
+    bool is_active;        
+    QMatrix4x4 basis;        
 };
 
 #endif // LEAPHANDS_H

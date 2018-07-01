@@ -2504,12 +2504,8 @@ void RoomObject::DrawGL(QPointer <AssetShader> shader, const bool left_eye, cons
 
                 RendererInterface::m_pimpl->SetDefaultFaceCullMode(FaceCullMode::BACK);
 
-                //draw controllers (if present) 55.2 - do not draw if using Leap motion (i.e. finger tracking)
-    //            qDebug() << ghost_frame.hands.first.finger_tracking << ghost_frame.hands.second.finger_tracking
-    //                     << ghost_frame.hands.first.is_active << ghost_frame.hands.second.is_active;
-                if (!ghost_frame.hands.first.finger_tracking && !ghost_frame.hands.second.finger_tracking &&
-                        (ghost_frame.hands.first.is_active || ghost_frame.hands.second.is_active)) {
-
+                //draw controllers (if present)
+                if (ghost_frame.hands.first.is_active || ghost_frame.hands.second.is_active) {
                     MathUtil::PushModelMatrix();
                     MathUtil::ModelMatrix().rotate(180,0,1,0);
                     MathUtil::ModelMatrix().scale(1.0f/s.x(), 1.0f/s.y(), 1.0f/s.z());

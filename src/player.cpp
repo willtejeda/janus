@@ -450,56 +450,30 @@ void Player::Update(const float move_speed)
 
     const float angle = -MathUtil::_PI_OVER_2 - atan2f(GetV("dir").z(), GetV("dir").x());
 
-    if (hand0.is_active) {
-        if (hand0.finger_tracking) {
-            SetV("hand0_xdir", GetViewToWorldDir(hand0.basis.column(0).toVector3D()));
-            SetV("hand0_ydir", GetViewToWorldDir(hand0.basis.column(1).toVector3D()));
-            SetV("hand0_zdir", GetViewToWorldDir(hand0.basis.column(2).toVector3D()));
-            SetV("hand0_pos", GetViewToWorldPoint(hand0.basis.column(3).toVector3D()));
-            SetV("hand0_p0", GetViewToWorldPoint(hand0.fingers[0][3].column(3).toVector3D()));
-            SetV("hand0_p1", GetViewToWorldPoint(hand0.fingers[1][3].column(3).toVector3D()));
-            SetV("hand0_p2", GetViewToWorldPoint(hand0.fingers[2][3].column(3).toVector3D()));
-            SetV("hand0_p3", GetViewToWorldPoint(hand0.fingers[3][3].column(3).toVector3D()));
-            SetV("hand0_p4", GetViewToWorldPoint(hand0.fingers[4][3].column(3).toVector3D()));
-        }
-        else {                        
-            QMatrix4x4 m;
-            m.translate(GetV("pos"));
-            m.rotate(angle * MathUtil::_180_OVER_PI, QVector3D(0,1,0));
-            m = m * hand0.basis;
-            SetV("hand0_xdir", m.column(0).toVector3D());
-            SetV("hand0_ydir", m.column(1).toVector3D());
-            SetV("hand0_zdir", m.column(2).toVector3D());
-            SetV("hand0_pos", m.column(3).toVector3D());
-        }
+    if (hand0.is_active) {                             
+        QMatrix4x4 m;
+        m.translate(GetV("pos"));
+        m.rotate(angle * MathUtil::_180_OVER_PI, QVector3D(0,1,0));
+        m = m * hand0.basis;
+        SetV("hand0_xdir", m.column(0).toVector3D());
+        SetV("hand0_ydir", m.column(1).toVector3D());
+        SetV("hand0_zdir", m.column(2).toVector3D());
+        SetV("hand0_pos", m.column(3).toVector3D());
     }
     else {
         SetV("hand0_vel", QVector3D());
         SetV("hand0_pos_old", QVector3D());
     }
 
-    if (hand1.is_active) {
-        if (hand1.finger_tracking) {
-            SetV("hand1_xdir", GetViewToWorldDir(hand1.basis.column(0).toVector3D()));
-            SetV("hand1_ydir", GetViewToWorldDir(hand1.basis.column(1).toVector3D()));
-            SetV("hand1_zdir", GetViewToWorldDir(hand1.basis.column(2).toVector3D()));
-            SetV("hand1_pos", GetViewToWorldPoint(hand1.basis.column(3).toVector3D()));
-            SetV("hand1_p0", GetViewToWorldPoint(hand1.fingers[0][3].column(3).toVector3D()));
-            SetV("hand1_p1", GetViewToWorldPoint(hand1.fingers[1][3].column(3).toVector3D()));
-            SetV("hand1_p2", GetViewToWorldPoint(hand1.fingers[2][3].column(3).toVector3D()));
-            SetV("hand1_p3", GetViewToWorldPoint(hand1.fingers[3][3].column(3).toVector3D()));
-            SetV("hand1_p4", GetViewToWorldPoint(hand1.fingers[4][3].column(3).toVector3D()));
-        }
-        else {
-            QMatrix4x4 m;
-            m.translate(GetV("pos"));
-            m.rotate(angle * MathUtil::_180_OVER_PI, QVector3D(0,1,0));
-            m = m * hand1.basis;
-            SetV("hand1_xdir", m.column(0).toVector3D());
-            SetV("hand1_ydir", m.column(1).toVector3D());
-            SetV("hand1_zdir", m.column(2).toVector3D());
-            SetV("hand1_pos", m.column(3).toVector3D());
-        }
+    if (hand1.is_active) {        
+        QMatrix4x4 m;
+        m.translate(GetV("pos"));
+        m.rotate(angle * MathUtil::_180_OVER_PI, QVector3D(0,1,0));
+        m = m * hand1.basis;
+        SetV("hand1_xdir", m.column(0).toVector3D());
+        SetV("hand1_ydir", m.column(1).toVector3D());
+        SetV("hand1_zdir", m.column(2).toVector3D());
+        SetV("hand1_pos", m.column(3).toVector3D());
     }
     else {
         SetV("hand1_vel", QVector3D());
