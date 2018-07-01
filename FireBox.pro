@@ -144,7 +144,6 @@ SOURCES += \
     src/textureimporterqimage.cpp \
     src/texturemanager.cpp \    
     src/virtualkeyboard.cpp \
-    src/vivemanager.cpp \
     src/webasset.cpp \
     src/webview.cpp \
     src/gamepad.c
@@ -224,7 +223,6 @@ HEADERS += \
     src/textureimporterqimage.h \
     src/texturemanager.h \    
     src/virtualkeyboard.h \
-    src/vivemanager.h \
     src/webasset.h \
     src/webview.h
 
