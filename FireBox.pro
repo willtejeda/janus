@@ -107,7 +107,7 @@ SOURCES += main.cpp \
     domnode.cpp \
     framebuffermanager.cpp \
     audioutil.cpp \
-    gamepad_new/gamepad.c \
+    gamepad.c \
     abstractrenderer.cpp \
     renderer.cpp \
     renderergl33_renderthread.cpp \
@@ -199,7 +199,7 @@ HEADERS += \
     domnode.h \
     framebuffermanager.h \
     audioutil.h \
-    gamepad_new/gamepad.h \
+    gamepad.h \
     rendererinterface.h \
     abstractrenderer.h \
     renderer.h \
@@ -269,13 +269,13 @@ unix:!macx:HEADERS += vivemanager.h
 unix:!macx:SOURCES += vivemanager.cpp
 
 #Gamepad not working on OSX
-unix:macx:SOURCES -= "gamepad_new/gamepad.c"
-unix:macx:HEADERS -= "gamepad_new/gamepad.h"
+unix:macx:SOURCES -= "gamepad.c"
+unix:macx:HEADERS -= "gamepad.h"
 
 #Remove dependencies unused by Android
 android:SOURCES -= "webview.cpp" \
     "assetwebsurface_pdf.cpp" \
-    "gamepad_new/gamepad.c" \
+    "gamepad.c" \
     "unittests.cpp" \
     "vivemanager.cpp" \
     "mem_istream.cpp" \
@@ -283,7 +283,7 @@ android:SOURCES -= "webview.cpp" \
     "cefwebview.cpp"
 android:HEADERS -= "webview.h" \
     "assetwebsurface_pdf.h" \
-    "gamepad_new/gamepad.h" \
+    "gamepad.h" \
     "unittests.h" \
     "vivemanager.h" \
     "mem_istream.h" \

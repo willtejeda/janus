@@ -6,7 +6,7 @@
 #include "abstracthmdmanager.h"
 
 #if !defined(__APPLE__) && !defined(__ANDROID__)
-    #include "gamepad_new/gamepad.h"
+    #include "gamepad.h"
 #endif
 
 #include "assetobject.h"
