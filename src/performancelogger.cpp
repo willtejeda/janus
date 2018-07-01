@@ -1,68 +1,19 @@
 #include "performancelogger.h"
 
 QVector <PerformanceLoggerSample> PerformanceLogger::frame_samples;
-QOpenGLTexture * PerformanceLogger::tex = NULL;
 int PerformanceLogger::max_frame_samples = 180;
 clock_t PerformanceLogger::last_clock = 0;
 
 PerformanceLogger::PerformanceLogger() :
-      m_total_main_CPU_time(0),
-      samples_num(0),
-      logging(false),
-      m_average_render_GPU_time(0),
-      m_average_render_CPU_time(0),
-      m_average_main_CPU_time(0)
+    samples_num(0),
+    m_total_main_CPU_time(0),
+    m_average_render_GPU_time(0),
+    m_average_render_CPU_time(0),
+    m_average_main_CPU_time(0)
 {    
     frame_samples.resize(max_frame_samples);
     main_thread_cpu_time_samples.resize(max_frame_samples);    
-    m_frame_time_timer.start();
-    Clear();
-}
-
-unsigned int PerformanceLogger::GetNumSamples() const
-{
-    return samples_num;
-}
-
-void PerformanceLogger::SetURL(const QString & s)
-{
-    data["url"] = s;
-    data["hash"] = MathUtil::MD5Hash(s);
-}
-
-void PerformanceLogger::Clear()
-{
-    logging = false;
-
-    data["minftTOTAL"] = FLT_MAX;
-    data["maxftTOTAL"] = -FLT_MAX;
-    data["minftGPU"] = FLT_MAX;
-    data["maxftGPU"] = -FLT_MAX;
-    data["medianftTOTAL"] = 0;
-    data["medianftGPU"] = 0;
-
-    data["sysmem"] = "0";
-    data["processorvendor"] = "unknown";
-    data["gpudriverversion"] = "unknown";
-    data["version"] = __JANUS_VERSION;       
-}
-
-QVariantMap & PerformanceLogger::GetData()
-{
-    return data;
-}
-
-void PerformanceLogger::SubmitData()
-{
-//    qDebug() << "PerformanceLogger::SubmitData()" << data;
-#ifndef QT_DEBUG
-    //Doing it
-//    qDebug() << "PerformanceLogger::SubmitData() min" << data["minftTOTAL"].toFloat() << "max" << data["maxftTOTAL"].toFloat() << "median" << data["medianftTOTAL"].toFloat();
-    //do http post
-    QUrl u("http://content.janusvr.com/api/perflog.php");
-//    const QByteArray b = "data={\"version\":\"54.0\",\"res\":[1280,1024],\"msaa\":4,\"fov\":\"30\",\"url\":\"http://vesta.janusvr.com/alainchesnais/my-test-room\",\"hash\":\"54bca559366d2b61addd134d6ef70650\",\"minftCPU\":\"0.01\",\"medianftCPU\":\"0.01\",\"maxftCPU\":\"0.01\",\"minftGPU\":\"0.01\",\"medianftGPU\":\"0.01\",\"maxftGPU\":\"0.01\",\"OS\":\"Mac OS 10.12.1\",\"sysmem\":\"8\",\"processorvendor\":\"intel\",\"processordevice\":\"2.9 GHz Intel Core i5\",\"gpuvendor\":\"intel\",\"gpudevice\":\"Intel Iris Graphics 6100 1536 MB\",\"gpudriverversion\":\"10.12.1\",\"rendermode\":\"direct\"}"; //for testing
-    webasset.DoHTTPPost(u, QByteArray("data=")+QJsonDocument::fromVariant(data).toJson(QJsonDocument::Compact));
-#endif
+    m_frame_time_timer.start();    
 }
 
 void PerformanceLogger::StartFrameSample()
@@ -70,15 +21,10 @@ void PerformanceLogger::StartFrameSample()
     last_clock = clock();
 }
 
-void PerformanceLogger::SetLogging(const bool b)
-{
-    logging = b;
-}
-
 void PerformanceLogger::EndFrameSample()
 {
-    uint32_t const results_index = samples_num % max_frame_samples;
-    samples_num++;
+    uint32_t const results_index = samples_num % max_frame_samples;    
+    ++samples_num;
 
     main_thread_cpu_time_samples[results_index] = double(m_frame_time_timer.nsecsElapsed() / 1000000);
     m_frame_time_timer.start();

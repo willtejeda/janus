@@ -184,9 +184,6 @@ void Room::Clear()
     }
 
     assetshader.clear();
-#ifndef __ANDROID__
-    perf_logger.Clear();
-#endif
 
     if (entrance_object.isNull()) {
         entrance_object = new RoomObject();
@@ -2969,9 +2966,6 @@ void Room::Create()
     const QString url = GetS("url");
 
     SetS("title", page->GetTitle());
-#ifndef __ANDROID__
-    perf_logger.SetURL(url);
-#endif
 
     envobjects.clear();
 

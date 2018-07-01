@@ -855,40 +855,6 @@ void Game::DrawGL(const float ipd, const QMatrix4x4 head_xform, const bool set_m
     }
 #endif
 
-    QPointer <Room> r = env->GetCurRoom();
-
-    //perf logging, update perf counter if player is in room, and it's ready
-#ifndef __ANDROID__
-    if (SettingsManager::GetPerfLog())
-    {        
-        if (r && r->GetReady() && r->GetReadyForScreenshot())
-        {
-            const int max_perf_samples = 300;
-            PerformanceLogger & perf_log = r->GetPerformanceLogger();
-            perf_log.SetLogging(true);
-            if (perf_log.GetNumSamples()  == max_perf_samples)
-            {
-                QVariantMap & data = perf_log.GetData();
-
-                QJsonArray a;
-                a.push_back(p_windowSize.width());
-                a.push_back(p_windowSize.height());
-                data["res"] = a.toVariantList();
-                data["msaa"] = SettingsManager::GetAntialiasingEnabled() ? 4 : 0;
-                data["fov"] = SettingsManager::GetFOV();
-                data["OS"] = QSysInfo::productType();
-                data["gpuvendor"] = QString((const char *)(glGetString(GL_VENDOR)));
-                data["gpudevice"] = QString((const char *)(glGetString(GL_RENDERER)));
-                data["processordevice"] = QString::number(QThread::idealThreadCount()) + " core CPU";
-                data["rendermode"] = player->GetS("hmd_type");
-                data["renderer"] = RendererInterface::m_pimpl->GetRendererName();
-
-                perf_log.SubmitData();
-            }
-        }
-    }
-#endif
-
     // Draw current room    
     env->draw_current_room(multi_players, player, true);
 
@@ -903,6 +869,7 @@ void Game::DrawGL(const float ipd, const QMatrix4x4 head_xform, const bool set_m
 
 
     // Update the cursor (Object ID, normal, world-space location)
+    QPointer <Room> r = env->GetCurRoom();
     RendererInterface::m_pimpl->BeginScope(RENDERER::RENDER_SCOPE::VIRTUAL_KEYBOARD);
     r->BindShader(Room::GetTransparencyShader());
     DrawVirtualKeyboard();

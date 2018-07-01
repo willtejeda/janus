@@ -13,7 +13,6 @@
 #include <time.h>
 #include <QtCore>
 
-#include "webasset.h"
 #include "mathutil.h"
 #include "rendererinterface.h"
 
@@ -26,44 +25,26 @@ struct PerformanceLoggerSample
 class PerformanceLogger
 {
 public:
-    PerformanceLogger();
+    PerformanceLogger();   
 
-    unsigned int GetNumSamples() const;
-    void Clear();
-
-    void SetURL(const QString & u);
-
-    void SubmitData();
-
-    QVariantMap & GetData();
-
-    void StartFrameSample();
-    static void TestFrameSample(const QString & s);
+    void StartFrameSample();    
     void EndFrameSample();
 
     void SetGPUTimeQueryResults(std::vector<uint64_t>& v);
     void SetCPUTimeQueryResults(std::vector<uint64_t>& v);
 
     void SetNumFrameSamples(const int i);
-    int GetNumFrameSamples() const;
-    void SetLogging(const bool b);
+    int GetNumFrameSamples() const;    
     TextureHandle* GetFrameSamplesTextureHandle();
     double GetAverageMainThreadCPUTime() const;
     double GetAverageRenderThreadCPUTime() const;
-    double GetAverageRenderThreadGPUTime() const;
+    double GetAverageRenderThreadGPUTime() const;    
+
+private:   
+
+    int samples_num;
     std::shared_ptr<TextureHandle> m_texture_handle;
-
-private:
-
-    QUrl url;
-
-    int64_t m_total_main_CPU_time;
-    int64_t samples_num;
-    bool logging;
-
-    WebAsset webasset;
-
-    QVariantMap data;
+    int64_t m_total_main_CPU_time;   
 
     // This is nanoseconds per frame
     double m_average_render_GPU_time;
@@ -73,8 +54,7 @@ private:
     QElapsedTimer m_frame_time_timer;
     QVector <int64_t> main_thread_cpu_time_samples;
 
-    static QVector <PerformanceLoggerSample> frame_samples;    
-    static QOpenGLTexture * tex;
+    static QVector <PerformanceLoggerSample> frame_samples;            
     static int max_frame_samples;
     static clock_t last_clock;
 };
