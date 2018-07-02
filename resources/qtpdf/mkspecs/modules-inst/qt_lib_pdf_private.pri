@@ -1,9 +1,0 @@
-QT.pdf_private.VERSION = 5.9.0
-QT.pdf_private.MAJOR_VERSION = 5
-QT.pdf_private.MINOR_VERSION = 9
-QT.pdf_private.PATCH_VERSION = 0
-QT.pdf_private.name = QtPdf
-QT.pdf_private.libs = $$QT_MODULE_LIB_BASE
-QT.pdf_private.includes = $$QT_MODULE_INCLUDE_BASE/QtPdf/5.9.0 $$QT_MODULE_INCLUDE_BASE/QtPdf/5.9.0/QtPdf
-QT.pdf_private.depends = pdf
-QT.pdf_private.module_config = internal_module no_link
