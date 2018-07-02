@@ -783,6 +783,7 @@ void Geom::Update()
 {
 //    qDebug() << "Geom::Update()" << ready;
     if (scene && ready && !textures_started) {
+        textures_started = true;
 
         //load textures from main thread
         QList <QString> mat_names = data.GetMaterialNames();
@@ -864,9 +865,7 @@ void Geom::Update()
                     mat.textures[j].img = new_img;
                 }
             }
-        }
-
-        textures_started = true;
+        }       
     }
     else if (ready && textures_started && !textures_ready) {
 

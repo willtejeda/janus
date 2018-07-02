@@ -515,7 +515,8 @@ void MultiPlayerManager::Update(QPointer <Player> player, const QString & url, c
         QPointer <RoomObject> p = playerIndex.value();
 
         if (p) {
-            if (p->GetTimeElapsed() > RoomObject::GetLogoffRate() + 3.0f) {
+            //release 60.0 - 30+ second timeout delay... if too short, a long avatar load may trigger the timeout, avatar is deleted, then load started, then deleted, on and on...
+            if (p->GetTimeElapsed() > RoomObject::GetLogoffRate() + 60.0f) {
     //            qDebug() << "MultiplayerManager::Update()  removing";
                 players_to_remove.push_back(playerIndex.key());
             }
@@ -617,7 +618,7 @@ void MultiPlayerManager::DrawCursorsGL(QPointer <AssetShader> shader)
     QMap<QString, QPointer <RoomObject> >::iterator i;
     for (i = players.begin(); i != players.end(); ++i) {
         QPointer <RoomObject> player = i.value();
-        if (QString::compare(player->GetURL(), url_to_draw_md5) == 0) {
+        if (player && QString::compare(player->GetURL(), url_to_draw_md5) == 0) {
             player->DrawCursorGL(shader);
         }
     }
@@ -632,7 +633,7 @@ void MultiPlayerManager::DrawGL(QPointer <AssetShader> shader, const QVector3D &
     QMap<QString, QPointer <RoomObject> >::iterator i;
     for (i = players.begin(); i != players.end(); ++i) {
         QPointer <RoomObject> player = i.value();
-        if (QString::compare(player->GetURL(), url_to_draw_md5) == 0) {            
+        if (player && QString::compare(player->GetURL(), url_to_draw_md5) == 0) {
             player->DrawGL(shader, render_left_eye, player_pos);
         }
     }
@@ -902,9 +903,10 @@ QList <QPointer <RoomObject> > MultiPlayerManager::GetPlayersInRoom(const QStrin
     QList <QPointer <RoomObject> > ps;
     QMap <QString, QPointer <RoomObject> >::iterator it;
     for (it=players.begin(); it!=players.end(); ++it) {
-        if (it.value() && QString::compare(it.value()->GetURL(), url_md5) == 0) {
+        QPointer <RoomObject> player = it.value();
+        if (player && QString::compare(player->GetURL(), url_md5) == 0) {
 //            qDebug() << "MultiPlayerManager::GetPlayersInRoom()" << it.value()->GetID() << it.value()->GetTimeElapsed();
-            ps.push_back(it.value());
+            ps.push_back(player);
         }
     }
     return ps;
@@ -1217,8 +1219,12 @@ void MultiPlayerManager::DoUserMoved(const QVariantMap & m)
 
 //    qDebug() << "MultiPlayerManager::DoUserMoved() " << userid;
     QPointer <RoomObject> cur_player;
-    if (!players.contains(userid) || players[userid] == NULL) {
-        cur_player = QPointer <RoomObject> (new RoomObject());
+    if (players.contains(userid) && players[userid]) {
+        cur_player = players[userid];
+    }
+    else {
+        cur_player = new RoomObject();
+//        qDebug() << "MULTI NEW PLAYER!" << cur_player << userid << roomid;
         cur_player->SetType("ghost");
         cur_player->SetS("id", userid);
         cur_player->SetB("loop", false);
@@ -1227,9 +1233,6 @@ void MultiPlayerManager::DoUserMoved(const QVariantMap & m)
         cur_player->SetV("scale", QVector3D(1.5f, 1.5f, 1.5f)); //this sets the "size"
         AddChatMessage(userid + " is nearby.", QColor(32, 32, 32)); //add message to chat log
         players[userid] = cur_player;
-    }
-    else {
-        cur_player = players[userid];
     }
 
     cur_player->DoGhostMoved(m);
@@ -1806,7 +1809,7 @@ int MultiPlayerManager::GetNumberUsersURL(const QString & url)
     QMap<QString, QPointer <RoomObject> >::iterator i;
     for (i = players.begin(); i != players.end(); ++i) {
         QPointer <RoomObject> player = i.value();
-        if (QString::compare(player->GetURL(), url_to_draw_md5) == 0 && player->GetTimeElapsed() < 5.0f) { //47.23 - make players who disconnect disappear
+        if (player && QString::compare(player->GetURL(), url_to_draw_md5) == 0 && player->GetTimeElapsed() < 5.0f) { //47.23 - make players who disconnect disappear
             ++num;
         }
     }

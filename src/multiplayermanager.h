@@ -242,6 +242,7 @@ private:
     QString userid_backup_filename;
 
     QString url_to_draw;
+    QString url_to_draw_md5;
 
     QList <QPair <QString, QColor> > chat_messages_log;
 
