@@ -4407,17 +4407,19 @@ void Game::UpdateControllers()
             player->TiltView(tilt_amount);
         }
         else {
-            if (websurface_selected[1] && fabsf(controller_y[1]) > snapturn_axis_threshold) { // && fabsf(last_controller_y[1]) < snapturn_axis_threshold) {
-                QWheelEvent e2(QPointF(), controller_y[1] * 10.0f, 0, 0);
-                websurface_selected[1]->wheelEvent(&e2);
-//                if (controller_y[1] > 0.0f) {
-//                    QWheelEvent e2(QPointF(), 150, 0, 0);
-//                    websurface_selected[1]->wheelEvent(&e2);
-//                }
-//                else {
-//                    QWheelEvent e2(QPointF(), -150, 0, 0);
-//                    websurface_selected[1]->wheelEvent(&e2);
-//                }
+            if (websurface_selected[1]) {
+                if (fabsf(controller_y[1]) > snapturn_axis_threshold) { // && fabsf(last_controller_y[1]) < snapturn_axis_threshold) {
+                    QWheelEvent e2(QPointF(), controller_y[1] * 10.0f, 0, 0);
+                    websurface_selected[1]->wheelEvent(&e2);
+                }
+            }
+            else {
+                if (controller_y[1] > snapturn_axis_threshold) { // && last_controller_y[1] < snapturn_axis_threshold) {
+                    player->SetB("jump", true); //jumping stuff
+                }
+                else {
+                    player->SetB("jump", false); //jumping stuff
+                }
             }
         }
     }
