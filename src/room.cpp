@@ -3608,14 +3608,12 @@ void Room::Create_Reddit()
 {    
     const QString translator_path = MathUtil::GetTranslatorPath();
 
-#ifndef __ANDROID__
     QPointer <AbstractWebSurface> new_asset_websurface = (AbstractWebSurface*)new AssetWebSurface();
     new_asset_websurface->SetSrc(GetS("url"), GetS("url"));
     new_asset_websurface->SetS("id", "web1");
     new_asset_websurface->SetWidth(1280);
     new_asset_websurface->SetHeight(768);
     AddAssetWebSurface(new_asset_websurface);
-#endif
 
     QPointer <AssetObject> assetobj0(new AssetObject());
     assetobj0->SetSrc(translator_path, "reddit/redditPBR.dae.gz");

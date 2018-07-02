@@ -250,12 +250,10 @@ unix:macx:SOURCES -= "src/gamepad.c"
 unix:macx:HEADERS -= "src/gamepad.h"
 
 #Remove dependencies unused by Android
-android:SOURCES -= "src/webview.cpp" \
-    "src/gamepad.c" \
+android:SOURCES -= "src/gamepad.c" \
     "src/vivemanager.cpp" \    
     "src/cefwebview.cpp"
-android:HEADERS -= "webview.h" \    
-    "src/gamepad.h" \
+android:HEADERS -= "src/gamepad.h" \
     "src/vivemanager.h" \    
     "src/cefwebview.h"
 android:SOURCES += "src/androidwebview.cpp" \
