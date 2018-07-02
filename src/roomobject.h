@@ -386,9 +386,7 @@ protected:
     void DrawIconGL(QPointer <AssetShader> shader, const QPointer <AssetImage> img);
     void UpdateMatrices();
 
-    void LoadGhost_Helper(const int depth, const QVariantMap & d, QPointer <RoomObject> parent_object, QHash<QString, QPointer<AssetObject> > &asset_obj_list, QHash<QString, QPointer<AssetShader> > &asset_shader_list);
-
-    void Update_GhostFrame(GhostFrame & g);
+    void LoadGhost_Helper(const int depth, const QVariantMap & d, QPointer <RoomObject> parent_object, QHash<QString, QPointer<AssetObject> > &asset_obj_list, QHash<QString, QPointer<AssetShader> > &asset_shader_list);   
 
     //portal specific
     QString ShortenString(const QString & s);

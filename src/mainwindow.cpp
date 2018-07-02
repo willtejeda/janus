@@ -833,7 +833,7 @@ void MainWindow::TimeOut()
     //Check for changes to enhanced depth precision setting
     RendererInterface::m_pimpl->SetIsUsingEnhancedDepthPrecision(SettingsManager::GetEnhancedDepthPrecisionEnabled());
 
-    Update();
+    Update();    
     glwidget->update();      
 }
 
