@@ -1,5 +1,0 @@
-QMAKE_PRL_BUILD_DIR = C:/Users/Joseph/Documents/JanusVR/janus-vr/resources/qtpdf/src/lib
-QMAKE_PRO_INPUT = lib.pro
-QMAKE_PRL_TARGET = qtpdfiumd
-QMAKE_PRL_CONFIG = lex yacc debug depend_includepath testcase_targets import_plugins import_qpa_plugin rtti_off incremental_off windows link_prl incremental flat precompile_header autogen_precompile_source debug_and_release debug_and_release_target embed_manifest_dll embed_manifest_exe c++11 no_plugin_manifest qpa win32 msvc copy_dir_files pcre compile_examples sse2 sse3 ssse3 sse4_1 sse4_2 avx avx2 largefile prefix_build force_independent create_prl link_prl prepare_docs qt_docs_targets no_private_qt_headers_warning QTDIR_build exceptions_off testcase_exceptions warning_clean debug DebugBuild Debug build_pass staticlib hide_symbols warn_off rtti_off exceptions_off c++11 debug_and_release build_all debug DebugBuild Debug build_pass have_target static staticlib no_plist exclusive_builds debug_info no_autoqmake
-QMAKE_PRL_LIBS = advapi32.lib gdi32.lib user32.lib

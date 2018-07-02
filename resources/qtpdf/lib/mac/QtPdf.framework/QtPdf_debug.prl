@@ -1,6 +1,0 @@
-QMAKE_PRL_BUILD_DIR = /Users/mccrae/Downloads/qtpdf/src/pdf
-QMAKE_PRO_INPUT = pdf.pro
-QMAKE_PRL_TARGET = QtPdf_debug
-QMAKE_PRL_CONFIG = lex yacc debug depend_includepath testcase_targets import_plugins import_qpa_plugin sdk rez qt warn_on link_prl app_bundle incremental global_init_link_order lib_version_first plugin_no_soname clang_pch_style shared qpa no_mocdepend qt_framework osx macx mac darwin unix posix gcc clang llvm compile_examples qpa largefile use_gold_linker sse2 sse3 ssse3 sse4_1 sse4_2 avx avx2 pcre use_libmysqlclient_r prefix_build force_independent create_prl link_prl prepare_docs qt_docs_targets no_private_qt_headers_warning QTDIR_build exceptions_off testcase_exceptions warning_clean debug DebugBuild Debug build_pass x86_64 debug DebugBuild Debug build_pass c++11 git_build qmake_cache target_qt need_fwd_pri qt_install_module c++11 hide_symbols debug_and_release build_all create_cmake sliced_bundle qt_framework lib_bundle explicitlib compiler_supports_fpmath create_pc create_libtool explicitlib debug DebugBuild Debug build_pass have_target dll no_plist exclusive_builds debug_info objective_c no_autoqmake thread opengl moc resources moc resources
-QMAKE_PRL_VERSION = 5.9.0
-QMAKE_PRL_LIBS = -F/Users/mccrae/Qt/5.5/clang_64/lib -framework QtGui -framework QtCore -framework DiskArbitration -framework IOKit
