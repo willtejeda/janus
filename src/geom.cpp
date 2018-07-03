@@ -1771,11 +1771,7 @@ void Geom::create_material(const struct aiMaterial *mtl, GeomMaterial & mat)
     aiColor4D specular;
     aiColor4D ambient;
     aiColor4D emission;
-#if defined(__APPLE__) || defined(__ANDROID__)
-    float shininess, strength, transparency;
-#else
     ai_real shininess, strength, transparency;
-#endif
     unsigned int max;
 
     set_float4(c, 0.8f, 0.8f, 0.8f, 1.0f);

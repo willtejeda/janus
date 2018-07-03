@@ -10,27 +10,24 @@ public:
     SlidingTabWidget();
     ~SlidingTabWidget();
 
-    void SetDeltaX(int x);
-    void SetDeltaY(int y);
-    int GetDeltaX();
-    int GetDeltaY();
+    void SetWindowSize(QSize s);
+
+    bool GetShowing();
     bool GetSliding();
 
-    void SetMaxDeltaX(int x);
-    void SetMinDeltaX(int x);
-    void SetMaxDeltaY(int y);
-    void SetMinDeltaY(int y);
+    void Show();
+    void Hide();
+
+    void Update();
 
     void mousePressEvent(QMouseEvent * event);
     void mouseReleaseEvent(QMouseEvent * event);
 
 private:
-    int dx;
-    int dy;
-    int max_dx;
-    int min_dx;
-    int max_dy;
-    int min_dy;
+    int window_width;
+    int window_height;
+
+    bool showing;
 
     bool sliding;
 

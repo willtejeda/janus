@@ -552,31 +552,12 @@ void MainWindow::resizeEvent(QResizeEvent *event)
         settings_window->move(width()/10, height()/10);
     }
 
-    //Reset URL bar / social window size and position in new orientation
-    url_bar_tab->setFixedWidth(2*width()/3 - 64); //+ social_window_tab->tabBar()->width()/2);
-    url_bar_tab->setFixedHeight(url_bar_tab->widget(0)->height() + url_bar_tab->tabBar()->height());
-
-    if (url_bar_tab->GetDeltaY() == 0)
-        url_bar_tab->SetDeltaY(0);
-    else
-        url_bar_tab->SetDeltaY(url_bar_tab->widget(0)->height());
-
+    //Reset URL bar / social window size
+    url_bar_tab->setFixedSize(2*width()/3 - 64, url_bar_tab->widget(0)->height() + url_bar_tab->tabBar()->height());
     social_window_tab->setFixedSize(width()/3, height());
 
-    if (social_window_tab->GetDeltaX() == 0)
-        social_window_tab->SetDeltaX(0);
-    else
-        social_window_tab->SetDeltaX(-(social_window_tab->width() - social_window_tab->tabBar()->width()));
-
-    url_bar_tab->move(0, -url_bar_tab->widget(0)->height() + url_bar_tab->GetDeltaY());
-    social_window_tab->move(width() - social_window_tab->tabBar()->width() + social_window_tab->GetDeltaX(), 0);
-
-    //Reset URL bar / social window maximum / minimum positions
-    url_bar_tab->SetMinDeltaY(0);
-    url_bar_tab->SetMaxDeltaY(url_bar_tab->widget(0)->height());
-
-    social_window_tab->SetMinDeltaX(-(social_window_tab->width() - social_window_tab->tabBar()->width()));
-    social_window_tab->SetMaxDeltaX(0);
+    url_bar_tab->SetWindowSize(size());
+    social_window_tab->SetWindowSize(size());
 
     QMainWindow::resizeEvent(event);
 }
@@ -647,7 +628,7 @@ void MainWindow::Update()
     }
     else
     {
-        if (url_bar_tab->GetDeltaY() == url_bar_tab->widget(0)->height() &&         //Check if URL bar is open
+        if (url_bar_tab->GetShowing() &&         //Check if URL bar is open
             !ellipsisMenu->isVisible() && !settings_window->isVisible() &&          //Check if ellipsis menu / settings window is open
             !urlbar->hasFocus()){                                                   //Check if URL line edit is focussed
             if (!url_bar_tab_timer.isValid()){
@@ -655,15 +636,16 @@ void MainWindow::Update()
             }
             else{
                 if (url_bar_tab_timer.isValid() && url_bar_tab_timer.elapsed() > 10000){
-                    url_bar_tab->SetDeltaY(0);
+                    url_bar_tab->Hide();
                 }
             }
         }
         else{
             url_bar_tab_timer.invalidate();
         }
-        url_bar_tab->move(0, -url_bar_tab->widget(0)->height() + url_bar_tab->GetDeltaY());
-        social_window_tab->move(width() - social_window_tab->tabBar()->width() + social_window_tab->GetDeltaX(), 0);
+
+        url_bar_tab->Update();
+        social_window_tab->Update();
 
         JNIUtil::SetControlsVisible(true, SettingsManager::GetShowViewJoystick());
     }
@@ -888,13 +870,11 @@ void MainWindow::Initialize()
 
     //qDebug() << "MainWindow::Initialize() - GetUseVR()" << SettingsManager::GetUseVR();
 
-    url_bar_tab->setFixedWidth(2*width()/3 - 64); //+ social_window_tab->tabBar()->width()/2);
+    url_bar_tab->setFixedSize(2*width()/3 - 64, url_bar_tab->widget(0)->height() + url_bar_tab->tabBar()->height());
+    social_window_tab->setFixedSize(width()/3, height());
 
-    url_bar_tab->SetMinDeltaY(0);
-    url_bar_tab->SetMaxDeltaY(url_bar_tab->widget(0)->height());
-
-    social_window_tab->SetMinDeltaX(-(social_window_tab->width() - social_window_tab->tabBar()->width()));
-    social_window_tab->SetMaxDeltaX(0);
+    url_bar_tab->SetWindowSize(size());
+    social_window_tab->SetWindowSize(size());
 
 #ifndef OCULUS_SUBMISSION_BUILD
     url_bar_tab->setVisible(true);
