@@ -562,7 +562,7 @@ void GLWidget::leaveEvent(QEvent * )
 void GLWidget::SetupFramebuffer()
 {
 #ifdef __ANDROID__
-    uint32_t samples = (SettingsManager::GetAntialiasingEnabled()) ? 2 : 0;
+    uint32_t samples = 0;
 #else
     uint32_t samples = (SettingsManager::GetAntialiasingEnabled()) ? 4 : 0;
 #endif

@@ -10,7 +10,15 @@ HTMLPage::~HTMLPage()
 
 void HTMLPage::SetURL(const QUrl & u)
 {
-    webasset.SetURL(u);    
+    if (u.toString().left(22).contains("reddit.com") && !u.toString().left(22).contains("old.reddit.com")) {
+        webasset.SetURL(QUrl(u.toString().replace("reddit.com", "old.reddit.com")));
+    }
+    else if (u.toString().left(22).contains("www.reddit.com")) {
+        webasset.SetURL(QUrl(u.toString().replace("www.reddit.com", "old.reddit.com")));
+    }
+    else {
+        webasset.SetURL(u);
+    }
 }
 
 QUrl HTMLPage::GetURL() const
@@ -608,7 +616,7 @@ void HTMLPage::ReadRedditCommentContent(const QString & reddit_data)
 
     HTMLExtractAll(QString("<div class=\"score unvoted"), QString("</div>"), true, reddit_data, thread_score_strings);
     HTMLExtractAll(QString("<div class=\"md\">"), QString("</div>"), true, reddit_data, user_comment_strings);
-    HTMLExtractAll(QString("<a href=\"http://www.reddit.com/user"), QString("</a>"), true, reddit_data, user_strings);
+    HTMLExtractAll(QString("<a href=\"http://www.old.reddit.com/user"), QString("</a>"), true, reddit_data, user_strings);
     HTMLExtractAll(QString("<span class=\"score unvoted"), QString("</span>"), true, reddit_data, score_strings);
     HTMLExtractAll(QString("<time title=\""), QString("</time>"), true, reddit_data, time_strings);
 
@@ -674,7 +682,7 @@ void HTMLPage::ReadRedditContent(const QString & reddit_data)
         HTMLExtract(QString("<span class=\"rank"), QString("</span>"), true, things[i], rank_strings[i]);
         HTMLExtract(QString("<a class=\"comments"), QString("</a>"), true, things[i], comments_strings[i]);
         HTMLExtract(QString("<time title=\""), QString("</time>"), true, things[i], time_strings[i]);
-        HTMLExtract(QString("<a href=\"http://www.reddit.com/user/"), QString("</a>"), true, things[i], user_strings[i]);
+        HTMLExtract(QString("<a href=\"http://www.old.reddit.com/user/"), QString("</a>"), true, things[i], user_strings[i]);
     }
 
     QString nav_substr;
@@ -864,7 +872,7 @@ void HTMLPage::LoadFile()
         room["visible"] = "false";
         return;
     }
-    else if (url_str.left(22).contains("reddit.com")) {
+    else if (url_str.left(26).contains("old.reddit.com")) {
 
         QString string;
 //        qDebug() << "HTMLPage::ReadRedditContent:" << ba_str;
@@ -1155,7 +1163,7 @@ QString HTMLPage::GfyGenerateGfyDefault() {
         "          fwd=\"0 0 -1\"\n"        
         "    >\n"
         "        <Image id=\"logo\" pos=\"0 2 -10\" scale=\"2 2 .01\" />\n"
-        "        <Link pos=\"0 0 -20\" url=\"http://www.reddit.com/r/gfycats/\" col=\"0.81 0.89 0.97\" title=\"/r/GFYCats\" scale=\"1.8 2.5 1\" />\n"
+        "        <Link pos=\"0 0 -20\" url=\"http://www.old.reddit.com/r/gfycats/\" col=\"0.81 0.89 0.97\" title=\"/r/GFYCats\" scale=\"1.8 2.5 1\" />\n"
         "    </Room>\n"
         "</FireBoxRoom>\n"
         "</body>\n"

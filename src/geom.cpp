@@ -783,6 +783,7 @@ void Geom::Update()
 {
 //    qDebug() << "Geom::Update()" << ready;
     if (scene && ready && !textures_started) {
+        textures_started = true;
 
         //load textures from main thread
         QList <QString> mat_names = data.GetMaterialNames();
@@ -864,9 +865,7 @@ void Geom::Update()
                     mat.textures[j].img = new_img;
                 }
             }
-        }
-
-        textures_started = true;
+        }       
     }
     else if (ready && textures_started && !textures_ready) {
 
@@ -1772,11 +1771,7 @@ void Geom::create_material(const struct aiMaterial *mtl, GeomMaterial & mat)
     aiColor4D specular;
     aiColor4D ambient;
     aiColor4D emission;
-#if defined(__APPLE__) || defined(__ANDROID__)
-    float shininess, strength, transparency;
-#else
     ai_real shininess, strength, transparency;
-#endif
     unsigned int max;
 
     set_float4(c, 0.8f, 0.8f, 0.8f, 1.0f);

@@ -921,28 +921,6 @@ void RoomObject::Update(const double dt_sec)
         SetB("_text_changed", false);
     }
 
-    //handle URL updates
-//    if (GetB("_url_changed")) { //object->websurface
-//        SetURL(GetS("url"));
-//        SetB("_url_changed", false);
-
-//        if (assetwebsurface && assetwebsurface->GetB("_save_to_markup")) {
-//            assetwebsurface->SetURL(GetS("url"));
-//            const QString websurface_url = assetwebsurface->GetURL();
-//            if (websurface_url != GetS("url")) {
-//                assetwebsurface->SetURL(GetS("url"));
-//            }
-//        }
-//    }
-//    else if (assetwebsurface) { //websurface -> object
-//        //55.6 Note!  Code finicky
-//        const QString websurface_url = assetwebsurface->GetURL();
-//        if (websurface_url != GetS("url")) {
-//            SetURL(websurface_url);
-//            SetB("_url_changed", false);
-//        }
-//    }
-
     if (interpolate && interp_time > 0.0f && obj_type != "link" && obj_type != "sound") {
         interp_val = float(interp_timer.elapsed()) / (interp_time * 1000.0f);
         interp_val = qMax(0.0f, qMin(interp_val, 1.0f));
@@ -1062,6 +1040,7 @@ void RoomObject::Update(const double dt_sec)
                         const QString id = GetS("id");
                         const QString js_id = GetS("js_id");
                         const bool loop = GetB("loop");
+//                        qDebug() << this << "setting data:" << ghost_frame.avatar_data;
                         LoadGhost(ghost_frame.avatar_data);
                         SetAvatarCode(ghost_frame.avatar_data);
 
@@ -1115,73 +1094,6 @@ void RoomObject::Update(const double dt_sec)
             SetDir(ghost_frame.dir);
             SetHMDType(ghost_frame.hmd_type);
         }
-
-//        QPointer <AssetGhost> g = assetghost;
-//        if (g && g->GetProcessed()) { //56.0 - ensure ghost data is processed before doing this
-
-//            ghost_frame = GhostFrame();
-
-//            const int cur_ghost_frame_index = g->GetFrameIndex(time_elapsed);
-//            const bool sequence_end = g->GetGhostFrame(time_elapsed, ghost_frame);
-
-//            g->ClearEditsDeletes();
-
-//            if (do_multiplayer_timeout) { //multiplayer users/simulated AssetRecordings
-//                //voip - consume all
-//                const int nFrames = g->GetNumFrames();
-//                for (int i=0; i<nFrames; ++i) {
-//                    GhostFrame & f2 = g->GetFrameByIndex(i);
-//                    if (SettingsManager::GetUpdateVOIP()
-//                            && !f2.sound_buffers.isEmpty()
-//                            && !player_in_room
-//                            && !player_in_adjacent_room) {
-//                        sound_buffers += f2.sound_buffers;
-//                        qDebug() << "RoomObject::Update packets from" << this->GetS("id") << f2.sound_buffers.size();
-//                        f2.sound_buffers.clear();
-//                    }
-//                }
-//            }
-//            else if (!do_multiplayer_timeout && playing && sequence_end) {
-//                if (GetB("loop")) {
-//                    time_elapsed = 0.0f;
-//                }
-//                else {
-//                    playing = false;
-//                }
-//            }
-
-//            //60.0 - ghosts need to retain the data - so play frames and process 1 by 1
-//            if (cur_ghost_frame_index >= 0 && cur_ghost_frame_index != ghost_frame_index) {
-//                //voip - consume current index
-//                if (cur_ghost_frame_index+1 < g->GetNumFrames()) {
-//                    GhostFrame & f2 = g->GetFrameByIndex(cur_ghost_frame_index+1);
-//                    if (SettingsManager::GetUpdateVOIP()
-//                            && !f2.sound_buffers.isEmpty()
-//                            && !player_in_room
-//                            && !player_in_adjacent_room) {
-//                        sound_buffers += f2.sound_buffers;
-//                    }
-//                }
-
-//                ghost_frame_index = cur_ghost_frame_index;
-//                Update_GhostFrame(ghost_frame);
-//            }
-
-//            //change the ghost's animation and other attributes
-//            SetS("anim_id", ghost_frame.anim_id);
-
-//            //re-orthogonalize view and up dirs (they get unorthogonalized through slerp)
-//            ghost_frame.head_xform.setColumn(1, ghost_frame.head_xform.column(1).toVector3D().normalized());
-//            ghost_frame.head_xform.setColumn(2, ghost_frame.head_xform.column(2).toVector3D().normalized());
-//            ghost_frame.head_xform.setColumn(0, QVector3D::crossProduct(ghost_frame.head_xform.column(1).toVector3D(),
-//                                                                        ghost_frame.head_xform.column(2).toVector3D()).normalized());
-//            ghost_frame.head_xform.setColumn(1, QVector3D::crossProduct(ghost_frame.head_xform.column(2).toVector3D(),
-//                                                                        ghost_frame.head_xform.column(0).toVector3D()).normalized());
-
-//            SetV("pos", ghost_frame.pos);
-//            SetDir(ghost_frame.dir);
-//            SetHMDType(ghost_frame.hmd_type);
-//        }
 
         //modify the transformation of the neck joint based on HMD transform
         QPointer <AssetObject> ghost_body = 0;
@@ -3996,6 +3908,7 @@ void RoomObject::LoadGhost_Helper(const int depth, const QVariantMap & d, QPoint
 void RoomObject::LoadGhost(const QString & data)
 {
 //    qDebug() << "RoomObject::LoadGhost" << data;
+//    return;
     child_objects.clear(); //54.8 - prevent userid.txt from filling up with child objects
 
     HTMLPage avatar_page;
@@ -4486,51 +4399,3 @@ void RoomObject::UpdateAssets()
 #endif
 }
 
-void RoomObject::Update_GhostFrame(GhostFrame & g)
-{
-    //make the ghost chat
-    SetChatMessage(g.chat_message);
-
-    //change the ghost's avatar
-    if (SettingsManager::GetUpdateCustomAvatars()) {
-        if (!g.avatar_data.isEmpty()
-                && QString::compare(g.avatar_data.left(13), "<FireBoxRoom>") == 0
-                && QString::compare(GetAvatarCode(), g.avatar_data) != 0) {
-            const QString id = GetS("id");
-            const QString js_id = GetS("js_id");
-            const bool loop = GetB("loop");
-            LoadGhost(g.avatar_data);
-            SetAvatarCode(g.avatar_data);
-
-            //49.50 - Do not let id, js_id, or loop attributes be overwritten
-            SetS("id", id);
-            SetS("js_id", js_id);
-            SetB("loop", loop);
-        }
-    }
-
-    //room edits/deletes
-    if (!g.room_edits.isEmpty()) {
-        RoomObjectEdit e;
-        e.data = g.room_edits;
-        e.room = g.roomid;
-        e.user = g.userid;
-        room_edits_incoming += e;
-    }
-
-    if (!g.room_deletes.isEmpty()) {
-        RoomObjectEdit e;
-        e.data = g.room_deletes;
-        e.room = g.roomid;
-        e.user = g.userid;
-        room_deletes_incoming += e;
-    }
-
-    //send portals
-    if (g.send_portal_url.length() > 0) {
-        send_portal_url += g.send_portal_url;
-        send_portal_jsid += g.send_portal_jsid;
-        send_portal_pos += g.send_portal_pos;
-        send_portal_fwd += g.send_portal_fwd;
-    }
-}
