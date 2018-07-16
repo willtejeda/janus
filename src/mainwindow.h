@@ -122,8 +122,7 @@ public slots:
 
     void Closed();
     void TimeOut();
-    void CEFTimeOut();
-    void MediaTimeOut();
+    void CEFTimeOut();    
 
     void ActionNew();
     void ActionOpen();
@@ -191,8 +190,7 @@ private:
     QString GetNewWorkspaceDirectory();
 
     QTimer timer;
-    QTimer timer2;
-    QTimer timer3;
+    QTimer timer2;    
     QMutex cef_mutex;
 
     QPointer <Game> game;

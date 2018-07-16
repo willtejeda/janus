@@ -769,20 +769,6 @@ void MainWindow::CEFTimeOut()
 #endif
 }
 
-void MainWindow::MediaTimeOut()
-{
-#ifdef __ANDROID__
-    while (paused && hmd_manager && !JNIUtil::GetShowingVR())
-    {
-       QThread::sleep(0.5);
-    }
-#endif
-    if (game)
-    {
-        game->UpdateMedia();
-    }
-}
-
 void MainWindow::TimeOut()
 {    
     if (game && game->GetDoExit()) {       
@@ -1042,14 +1028,12 @@ void MainWindow::Initialize()
 #ifndef __ANDROID__
     connect(&timer2, SIGNAL(timeout()), this, SLOT(CEFTimeOut()), Qt::ConnectionType::QueuedConnection);
 #endif
-    connect(&timer3, SIGNAL(timeout()), this, SLOT(MediaTimeOut()), Qt::ConnectionType::QueuedConnection);
     connect(&timer, SIGNAL(timeout()), this, SLOT(TimeOut()), Qt::ConnectionType::QueuedConnection);
 
 #ifndef __ANDROID__
     timer2.start( 0 );
 #endif
-    timer.start( 0 );
-    timer3.start( 0 );
+    timer.start( 0 );    
 }
 
 void MainWindow::UpdateHands()
@@ -1076,8 +1060,7 @@ void MainWindow::Closed()
     qDebug() << "MainWindow::Closed()";      
 
     disconnect(&timer, 0, 0, 0);
-    disconnect(&timer2, 0, 0, 0);
-    disconnect(&timer3, 0, 0, 0);
+    disconnect(&timer2, 0, 0, 0);    
 
     if (social_window) {
         social_window->Shutdown();
