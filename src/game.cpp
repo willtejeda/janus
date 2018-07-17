@@ -369,6 +369,9 @@ void Game::Update()
     //update multiplayers
     UpdateMultiplayer();
 
+    //update VOIP
+    UpdateMedia();
+
     //do environment::update1 and process portal crossings
     QPointer <Room> r0 = env->GetCurRoom();
     env->Update1(player);
