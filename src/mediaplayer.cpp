@@ -124,10 +124,17 @@ void MediaPlayer::SetupOutput(MediaContext * ctx, QString vid_url, const bool lo
     }
 }
 
-void MediaPlayer::ClearVLC(libvlc_media_player_t * media_player, libvlc_media_t * media)
+void MediaPlayer::ClearVLC(MediaContext * ctx)
 {
-    libvlc_media_release(media);
-    libvlc_media_player_release(media_player);
+    if (libvlc_media_player_is_playing(ctx->media_player)){
+        libvlc_media_player_stop(ctx->media_player);
+    }
+
+    libvlc_media_release(ctx->media);
+    libvlc_media_player_release(ctx->media_player);
+
+    ctx->media_player = nullptr;
+    ctx->media = nullptr;
 }
 
 void MediaPlayer::ClearOutput(MediaContext * ctx)
@@ -136,12 +143,7 @@ void MediaPlayer::ClearOutput(MediaContext * ctx)
     ctx->audio_lock.lock();
 
     if (ctx->media_player){
-        while(libvlc_media_player_is_playing(ctx->media_player)){;}
-
-        QtConcurrent::run(&MediaPlayer::ClearVLC, ctx->media_player, ctx->media);
-
-        ctx->media_player = nullptr;
-        ctx->media = nullptr;
+        QtConcurrent::run(&MediaPlayer::ClearVLC, ctx);
     }
 
     if (ctx->openal_source > 0) {
@@ -712,19 +714,6 @@ void MediaPlayer::pause(void *data, int64_t )
         alSourcePause(ctx->openal_source);
     }
 
-    //Dequeue buffers
-    int buffers_to_dequeue = 0;
-    alGetSourcei(ctx->openal_source, AL_BUFFERS_QUEUED, &buffers_to_dequeue);
-    if (buffers_to_dequeue > 0)
-    {
-        std::vector<ALuint> buffHolder;
-        buffHolder.resize(buffers_to_dequeue);
-        alSourceUnqueueBuffers(ctx->openal_source, buffers_to_dequeue, buffHolder.data());
-        for (int i=0;i<buffers_to_dequeue;++i) {
-            // Push the recovered buffers back on the queue
-            ctx->buffer_queue.push_back(buffHolder[i]);
-        }
-    }
     ctx->audio_lock.unlock();
 }
 
@@ -735,29 +724,7 @@ void MediaPlayer::resume(void *data, int64_t )
 
 void MediaPlayer::flush(void *data, int64_t )
 {
-    MediaContext *ctx = (MediaContext *) data;
-
-    //Dequeue buffers
-    ctx->audio_lock.lock();
-
-    if (!ctx->setup || ctx->openal_source == 0){
-        ctx->audio_lock.unlock();
-        return;
-    }
-
-    int buffers_to_dequeue = 0;
-    alGetSourcei(ctx->openal_source, AL_BUFFERS_QUEUED, &buffers_to_dequeue);
-    if (buffers_to_dequeue > 0)
-    {
-        std::vector<ALuint> buffHolder;
-        buffHolder.resize(buffers_to_dequeue);
-        alSourceUnqueueBuffers(ctx->openal_source, buffers_to_dequeue, buffHolder.data());
-        for (int i=0;i<buffers_to_dequeue;++i) {
-            // Push the recovered buffers back on the queue
-            ctx->buffer_queue.push_back(buffHolder[i]);
-        }
-    }
-    ctx->audio_lock.unlock();
+    (void) data;
 }
 
 void MediaPlayer::drain(void *data)

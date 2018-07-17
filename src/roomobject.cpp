@@ -2747,7 +2747,13 @@ void RoomObject::SetFixedSize(const bool fixed_size, const float size) {
 
 void RoomObject::SetAssetSound(const QPointer <AssetSound> a)
 {
-    assetsound = a;
+    if (a != assetsound) {
+        if (assetsound) {
+            assetsound->Stop(&media_ctx);
+        }
+        assetsound = a;
+        media_ctx.setup = false;
+    }
 }
 
 void RoomObject::SetAssetVideo(const QPointer <AssetVideo> a)
