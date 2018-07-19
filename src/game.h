@@ -224,6 +224,7 @@ public:
 
 public slots:
 
+    void StartLoadTimer();
     void CheckInternetConnection(QNetworkReply *reply);
 #endif
 
@@ -370,6 +371,7 @@ private:
     bool remove_headset;
 
     QSize windowSize;
+    QTime loading_timer;
 #endif
 };
 

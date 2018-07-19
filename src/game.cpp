@@ -77,6 +77,8 @@ Game::Game() :
 
     RequestInternetConnection();
     network_timer.start();
+
+    connect(env, SIGNAL(RoomsChanged()), this, SLOT(StartLoadTimer()));
 #endif
 }
 
@@ -108,6 +110,11 @@ Game::~Game()
 }
 
 #ifdef __ANDROID__
+void Game::StartLoadTimer()
+{
+    loading_timer.restart();
+}
+
 void Game::CheckInternetConnection(QNetworkReply *reply)
 {
     //qDebug() << "REPLY" << reply->bytesAvailable();
@@ -3274,7 +3281,7 @@ void Game::DrawOverlaysGL()
         MathUtil::PopModelMatrix();
     }
     //Draw loading icon as overlay if room is not loaded
-    else if (r->GetProgress() < 0.8f && SettingsManager::GetShowLoadingIcon()){
+    else if (r->GetProgress() < 0.8f && loading_timer.elapsed() < 60000 && SettingsManager::GetShowLoadingIcon()){
         MathUtil::PushModelMatrix();
         MathUtil::MultModelMatrix(m);
         MathUtil::ModelMatrix().scale(0.25f);
@@ -3718,7 +3725,11 @@ void Game::UpdateControllers()
     }
 
     //59.7 - Updated controller player states
-    if (controller_manager->GetUsingSpatiallyTrackedControllers()) {
+    if (controller_manager->GetUsingSpatiallyTrackedControllers()
+#ifdef __ANDROID__
+            && !JNIUtil::GetGamepadConnected()
+#endif
+            ) {
         if (player->GetS("hmd_type") == "rift") {
             QPointer <QObject> c = qvariant_cast<QObject *>(player->GetProperties()->property("touch"));
             if (c) {
@@ -3827,6 +3838,9 @@ void Game::UpdateControllers()
     else if (controller_manager->GetUsingGamepad()) { //Note: 59.7 - currently has to be one or the other, might we want to support both at once?
         QPointer <QObject> c = qvariant_cast<QObject *>(player->GetProperties()->property("xbox"));
         if (c) {
+//#ifdef __ANDROID__
+//            c->setProperty("connected", JNIUtil::GetGamepadConnected());
+//#endif
             c->setProperty("left_stick_x", s[0].x);
             c->setProperty("left_stick_y", s[0].y);
             c->setProperty("left_trigger", s[0].t[0].value);
