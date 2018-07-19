@@ -3,26 +3,34 @@ package org.janus;
 import android.Manifest;
 
 import android.R;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.PixelFormat;
+import android.hardware.input.InputManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Vibrator;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.InputDevice;
+import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.WindowManager.LayoutParams;
 import android.widget.FrameLayout;
 
 public class JanusActivity extends org.qtproject.qt5.android.bindings.QtActivity
-                           implements JoystickView.JoystickListener, ButtonView.ButtonListener
+                           implements JoystickView.JoystickListener, ButtonView.ButtonListener, InputManager.InputDeviceListener
 {
         private String launch_url = "";
         private boolean launch_in_vr = false;
@@ -53,8 +61,37 @@ public class JanusActivity extends org.qtproject.qt5.android.bindings.QtActivity
         //GearVR
         GearManager gearManager = null;
 
+        //Gamepad flags
+        private boolean gamepad_connected = false;
+        private float left_stick_x = 0.0f;
+        private float left_stick_y = 0.0f;
+        private float right_stick_x = 0.0f;
+        private float right_stick_y = 0.0f;
+        private boolean dpad_up = false;
+        private boolean dpad_down = false;
+        private boolean dpad_left = false;
+        private boolean dpad_right = false;
+        private boolean button_x = false;
+        private boolean button_y = false;
+        private boolean button_a = false;
+        private boolean button_b = false;
+        private boolean button_left_thumb = false;
+        private boolean button_right_thumb = false;
+        private float trigger_left = 0.0f;
+        private float trigger_right = 0.0f;
+        private boolean button_left_shoulder = false;
+        private boolean button_right_shoulder = false;
+        private boolean button_start = false;
+        private boolean button_back = false;
+
+        private InputManager mInputManager;
+        private InputDevice mInputDevice;
+
         public void onCreate(Bundle savedInstanceState){
             super.onCreate(savedInstanceState);
+
+            mInputManager = JanusActivity.this.getSystemService(InputManager.class);
+            mInputManager.registerInputDeviceListener(JanusActivity.this, null);
 
             //Intent example:
             //      <a href="intent:#Intent;action=org.janusvr.launchfrombrowser;category=android.intent.category.DEFAULT;category=android.intent.category.BROWSABLE;category=com.google.intent.category.DAYDREAM;category=com.google.intent.category.CARDBOARD;S.url=http://demos.janusvr.com/joseph/android/images/index.html;end">Click here to launch sample app</a>
@@ -673,6 +710,401 @@ public class JanusActivity extends org.qtproject.qt5.android.bindings.QtActivity
 
         public Surface getWindowSurface() {
             return gearManager.getWindowSurface();
+        }
+
+        //============================================================================================================
+        //Gamepad methods
+        //============================================================================================================
+
+        public boolean getGamepadConnected() {
+            return gamepad_connected;
+        }
+
+        public float getLeftStickX() {
+            return left_stick_x;
+        }
+
+        public float getLeftStickY() {
+            return left_stick_y;
+        }
+
+        public float getRightStickX() {
+            return right_stick_x;
+        }
+
+        public float getRightStickY() {
+            return right_stick_y;
+        }
+
+        public boolean getDpadUp() {
+            return dpad_up;
+        }
+
+        public boolean getDpadDown() {
+            return dpad_down;
+        }
+
+        public boolean getDpadLeft() {
+            return dpad_left;
+        }
+
+        public boolean getDpadRight() {
+            return dpad_right;
+        }
+
+        public boolean getButtonX() {
+            return button_x;
+        }
+
+        public boolean getButtonY() {
+            return button_y;
+        }
+
+        public boolean getButtonA() {
+            return button_a;
+        }
+
+        public boolean getButtonB() {
+            return button_b;
+        }
+
+        public boolean getButtonLeftThumb() {
+            return button_left_thumb;
+        }
+
+        public boolean getButtonRightThumb() {
+            return button_right_thumb;
+        }
+
+        public float getTriggerLeft() {
+            return trigger_left;
+        }
+
+        public float getTriggerRight() {
+            return trigger_right;
+        }
+
+        public boolean getButtonLeftShoulder() {
+            return button_left_shoulder;
+        }
+
+        public boolean getButtonRightShoulder() {
+            return button_right_shoulder;
+        }
+
+        public boolean getButtonStart() {
+            return button_start;
+        }
+
+        public boolean getButtonBack() {
+            return button_back;
+        }
+
+        @Override
+        public boolean onKeyDown(int keyCode, KeyEvent event) {
+            int deviceId = event.getDeviceId();
+            boolean connected = false;
+            if ((mInputManager.getInputDevice(deviceId).getSources() & InputDevice.SOURCE_GAMEPAD) == InputDevice.SOURCE_GAMEPAD
+            || (mInputManager.getInputDevice(deviceId).getSources() & InputDevice.SOURCE_JOYSTICK) == InputDevice.SOURCE_JOYSTICK) {
+                connected = true;
+            }
+            gamepad_connected = connected;
+
+            if (deviceId != -1) {
+                // Handle keys going up.
+                boolean handled = false;
+                switch (keyCode) {
+                    case KeyEvent.KEYCODE_DPAD_LEFT:
+                        if ((event.getSource() & InputDevice.SOURCE_DPAD) == InputDevice.SOURCE_DPAD) {
+                            dpad_left = true;
+                            handled = true;
+                        }
+                        break;
+                    case KeyEvent.KEYCODE_DPAD_RIGHT:
+                        if ((event.getSource() & InputDevice.SOURCE_DPAD) == InputDevice.SOURCE_DPAD) {
+                            dpad_right = true;
+                            handled = true;
+                        }
+                        break;
+                    case KeyEvent.KEYCODE_DPAD_UP:
+                        if ((event.getSource() & InputDevice.SOURCE_DPAD) == InputDevice.SOURCE_DPAD) {
+                            dpad_up = true;
+                            handled = true;
+                        }
+                        break;
+                    case KeyEvent.KEYCODE_DPAD_DOWN:
+                        if ((event.getSource() & InputDevice.SOURCE_DPAD) == InputDevice.SOURCE_DPAD) {
+                            dpad_down = true;
+                            handled = true;
+                        }
+                        break;
+                    case KeyEvent.KEYCODE_BUTTON_X:
+                        button_x = true;
+                        handled = true;
+                        break;
+                    case KeyEvent.KEYCODE_BUTTON_Y:
+                        button_y = true;
+                        handled = true;
+                        break;
+                    case KeyEvent.KEYCODE_BUTTON_A:
+                        button_a = true;
+                        handled = true;
+                        break;
+                    case KeyEvent.KEYCODE_BUTTON_B:
+                        button_b = true;
+                        handled = true;
+                        break;
+                    case KeyEvent.KEYCODE_BUTTON_L1:
+                        button_left_shoulder = true;
+                        handled = true;
+                        break;
+                    case KeyEvent.KEYCODE_BUTTON_R1:
+                        button_right_shoulder = true;
+                        handled = true;
+                        break;
+                    case KeyEvent.KEYCODE_BUTTON_L2:
+                        trigger_left = 1.0f;
+                        handled = true;
+                        break;
+                    case KeyEvent.KEYCODE_BUTTON_R2:
+                        trigger_right = 1.0f;
+                        handled = true;
+                        break;
+                    case KeyEvent.KEYCODE_BUTTON_THUMBL:
+                        button_left_thumb = true;
+                        handled = true;
+                        break;
+                    case KeyEvent.KEYCODE_BUTTON_THUMBR:
+                        button_right_thumb = true;
+                        handled = true;
+                        break;
+                    case KeyEvent.KEYCODE_BUTTON_START:
+                        button_start = true;
+                        handled = true;
+                        break;
+                    case KeyEvent.KEYCODE_BACK:
+                        button_back = true;
+                        handled = true;
+                        break;
+                    default:
+                        break;
+                }
+                return handled;
+            }
+
+            return super.onKeyDown(keyCode, event);
+        }
+
+        @Override
+        public boolean onKeyUp(int keyCode, KeyEvent event) {
+            int deviceId = event.getDeviceId();
+            if (deviceId != -1) {
+                boolean handled = false;
+                switch (keyCode) {
+                    case KeyEvent.KEYCODE_DPAD_LEFT:
+                        if ((event.getSource() & InputDevice.SOURCE_DPAD) == InputDevice.SOURCE_DPAD) {
+                            dpad_left = false;
+                            handled = true;
+                        }
+                        break;
+                    case KeyEvent.KEYCODE_DPAD_RIGHT:
+                        if ((event.getSource() & InputDevice.SOURCE_DPAD) == InputDevice.SOURCE_DPAD) {
+                            dpad_right = false;
+                            handled = true;
+                        }
+                        break;
+                    case KeyEvent.KEYCODE_DPAD_UP:
+                        if ((event.getSource() & InputDevice.SOURCE_DPAD) == InputDevice.SOURCE_DPAD) {
+                            dpad_up = false;
+                            handled = true;
+                        }
+                        break;
+                    case KeyEvent.KEYCODE_DPAD_DOWN:
+                        if ((event.getSource() & InputDevice.SOURCE_DPAD) == InputDevice.SOURCE_DPAD) {
+                            dpad_down = false;
+                            handled = true;
+                        }
+                        break;
+                    case KeyEvent.KEYCODE_BUTTON_X:
+                        button_x = false;
+                        handled = true;
+                        break;
+                    case KeyEvent.KEYCODE_BUTTON_Y:
+                        button_y = false;
+                        handled = true;
+                        break;
+                    case KeyEvent.KEYCODE_BUTTON_A:
+                        button_a = false;
+                        handled = true;
+                        break;
+                    case KeyEvent.KEYCODE_BUTTON_B:
+                        button_b = false;
+                        handled = true;
+                        break;
+                    case KeyEvent.KEYCODE_BUTTON_L1:
+                        button_left_shoulder = false;
+                        handled = true;
+                        break;
+                    case KeyEvent.KEYCODE_BUTTON_R1:
+                        button_right_shoulder = false;
+                        handled = true;
+                        break;
+                    case KeyEvent.KEYCODE_BUTTON_L2:
+                        trigger_left = 0.0f;
+                        handled = true;
+                        break;
+                    case KeyEvent.KEYCODE_BUTTON_R2:
+                        trigger_right = 0.0f;
+                        handled = true;
+                        break;
+                    case KeyEvent.KEYCODE_BUTTON_THUMBL:
+                        button_left_thumb = false;
+                        handled = true;
+                        break;
+                    case KeyEvent.KEYCODE_BUTTON_THUMBR:
+                        button_right_thumb = false;
+                        handled = true;
+                        break;
+                    case KeyEvent.KEYCODE_BUTTON_START:
+                        button_start = false;
+                        handled = true;
+                        break;
+                    case KeyEvent.KEYCODE_BACK:
+                        button_back = false;
+                        handled = true;
+                        break;
+                    default:
+                        break;
+                }
+                return handled;
+            }
+
+            return super.onKeyUp(keyCode, event);
+        }
+
+        @Override
+        public boolean onGenericMotionEvent(MotionEvent event) {
+            //mInputManager.onGenericMotionEvent(event);
+            int deviceId = event.getDeviceId();
+            boolean connected = false;
+            if ((mInputManager.getInputDevice(deviceId).getSources() & InputDevice.SOURCE_GAMEPAD) == InputDevice.SOURCE_GAMEPAD
+            || (mInputManager.getInputDevice(deviceId).getSources() & InputDevice.SOURCE_JOYSTICK) == InputDevice.SOURCE_JOYSTICK) {
+                connected = true;
+            }
+            gamepad_connected = connected;
+
+            int eventSource = event.getSource();
+            if ((((eventSource & InputDevice.SOURCE_GAMEPAD) == InputDevice.SOURCE_GAMEPAD) ||
+                    ((eventSource & InputDevice.SOURCE_JOYSTICK) == InputDevice.SOURCE_JOYSTICK))
+                    && event.getAction() == MotionEvent.ACTION_MOVE) {
+                int id = event.getDeviceId();
+                if (-1 != id) {
+                    mInputDevice = event.getDevice();
+
+                    left_stick_x = getCenteredAxis(event, mInputDevice, MotionEvent.AXIS_X);
+                    left_stick_y = -getCenteredAxis(event, mInputDevice, MotionEvent.AXIS_Y);
+                    right_stick_x = getCenteredAxis(event, mInputDevice, MotionEvent.AXIS_Z);
+                    right_stick_y = -getCenteredAxis(event, mInputDevice, MotionEvent.AXIS_RZ);
+
+                    if (event.getAxisValue(MotionEvent.AXIS_LTRIGGER) != 0.0f)
+                        trigger_left = event.getAxisValue(MotionEvent.AXIS_LTRIGGER);
+
+                    if (event.getAxisValue(MotionEvent.AXIS_RTRIGGER) != 0.0f)
+                        trigger_right = event.getAxisValue(MotionEvent.AXIS_RTRIGGER);
+
+                    if (event.getAxisValue(MotionEvent.AXIS_HAT_Y) == -1.0f) {
+                        dpad_up = true;
+                    }
+                    else if (event.getAxisValue(MotionEvent.AXIS_HAT_Y) == 1.0f) {
+                        dpad_down = true;
+                    }
+                    else if (event.getAxisValue(MotionEvent.AXIS_HAT_Y) == 0.0f) {
+                        dpad_up = false;
+                        dpad_down = false;
+                    }
+
+                    if (event.getAxisValue(MotionEvent.AXIS_HAT_X) == -1.0f) {
+                        dpad_left = true;
+                    }
+                    else if (event.getAxisValue(MotionEvent.AXIS_HAT_X) == 1.0f) {
+                        dpad_right = true;
+                    }
+                    else if (event.getAxisValue(MotionEvent.AXIS_HAT_X) == 0.0f) {
+                        dpad_left = false;
+                        dpad_right = false;
+                    }
+                }
+            }
+            else {
+                left_stick_x = 0.0f;
+                left_stick_y = 0.0f;
+                right_stick_x = 0.0f;
+                right_stick_y = 0.0f;
+            }
+
+            return super.onGenericMotionEvent(event);
+        }
+
+        private static float getCenteredAxis(MotionEvent event, InputDevice device,
+                int axis) {
+            final InputDevice.MotionRange range = device.getMotionRange(axis, event.getSource());
+            if (range != null) {
+                final float flat = range.getFlat();
+                final float value = event.getAxisValue(axis);
+
+                // Ignore axis values that are within the 'flat' region of the
+                // joystick axis center.
+                // A joystick at rest does not always report an absolute position of
+                // (0,0).
+                if (Math.abs(value) > flat) {
+                    return value;
+                }
+            }
+            return 0;
+        }
+
+        @SuppressLint("NewApi")
+        private final Vibrator getVibrator() {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN &&
+                    null != mInputDevice) {
+                return mInputDevice.getVibrator();
+            }
+            return null;
+        }
+
+        private void vibrateController(int time) {
+            Vibrator vibrator = getVibrator();
+            if (null != vibrator) {
+                vibrator.vibrate(time);
+            }
+        }
+
+        @Override
+        public void onInputDeviceAdded(int deviceId) {
+            //Check if device connected is a gamepad
+            /*if ((mInputManager.getInputDevice(deviceId).getSources() & InputDevice.SOURCE_GAMEPAD) == InputDevice.SOURCE_GAMEPAD
+            || (mInputManager.getInputDevice(deviceId).getSources() & InputDevice.SOURCE_JOYSTICK) == InputDevice.SOURCE_JOYSTICK) {
+                gamepad_connected = true;
+            }*/
+        }
+
+        @Override
+        public void onInputDeviceChanged(int deviceId) {
+        }
+
+        @Override
+        public void onInputDeviceRemoved(int deviceId) {
+            //Check if connected devices still contains a gamepad
+            boolean connected = false;
+            int[] devices = mInputManager.getInputDeviceIds();
+            for (int i = 0; i < devices.length; i++) {
+                if ((mInputManager.getInputDevice(devices[i]).getSources() & InputDevice.SOURCE_GAMEPAD) == InputDevice.SOURCE_GAMEPAD
+                || (mInputManager.getInputDevice(devices[i]).getSources() & InputDevice.SOURCE_JOYSTICK) == InputDevice.SOURCE_JOYSTICK) {
+                    connected = true;
+                    break;
+                }
+            }
+            gamepad_connected = connected;
         }
 
         //============================================================================================================

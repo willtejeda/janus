@@ -605,6 +605,7 @@ void MainWindow::Update()
             if (GLWidget::GetDisplayMode() == MODE_GEAR) {
                 EnterVR();
             }
+#ifndef OCULUS_SUBMISSION_BUILD
             else if (!hmd_manager && GLWidget::GetDisplayMode() == MODE_2D){
                 hmd_manager = new GVRManager();
                 bool enabled = hmd_manager->Initialize();
@@ -616,6 +617,7 @@ void MainWindow::Update()
                     hmd_manager.clear();
                 }
             }
+#endif
         }
     }
 
@@ -647,7 +649,10 @@ void MainWindow::Update()
         url_bar_tab->Update();
         social_window_tab->Update();
 
-        JNIUtil::SetControlsVisible(true, SettingsManager::GetShowViewJoystick());
+        if (JNIUtil::GetGamepadConnected())
+            JNIUtil::SetControlsVisible(false, SettingsManager::GetShowViewJoystick());
+        else
+            JNIUtil::SetControlsVisible(true, SettingsManager::GetShowViewJoystick());
     }
 #endif
 #endif
