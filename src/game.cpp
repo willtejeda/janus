@@ -319,9 +319,10 @@ void Game::Update()
     UpdatePrivateWebsurfaces();
 
     //update virtual keyboard
-#ifndef __ANDROID__
-    UpdateVirtualKeyboard();
+#ifdef __ANDROID__
+    if (controller_manager->GetHMDManager() && controller_manager->GetHMDManager()->GetEnabled())
 #endif
+        UpdateVirtualKeyboard();
 
     //Update AssetRecordings
     UpdateAssetRecordings();
