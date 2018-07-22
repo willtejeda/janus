@@ -210,21 +210,7 @@ void BookmarkManager::LoadBookmarks()
         AddBookmark("https://vesta.janusvr.com/sandbox", "Vesta Sandbox", path+"31.jpg");
         AddBookmark("https://janusvr.com/help", "JanusVR Help", path+"32.jpg");
 #else
-        /*
-        AddBookmark("http://demos.janusvr.com/karan/soundscape/index.html", "Dark Side of the Moon", "");
-        AddBookmark("http://www.thevrbar.com/day/images.html", "360 Images", "");
-        AddBookmark("https://vesta.janusvr.com/spyduck/vaporwave-plaza", "Vaporwave Plaza", "");
-        AddBookmark("https://nazrin.net/Piano/", "Piano", "");
-        AddBookmark("https://nazrin.net/Minecraft-Sandbox/", "Minecraft Sandbox", "");
-        AddBookmark("https://vesta.janusvr.com/qster123/nuketown", "Nuketown", "");
-        AddBookmark("http://demos.janusvr.com/karan/soundscape/index.html", "Dark Side of the Moon", "");
-        */
-        AddBookmark("https://demos.janusvr.com/joseph/android/images/index.html", "360 Images", "");
-        AddBookmark("http://demos.janusvr.com/joseph/android/piano/index.html", "Piano", "");
-        AddBookmark("http://demos.janusvr.com/joseph/android/sandbox/index.html", "Crafting Sandbox", "");
-        AddBookmark("https://vesta.janusvr.com/spyduck/new-bark-town-pokemon-gsc", "Pokemon", "");
-        AddBookmark("http://demos.janusvr.com/joseph/android/gallery/index.html", "Compassion", "");
-        AddBookmark("https://vesta.janusvr.com/firefoxg/learn-about-pyramids-in-multiplayer-webvr", "Pyramids", "");
+        AddBookmark("https://vesta.janusvr.com", path+"vesta.jpg");
 #endif
 
         SaveBookmarks();
@@ -236,6 +222,14 @@ void BookmarkManager::LoadBookmarks()
         bookmarks = QJsonDocument::fromJson(ba).toVariant().toList();
         qDebug() << "BookmarkManager::LoadBookmarks() - Loaded" << bookmarks.size() << "bookmarks.";
     }
+
+#if defined(__ANDROID__) && defined(OCULUS_SUBMISSION_BUILD)
+    //For now just reset bookmarks on every load
+    bookmarks.clear();
+    const QString path = MathUtil::GetApplicationURL() + "assets/3dui/thumbs/";
+    AddBookmark("https://vesta.janusvr.com", path+"vesta.jpg");
+    SaveBookmarks();
+#endif
 }
 
 void BookmarkManager::SaveBookmarks()
