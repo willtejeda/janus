@@ -319,10 +319,7 @@ void Game::Update()
     UpdatePrivateWebsurfaces();
 
     //update virtual keyboard
-#ifdef __ANDROID__
-    if (controller_manager->GetHMDManager() && controller_manager->GetHMDManager()->GetEnabled())
-#endif
-        UpdateVirtualKeyboard();
+    UpdateVirtualKeyboard();
 
     //Update AssetRecordings
     UpdateAssetRecordings();
@@ -1577,7 +1574,8 @@ bool Game::GetPlayerEnteringText()
 {
     return state == JVR_STATE_EDIT_TEXT
             || (websurface_selected[0] && websurface_selected[0]->GetTextEditing())
-            || (websurface_selected[1] && websurface_selected[1]->GetTextEditing());
+            || (websurface_selected[1] && websurface_selected[1]->GetTextEditing())
+            || (urlbar && urlbar->hasFocus());
 }
 
 void Game::keyPressEvent(QKeyEvent * e)
@@ -3876,7 +3874,8 @@ void Game::UpdateControllers()
     float y0 = s[0].y;
     float x1 = s[1].x;
     float y1 = s[1].y;
-#ifdef OCULUS_SUBMISSION_BUILD
+
+#if defined(OCULUS_SUBMISSION_BUILD) && defined(__ANDROID__)
     // Headset trackpad is also used for locomotion
     if (!JNIUtil::GetGamepadConnected()) {
         x0 += x1;
@@ -4599,8 +4598,8 @@ void Game::UpdateVirtualKeyboard()
     player->SetB("entering_text", text_entry);
 
     //update state of virtual keyboard if HMD is enabled
-    if ((player->GetB("hmd_enabled") || controller_manager->GetUsingGamepad()) && text_entry && !virtualkeyboard->GetVisible()) { //show keyboard if hidden and needed
-//    if (text_entry && !virtualkeyboard->GetVisible()) { //uncomment this and comment above for testing with mouse
+//    if ((player->GetB("hmd_enabled") || controller_manager->GetUsingGamepad()) && text_entry && !virtualkeyboard->GetVisible()) { //show keyboard if hidden and needed
+    if (text_entry && !virtualkeyboard->GetVisible()) { //uncomment this and comment above for testing with mouse
         QVector3D z = -player->GetV("dir");
         z.setY(0.0f);
         z.normalize();
@@ -4624,6 +4623,9 @@ void Game::UpdateVirtualKeyboard()
         }
         else if (websurface_selected[1] && websurface_selected[1]->GetTextEditing()) {
             virtualkeyboard->SetWebSurface(websurface_selected[1]);
+        }
+        else if (urlbar->hasFocus()) { // TODO: change, need to render
+            virtualkeyboard->SetLineEdit(urlbar);
         }
     }
     else if (virtualkeyboard->GetVisible()) {
@@ -5704,5 +5706,10 @@ void Game::UpdateAssets()
 void Game::SetRemoveHeadset(const bool b)
 {
     remove_headset = b;
+}
+
+void Game::SetURLBar(LineEdit *u)
+{
+    urlbar = u;
 }
 #endif

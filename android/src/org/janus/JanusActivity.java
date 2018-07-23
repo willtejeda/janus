@@ -18,6 +18,7 @@ import android.os.Message;
 import android.os.Vibrator;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.inputmethod.InputMethodManager;
 import android.view.Gravity;
 import android.view.Surface;
 import android.view.View;
@@ -666,6 +667,16 @@ public class JanusActivity extends org.qtproject.qt5.android.bindings.QtActivity
                             view_joystick.setVisibility(View.INVISIBLE);
                         talk_button.setVisibility(View.VISIBLE);
                         jump_button.setVisibility(View.VISIBLE);
+                    }
+
+                    if (getShowingVR() || getGamepadConnected())
+                    {
+                        InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
+                        View view = getCurrentFocus();
+                        if (view == null) {
+                            return;
+                        }
+                        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
                     }
                 }
         };
