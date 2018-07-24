@@ -11,10 +11,7 @@ HTMLPage::~HTMLPage()
 void HTMLPage::SetURL(const QUrl & u)
 {
     if (u.toString().left(22).contains("reddit.com") && !u.toString().left(22).contains("old.reddit.com")) {
-        webasset.SetURL(QUrl(u.toString().replace("reddit.com", "old.reddit.com")));
-    }
-    else if (u.toString().left(22).contains("www.reddit.com")) {
-        webasset.SetURL(QUrl(u.toString().replace("www.reddit.com", "old.reddit.com")));
+        webasset.SetURL(QUrl(u.toString().replace("www.reddit.com", "reddit.com").replace("reddit.com", "old.reddit.com")));
     }
     else {
         webasset.SetURL(u);
