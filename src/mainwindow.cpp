@@ -486,6 +486,8 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
                 {
                     glwidget->SetGrab(true);
                 }
+
+                JNIUtil::HideKeyboard();
             }
         }
         break;

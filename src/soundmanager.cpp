@@ -25,11 +25,7 @@ QVector <ALuint> SoundManager::buffer_input_pool;
 QList <ALuint> SoundManager::buffer_input_queue;
 
 int SoundManager::input_frequency = 44100; //used to be 24000, resulting in bad VOIP quality
-#ifdef __ANDROID__
-int SoundManager::input_capture_size = 3*2880; //1024
-#else
 int SoundManager::input_capture_size = 2880; //1024
-#endif
 int SoundManager::input_buffer_pool_size = 32;
 
 float SoundManager::gain_mic = 1.0f;
@@ -493,8 +489,8 @@ void SoundManager::Update(QPointer <Player> player)
         //}
             //hopefully solves the buffer queueing issue where sound falls behind
         if (player->GetB("speaking")) {
-            input_mic_buffers.push_back(bufferdata_input);
             input_mic_level = MathUtil::GetSoundLevel(bufferdata_input);
+            input_mic_buffers.push_back(AudioUtil::encode(bufferdata_input).toBase64());
             //                qDebug() << "inputmicbuffers size" << input_mic_buffers.size();
         }
     }

@@ -681,6 +681,23 @@ public class JanusActivity extends org.qtproject.qt5.android.bindings.QtActivity
                 }
         };
 
+        public void hideKeyboard(){
+            Message msg = new Message();
+
+            hideKeyboardHandler.sendMessage(msg);
+        }
+
+        protected Handler hideKeyboardHandler = new Handler() {
+                public void handleMessage(Message msg) {
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
+                    View view = getCurrentFocus();
+                    if (view == null) {
+                        return;
+                    }
+                    imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                }
+        };
+
         //============================================================================================================
         //GoogleVR
         //============================================================================================================

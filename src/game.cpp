@@ -295,7 +295,7 @@ void Game::Update()
     }
 
 #ifdef __ANDROID__
-    if (network_timer.elapsed() > 10000){ //Request every 10 seconds
+    if (network_timer.elapsed() > 60000){ //Request every minute
         RequestInternetConnection();
         network_timer.restart();
     }
@@ -368,14 +368,14 @@ void Game::Update()
     //update follow mode
     UpdateFollowMode();
 
+    //update VOIP
+    UpdateMedia();
+
     //update assets
     UpdateAssets();   
 
     //update multiplayers
     UpdateMultiplayer();
-
-    //update VOIP
-    UpdateMedia();
 
     //do environment::update1 and process portal crossings
     QPointer <Room> r0 = env->GetCurRoom();

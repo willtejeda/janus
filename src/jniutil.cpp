@@ -47,6 +47,7 @@ jmethodID JNIUtil::m_getURLChangedAtWebViewMID = NULL;
 jmethodID JNIUtil::m_getScreenOrientationMID = NULL;
 jmethodID JNIUtil::m_setButtonMarginMID = NULL;
 jmethodID JNIUtil::m_setControlsVisibleMID = NULL;
+jmethodID JNIUtil::m_hideKeyboardMID = NULL;
 jmethodID JNIUtil::m_getWalkJoystickXMID = NULL;
 jmethodID JNIUtil::m_getWalkJoystickYMID = NULL;
 jmethodID JNIUtil::m_getViewJoystickXMID = NULL;
@@ -185,6 +186,7 @@ void JNIUtil::Initialize()
         m_getScreenOrientationMID = jniEnv->GetMethodID(cls, "getScreenOrientation", "()I");
         m_setButtonMarginMID = jniEnv->GetMethodID(cls, "setButtonMargin", "(I)V");
         m_setControlsVisibleMID = jniEnv->GetMethodID(cls, "setControlsVisible", "(ZZ)V");
+        m_hideKeyboardMID = jniEnv->GetMethodID(cls, "hideKeyboard", "()V");
         m_getWalkJoystickXMID = jniEnv->GetMethodID(cls, "getWalkJoystickX", "()F");
         m_getWalkJoystickYMID = jniEnv->GetMethodID(cls, "getWalkJoystickY", "()F");
         m_getViewJoystickXMID = jniEnv->GetMethodID(cls, "getViewJoystickX", "()F");
@@ -639,6 +641,15 @@ void JNIUtil::SetControlsVisible(bool b, bool show_view_joystick)
     {
         QAndroidJniEnvironment jniEnv;
         jniEnv->CallVoidMethod(m_objectRef, m_setControlsVisibleMID, (jboolean) b, (jboolean) show_view_joystick);
+    }
+}
+
+void JNIUtil::HideKeyboard()
+{
+    if(m_hideKeyboardMID)
+    {
+        QAndroidJniEnvironment jniEnv;
+        jniEnv->CallVoidMethod(m_objectRef, m_hideKeyboardMID);
     }
 }
 

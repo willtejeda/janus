@@ -1008,16 +1008,9 @@ QString MultiPlayerManager::GetMovePacket_Helper(QPointer <Player> player)
 
         for (int i=0; i<mic_buffers.size(); ++i) {
 //            qDebug() << " sending packet" << "audio_opus"+QString::number(i) << "bytes" << mic_buffers[i].size();
-#ifdef __ANDROID__
-            packet += ",\"audio\":\"" + mic_buffers[i].toBase64() + "\"";
-            //int size = mic_buffers[i].length()/3;
-            //packet += ",\"audio_opus"+QString::number(3*i)+ "\":\"" + AudioUtil::encode(mic_buffers[i].mid(0, size)).toBase64() + "\"";
-            //packet += ",\"audio_opus"+QString::number(3*i+1)+ "\":\"" + AudioUtil::encode(mic_buffers[i].mid(size,size)).toBase64() + "\"";
-            //packet += ",\"audio_opus"+QString::number(3*i+2)+ "\":\"" + AudioUtil::encode(mic_buffers[i].mid(2*size,size)).toBase64() + "\"";
-#else
-            packet += ",\"audio_opus"+QString::number(i)+ "\":\"" + AudioUtil::encode(mic_buffers[i]).toBase64() + "\"";
-#endif
+            packet += ",\"audio_opus"+QString::number(i)+ "\":\"" + mic_buffers[i] + "\"";
         }
+        packet += ",\"sound_level\":" + MathUtil::GetFloatAsString(SoundManager::GetMicLevel());
     }
 
     //56.0 - for security reasons, do not send hand-tracking data when player is in typing/text entry states

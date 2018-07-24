@@ -77,6 +77,7 @@ public:
     static int GetScreenOrientation();
     static void SetButtonMargin(int margin);
     static void SetControlsVisible(bool b, bool show_view_joystick);
+    static void HideKeyboard();
     static float GetWalkJoystickX();
     static float GetWalkJoystickY();
     static float GetViewJoystickX();
@@ -172,6 +173,7 @@ private:
     static jmethodID m_getScreenOrientationMID;
     static jmethodID m_setButtonMarginMID;
     static jmethodID m_setControlsVisibleMID;
+    static jmethodID m_hideKeyboardMID;
     static jmethodID m_getWalkJoystickXMID;
     static jmethodID m_getWalkJoystickYMID;
     static jmethodID m_getViewJoystickXMID;
