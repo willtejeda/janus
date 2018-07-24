@@ -86,7 +86,7 @@ public:
 
     void SetupOutput(MediaContext * ctx, QString url, const bool loop, const bool audio_only = false);
     static void ClearOutput(MediaContext * ctx);
-    static void ClearVLC(libvlc_media_player_t * media_player, libvlc_media_t * media);
+    static void ClearVLC(MediaContext * ctx);
 
     bool GetPlaying(MediaContext * ctx) const;
     bool GetReady(MediaContext * ctx) const;
