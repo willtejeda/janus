@@ -7,6 +7,17 @@
 
 #if !defined(__APPLE__) && !defined(__ANDROID__)
     #include "gamepad.h"
+#elif defined(__ANDROID__)
+
+enum GAMEPAD_DEVICE {
+    GAMEPAD_0 = 0,	/**< First gamepad */
+    GAMEPAD_1 = 1,	/**< Second gamepad */
+    GAMEPAD_2 = 2,	/**< Third gamepad */
+    GAMEPAD_3 = 3,	/**< Fourth gamepad */
+
+    GAMEPAD_COUNT	/**< Maximum number of supported gamepads */
+};
+
 #endif
 
 #include "assetobject.h"
@@ -106,8 +117,8 @@ public:
     static float GetAxisThreshold();
 
 private:
-#if !defined(__APPLE__) && !defined(__ANDROID__)
-    void UpdateGamepad(GAMEPAD_DEVICE dev);
+#if !defined(__APPLE__)
+    void UpdateGamepad(GAMEPAD_DEVICE dev = GAMEPAD_0);
 #endif
     void UpdateControllers();
     void UpdateAssets();

@@ -47,6 +47,7 @@ jmethodID JNIUtil::m_getURLChangedAtWebViewMID = NULL;
 jmethodID JNIUtil::m_getScreenOrientationMID = NULL;
 jmethodID JNIUtil::m_setButtonMarginMID = NULL;
 jmethodID JNIUtil::m_setControlsVisibleMID = NULL;
+jmethodID JNIUtil::m_hideKeyboardMID = NULL;
 jmethodID JNIUtil::m_getWalkJoystickXMID = NULL;
 jmethodID JNIUtil::m_getWalkJoystickYMID = NULL;
 jmethodID JNIUtil::m_getViewJoystickXMID = NULL;
@@ -67,6 +68,28 @@ jmethodID JNIUtil::m_showGVRMID = NULL;
 jmethodID JNIUtil::m_showGearMID = NULL;
 jmethodID JNIUtil::m_getShowingVRMID = NULL;
 jmethodID JNIUtil::m_getWindowSurfaceMID = NULL;
+
+jmethodID JNIUtil::m_getGamepadConnectedMID = NULL;
+jmethodID JNIUtil::m_getLeftStickXMID = NULL;
+jmethodID JNIUtil::m_getLeftStickYMID = NULL;
+jmethodID JNIUtil::m_getRightStickXMID = NULL;
+jmethodID JNIUtil::m_getRightStickYMID = NULL;
+jmethodID JNIUtil::m_getDpadUpMID = NULL;
+jmethodID JNIUtil::m_getDpadDownMID = NULL;
+jmethodID JNIUtil::m_getDpadLeftMID = NULL;
+jmethodID JNIUtil::m_getDpadRightMID = NULL;
+jmethodID JNIUtil::m_getButtonXMID = NULL;
+jmethodID JNIUtil::m_getButtonYMID = NULL;
+jmethodID JNIUtil::m_getButtonAMID = NULL;
+jmethodID JNIUtil::m_getButtonBMID = NULL;
+jmethodID JNIUtil::m_getButtonLeftThumbMID = NULL;
+jmethodID JNIUtil::m_getButtonRightThumbMID = NULL;
+jmethodID JNIUtil::m_getTriggerLeftMID = NULL;
+jmethodID JNIUtil::m_getTriggerRightMID = NULL;
+jmethodID JNIUtil::m_getButtonLeftShoulderMID = NULL;
+jmethodID JNIUtil::m_getButtonRightShoulderMID = NULL;
+jmethodID JNIUtil::m_getButtonStartMID = NULL;
+jmethodID JNIUtil::m_getButtonBackMID = NULL;
 
 jobject JNIUtil::m_objectRef = NULL;
 jclass JNIUtil::cls = NULL;
@@ -163,6 +186,7 @@ void JNIUtil::Initialize()
         m_getScreenOrientationMID = jniEnv->GetMethodID(cls, "getScreenOrientation", "()I");
         m_setButtonMarginMID = jniEnv->GetMethodID(cls, "setButtonMargin", "(I)V");
         m_setControlsVisibleMID = jniEnv->GetMethodID(cls, "setControlsVisible", "(ZZ)V");
+        m_hideKeyboardMID = jniEnv->GetMethodID(cls, "hideKeyboard", "()V");
         m_getWalkJoystickXMID = jniEnv->GetMethodID(cls, "getWalkJoystickX", "()F");
         m_getWalkJoystickYMID = jniEnv->GetMethodID(cls, "getWalkJoystickY", "()F");
         m_getViewJoystickXMID = jniEnv->GetMethodID(cls, "getViewJoystickX", "()F");
@@ -184,6 +208,29 @@ void JNIUtil::Initialize()
         m_showGearMID = jniEnv->GetMethodID(cls, "showGear", "(Z)V");
         m_getShowingVRMID = jniEnv->GetMethodID(cls, "getShowingVR", "()Z");
         m_getWindowSurfaceMID = jniEnv->GetMethodID(cls, "getWindowSurface", "()Landroid/view/Surface;");
+
+        //Gamepad
+        m_getGamepadConnectedMID = jniEnv->GetMethodID(cls, "getGamepadConnected", "()Z");
+        m_getLeftStickXMID = jniEnv->GetMethodID(cls, "getLeftStickX", "()F");
+        m_getLeftStickYMID = jniEnv->GetMethodID(cls, "getLeftStickY", "()F");
+        m_getRightStickXMID = jniEnv->GetMethodID(cls, "getRightStickX", "()F");
+        m_getRightStickYMID = jniEnv->GetMethodID(cls, "getRightStickY", "()F");
+        m_getDpadUpMID = jniEnv->GetMethodID(cls, "getDpadUp", "()Z");
+        m_getDpadDownMID = jniEnv->GetMethodID(cls, "getDpadDown", "()Z");
+        m_getDpadLeftMID = jniEnv->GetMethodID(cls, "getDpadLeft", "()Z");
+        m_getDpadRightMID = jniEnv->GetMethodID(cls, "getDpadRight", "()Z");
+        m_getButtonXMID = jniEnv->GetMethodID(cls, "getButtonX", "()Z");
+        m_getButtonYMID = jniEnv->GetMethodID(cls, "getButtonY", "()Z");
+        m_getButtonAMID = jniEnv->GetMethodID(cls, "getButtonA", "()Z");
+        m_getButtonBMID = jniEnv->GetMethodID(cls, "getButtonB", "()Z");
+        m_getButtonLeftThumbMID = jniEnv->GetMethodID(cls, "getButtonLeftThumb", "()Z");
+        m_getButtonRightThumbMID = jniEnv->GetMethodID(cls, "getButtonRightThumb", "()Z");
+        m_getTriggerLeftMID = jniEnv->GetMethodID(cls, "getTriggerLeft", "()F");
+        m_getTriggerRightMID = jniEnv->GetMethodID(cls, "getTriggerRight", "()F");
+        m_getButtonLeftShoulderMID = jniEnv->GetMethodID(cls, "getButtonLeftShoulder", "()Z");
+        m_getButtonRightShoulderMID = jniEnv->GetMethodID(cls, "getButtonRightShoulder", "()Z");
+        m_getButtonStartMID = jniEnv->GetMethodID(cls, "getButtonStart", "()Z");
+        m_getButtonBackMID = jniEnv->GetMethodID(cls, "getButtonBack", "()Z");
     }
 
 #ifdef __arm__
@@ -597,6 +644,15 @@ void JNIUtil::SetControlsVisible(bool b, bool show_view_joystick)
     }
 }
 
+void JNIUtil::HideKeyboard()
+{
+    if(m_hideKeyboardMID)
+    {
+        QAndroidJniEnvironment jniEnv;
+        jniEnv->CallVoidMethod(m_objectRef, m_hideKeyboardMID);
+    }
+}
+
 float JNIUtil::GetWalkJoystickX()
 {
     float x = 0;
@@ -739,6 +795,156 @@ jobject JNIUtil::GetWindowSurface()
         return surface;
     }
     return 0;
+}
+
+bool JNIUtil::GetGamepadConnected()
+{
+    QAndroidJniEnvironment jniEnv;
+    return (m_getGamepadConnectedMID && (bool)jniEnv->CallBooleanMethod(m_objectRef, m_getGamepadConnectedMID));
+}
+
+float JNIUtil::GetLeftStickX()
+{
+    float x = 0;
+    if (m_getLeftStickXMID){
+        QAndroidJniEnvironment jniEnv;
+        x = (float)jniEnv->CallFloatMethod(m_objectRef, m_getLeftStickXMID);
+    }
+    return x;
+}
+
+float JNIUtil::GetLeftStickY()
+{
+    float y = 0;
+    if (m_getLeftStickYMID){
+        QAndroidJniEnvironment jniEnv;
+        y = (float)jniEnv->CallFloatMethod(m_objectRef, m_getLeftStickYMID);
+    }
+    return y;
+}
+
+float JNIUtil::GetRightStickX()
+{
+    float x = 0;
+    if (m_getRightStickXMID){
+        QAndroidJniEnvironment jniEnv;
+        x = (float)jniEnv->CallFloatMethod(m_objectRef, m_getRightStickXMID);
+    }
+    return x;
+}
+
+float JNIUtil::GetRightStickY()
+{
+    float y = 0;
+    if (m_getRightStickYMID){
+        QAndroidJniEnvironment jniEnv;
+        y = (float)jniEnv->CallFloatMethod(m_objectRef, m_getRightStickYMID);
+    }
+    return y;
+}
+
+bool JNIUtil::GetDpadUp()
+{
+    QAndroidJniEnvironment jniEnv;
+    return (m_getDpadUpMID && (bool)jniEnv->CallBooleanMethod(m_objectRef, m_getDpadUpMID));
+}
+
+bool JNIUtil::GetDpadDown()
+{
+    QAndroidJniEnvironment jniEnv;
+    return (m_getDpadDownMID && (bool)jniEnv->CallBooleanMethod(m_objectRef, m_getDpadDownMID));
+}
+
+bool JNIUtil::GetDpadLeft()
+{
+    QAndroidJniEnvironment jniEnv;
+    return (m_getDpadLeftMID && (bool)jniEnv->CallBooleanMethod(m_objectRef, m_getDpadLeftMID));
+}
+
+bool JNIUtil::GetDpadRight()
+{
+    QAndroidJniEnvironment jniEnv;
+    return (m_getDpadRightMID && (bool)jniEnv->CallBooleanMethod(m_objectRef, m_getDpadRightMID));
+}
+
+bool JNIUtil::GetButtonX()
+{
+    QAndroidJniEnvironment jniEnv;
+    return (m_getButtonXMID && (bool)jniEnv->CallBooleanMethod(m_objectRef, m_getButtonXMID));
+}
+
+bool JNIUtil::GetButtonY()
+{
+    QAndroidJniEnvironment jniEnv;
+    return (m_getButtonYMID && (bool)jniEnv->CallBooleanMethod(m_objectRef, m_getButtonYMID));
+}
+
+bool JNIUtil::GetButtonA()
+{
+    QAndroidJniEnvironment jniEnv;
+    return (m_getButtonAMID && (bool)jniEnv->CallBooleanMethod(m_objectRef, m_getButtonAMID));
+}
+
+bool JNIUtil::GetButtonB()
+{
+    QAndroidJniEnvironment jniEnv;
+    return (m_getButtonBMID && (bool)jniEnv->CallBooleanMethod(m_objectRef, m_getButtonBMID));
+}
+
+bool JNIUtil::GetButtonLeftThumb()
+{
+    QAndroidJniEnvironment jniEnv;
+    return (m_getButtonLeftThumbMID && (bool)jniEnv->CallBooleanMethod(m_objectRef, m_getButtonLeftThumbMID));
+}
+
+bool JNIUtil::GetButtonRightThumb()
+{
+    QAndroidJniEnvironment jniEnv;
+    return (m_getButtonRightThumbMID && (bool)jniEnv->CallBooleanMethod(m_objectRef, m_getButtonRightThumbMID));
+}
+
+float JNIUtil::GetTriggerLeft()
+{
+    float l = 0;
+    if (m_getTriggerLeftMID){
+        QAndroidJniEnvironment jniEnv;
+        l = (float)jniEnv->CallFloatMethod(m_objectRef, m_getTriggerLeftMID);
+    }
+    return l;
+}
+
+float JNIUtil::GetTriggerRight()
+{
+    float r = 0;
+    if (m_getTriggerRightMID){
+        QAndroidJniEnvironment jniEnv;
+        r = (float)jniEnv->CallFloatMethod(m_objectRef, m_getTriggerRightMID);
+    }
+    return r;
+}
+
+bool JNIUtil::GetButtonLeftShoulder()
+{
+    QAndroidJniEnvironment jniEnv;
+    return (m_getButtonLeftShoulderMID && (bool)jniEnv->CallBooleanMethod(m_objectRef, m_getButtonLeftShoulderMID));
+}
+
+bool JNIUtil::GetButtonRightShoulder()
+{
+    QAndroidJniEnvironment jniEnv;
+    return (m_getButtonRightShoulderMID && (bool)jniEnv->CallBooleanMethod(m_objectRef, m_getButtonRightShoulderMID));
+}
+
+bool JNIUtil::GetButtonStart()
+{
+    QAndroidJniEnvironment jniEnv;
+    return (m_getButtonStartMID && (bool)jniEnv->CallBooleanMethod(m_objectRef, m_getButtonStartMID));
+}
+
+bool JNIUtil::GetButtonBack()
+{
+    QAndroidJniEnvironment jniEnv;
+    return (m_getButtonBackMID && (bool)jniEnv->CallBooleanMethod(m_objectRef, m_getButtonBackMID));
 }
 
 void JNIUtil::SetMainWindow(MainWindow* w)

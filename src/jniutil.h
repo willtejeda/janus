@@ -77,6 +77,7 @@ public:
     static int GetScreenOrientation();
     static void SetButtonMargin(int margin);
     static void SetControlsVisible(bool b, bool show_view_joystick);
+    static void HideKeyboard();
     static float GetWalkJoystickX();
     static float GetWalkJoystickY();
     static float GetViewJoystickX();
@@ -95,6 +96,28 @@ public:
     static void ShowGear(bool b);
     static bool GetShowingVR();
     static jobject GetWindowSurface();
+
+    static bool GetGamepadConnected();
+    static float GetLeftStickX();
+    static float GetLeftStickY();
+    static float GetRightStickX();
+    static float GetRightStickY();
+    static bool GetDpadUp();
+    static bool GetDpadDown();
+    static bool GetDpadLeft();
+    static bool GetDpadRight();
+    static bool GetButtonX();
+    static bool GetButtonY();
+    static bool GetButtonA();
+    static bool GetButtonB();
+    static bool GetButtonLeftThumb();
+    static bool GetButtonRightThumb();
+    static float GetTriggerLeft();
+    static float GetTriggerRight();
+    static bool GetButtonLeftShoulder();
+    static bool GetButtonRightShoulder();
+    static bool GetButtonStart();
+    static bool GetButtonBack();
 
     static void SetMainWindow(MainWindow* w);
     static MainWindow * GetMainWindow();
@@ -150,6 +173,7 @@ private:
     static jmethodID m_getScreenOrientationMID;
     static jmethodID m_setButtonMarginMID;
     static jmethodID m_setControlsVisibleMID;
+    static jmethodID m_hideKeyboardMID;
     static jmethodID m_getWalkJoystickXMID;
     static jmethodID m_getWalkJoystickYMID;
     static jmethodID m_getViewJoystickXMID;
@@ -170,6 +194,28 @@ private:
     static jmethodID m_showGearMID;
     static jmethodID m_getShowingVRMID;
     static jmethodID m_getWindowSurfaceMID;
+
+    static jmethodID m_getGamepadConnectedMID;
+    static jmethodID m_getLeftStickXMID;
+    static jmethodID m_getLeftStickYMID;
+    static jmethodID m_getRightStickXMID;
+    static jmethodID m_getRightStickYMID;
+    static jmethodID m_getDpadUpMID;
+    static jmethodID m_getDpadDownMID;
+    static jmethodID m_getDpadLeftMID;
+    static jmethodID m_getDpadRightMID;
+    static jmethodID m_getButtonXMID;
+    static jmethodID m_getButtonYMID;
+    static jmethodID m_getButtonAMID;
+    static jmethodID m_getButtonBMID;
+    static jmethodID m_getButtonLeftThumbMID;
+    static jmethodID m_getButtonRightThumbMID;
+    static jmethodID m_getTriggerLeftMID;
+    static jmethodID m_getTriggerRightMID;
+    static jmethodID m_getButtonLeftShoulderMID;
+    static jmethodID m_getButtonRightShoulderMID;
+    static jmethodID m_getButtonStartMID;
+    static jmethodID m_getButtonBackMID;
 
     static jobject m_objectRef;
     static jclass cls;

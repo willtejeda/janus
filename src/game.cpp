@@ -77,6 +77,8 @@ Game::Game() :
 
     RequestInternetConnection();
     network_timer.start();
+
+    connect(env, SIGNAL(RoomsChanged()), this, SLOT(StartLoadTimer()));
 #endif
 }
 
@@ -108,6 +110,11 @@ Game::~Game()
 }
 
 #ifdef __ANDROID__
+void Game::StartLoadTimer()
+{
+    loading_timer.restart();
+}
+
 void Game::CheckInternetConnection(QNetworkReply *reply)
 {
     //qDebug() << "REPLY" << reply->bytesAvailable();
@@ -288,7 +295,7 @@ void Game::Update()
     }
 
 #ifdef __ANDROID__
-    if (network_timer.elapsed() > 10000){ //Request every 10 seconds
+    if (network_timer.elapsed() > 60000){ //Request every minute
         RequestInternetConnection();
         network_timer.restart();
     }
@@ -312,9 +319,7 @@ void Game::Update()
     UpdatePrivateWebsurfaces();
 
     //update virtual keyboard
-#ifndef __ANDROID__
     UpdateVirtualKeyboard();
-#endif
 
     //Update AssetRecordings
     UpdateAssetRecordings();
@@ -363,14 +368,14 @@ void Game::Update()
     //update follow mode
     UpdateFollowMode();
 
+    //update VOIP
+    UpdateMedia();
+
     //update assets
     UpdateAssets();   
 
     //update multiplayers
     UpdateMultiplayer();
-
-    //update VOIP
-    UpdateMedia();
 
     //do environment::update1 and process portal crossings
     QPointer <Room> r0 = env->GetCurRoom();
@@ -856,6 +861,8 @@ void Game::DrawGL(const float ipd, const QMatrix4x4 head_xform, const bool set_m
         ComputeMouseCursorTransform(p_windowSize, p_mousePos);
         UpdateCursorRaycast(GetMouseCursorTransform(), 0);
     }
+#else
+    windowSize = p_windowSize;
 #endif
 
     // Draw current room    
@@ -2767,6 +2774,7 @@ void Game::DrawCursorGL()
 #ifdef __ANDROID__
             ControllerState * cs = controller_manager->GetStates();
             if ((draw_cursor ||
+                 JNIUtil::GetGamepadConnected() ||
                  (controller_manager->GetUsingSpatiallyTrackedControllers() &&
                   (cursor_active == 0 || (cursor_active == 1 && (!cs[0].active || cs[1].GetClick().hover || cs[1].GetTeleport().hover || cs[1].GetGrab().pressed)))))
                     && r->GetB("cursor_visible")) {
@@ -3271,7 +3279,7 @@ void Game::DrawOverlaysGL()
         MathUtil::PopModelMatrix();
     }
     //Draw loading icon as overlay if room is not loaded
-    else if (r->GetProgress() < 0.8f && SettingsManager::GetShowLoadingIcon()){
+    else if (r->GetProgress() < 0.8f && loading_timer.elapsed() < 60000 && SettingsManager::GetShowLoadingIcon()){
         MathUtil::PushModelMatrix();
         MathUtil::MultModelMatrix(m);
         MathUtil::ModelMatrix().scale(0.25f);
@@ -3715,7 +3723,11 @@ void Game::UpdateControllers()
     }
 
     //59.7 - Updated controller player states
-    if (controller_manager->GetUsingSpatiallyTrackedControllers()) {
+    if (controller_manager->GetUsingSpatiallyTrackedControllers()
+#ifdef __ANDROID__
+            && !JNIUtil::GetGamepadConnected()
+#endif
+            ) {
         if (player->GetS("hmd_type") == "rift") {
             QPointer <QObject> c = qvariant_cast<QObject *>(player->GetProperties()->property("touch"));
             if (c) {
@@ -3824,6 +3836,9 @@ void Game::UpdateControllers()
     else if (controller_manager->GetUsingGamepad()) { //Note: 59.7 - currently has to be one or the other, might we want to support both at once?
         QPointer <QObject> c = qvariant_cast<QObject *>(player->GetProperties()->property("xbox"));
         if (c) {
+#ifdef __ANDROID__
+            c->setProperty("connected", JNIUtil::GetGamepadConnected());
+#endif
             c->setProperty("left_stick_x", s[0].x);
             c->setProperty("left_stick_y", s[0].y);
             c->setProperty("left_trigger", s[0].t[0].value);
@@ -3858,12 +3873,15 @@ void Game::UpdateControllers()
     float y0 = s[0].y;
     float x1 = s[1].x;
     float y1 = s[1].y;
-#ifdef OCULUS_SUBMISSION_BUILD
+
+#if defined(OCULUS_SUBMISSION_BUILD) && defined(__ANDROID__)
     // Headset trackpad is also used for locomotion
-    x0 += x1;
-    y0 += y1;
-    x1 = 0.0f;
-    y1 = 0.0f;
+    if (!JNIUtil::GetGamepadConnected()) {
+        x0 += x1;
+        y0 += y1;
+        x1 = 0.0f;
+        y1 = 0.0f;
+    }
 #endif
 
     const float snapturn_axis_threshold = 0.8f;
@@ -3882,7 +3900,11 @@ void Game::UpdateControllers()
     }
 
     //this should do lasers thing later
+#ifndef __ANDROID__
     if (controller_manager->GetUsingSpatiallyTrackedControllers()) {
+#else
+    if (controller_manager->GetUsingSpatiallyTrackedControllers() && !JNIUtil::GetGamepadConnected()) {
+#endif
 
         const bool room_has_fn_onmousedown = r->HasJSFunctionContains("room.onMouseDown", "room.preventDefault()");
         const bool room_has_fn_onmouseup = r->HasJSFunctionContains("room.onMouseUp", "room.preventDefault()");
@@ -4085,16 +4107,57 @@ void Game::UpdateControllers()
             }                                  
         } 
     }
+#ifdef __ANDROID__
+    else if (controller_manager->GetUsingGamepad() && JNIUtil::GetGamepadConnected()) {
+        if (!controller_manager->GetHMDManager() || (controller_manager->GetHMDManager() && !controller_manager->GetHMDManager()->GetEnabled())) {
+            cursor_active = 0;
+            ComputeMouseCursorTransform(windowSize, QPointF(windowSize.width()/2, windowSize.height()/2));
+            UpdateCursorRaycast(GetMouseCursorTransform(), 0);
+        }
+        else if (controller_manager->GetHMDManager() && controller_manager->GetHMDManager()->GetEnabled()){
+            cursor_active = 0;
+            QMatrix4x4 m2 = controller_manager->GetHMDManager()->GetHMDTransform();
+            QMatrix4x4 m = player->GetTransform() * m2;
+            m.setColumn(2, -m.column(2));
+            UpdateCursorRaycast(m, 0);
+        }
+#else
     else if (controller_manager->GetUsingGamepad() && SettingsManager::GetGamepadEnabled()) {
+#endif
+
+        const bool room_has_fn_onmousedown = r->HasJSFunctionContains("room.onMouseDown", "room.preventDefault()");
+        const bool room_has_fn_onmouseup = r->HasJSFunctionContains("room.onMouseUp", "room.preventDefault()");
+        const bool room_has_fn_onclick = r->HasJSFunctionContains("room.onClick", "room.preventDefault()");
 
         //LMB
         if (s[1].t[0].proc_press) {
             s[1].t[0].proc_press = false;
-            StartOpInteractionDefault(0);
+            r->CallJSFunction("room.onMouseDown", player);
+
+            if (!room_has_fn_onmousedown) {
+                StartOpInteractionDefault(0);
+            }
         }
         if (s[1].t[0].proc_release) {
             s[1].t[0].proc_release = false;
-            EndOpInteractionDefault(0);
+
+            //room onclick
+            r->CallJSFunction("room.onMouseUp", player);
+            r->CallJSFunction("room.onClick", player);
+
+            //object onclick
+            QPointer <RoomObject> o = r->GetRoomObject(player->GetCursorObject(0));
+            if (o) {
+                //55.2 - onclick is on mouse release, and should only happen once per mouse click
+                QString click_code = o->GetS("onclick");
+                if (click_code.length() > 0) { //special javascript onclick code to run
+                    r->CallJSFunction(click_code, player);
+                }
+            }
+
+            if (!room_has_fn_onmouseup && !room_has_fn_onclick) {
+                    EndOpInteractionDefault(0);
+            }
         }
 
         //RMB
@@ -4231,7 +4294,9 @@ void Game::UpdateControllers()
     x0 += JNIUtil::GetWalkJoystickX();
     y0 += -JNIUtil::GetWalkJoystickY();
 
-    if (!websurface_selected[0] || !(controller_manager->GetHMDManager() && controller_manager->GetHMDManager()->GetEnabled() && controller_manager->GetUsingSpatiallyTrackedControllers()))
+    if (!websurface_selected[0]
+            || (controller_manager->GetUsingGamepad() && JNIUtil::GetGamepadConnected())
+            || !(controller_manager->GetHMDManager() && controller_manager->GetHMDManager()->GetEnabled() && controller_manager->GetUsingSpatiallyTrackedControllers()))
 #endif
     {
 
@@ -4377,9 +4442,9 @@ void Game::UpdateControllers()
             websurface_selected[0]->wheelEvent(&e3);
         }
     }
-    else {
-        controller_x[1] = ((SettingsManager::GetInvertXEnabled())?1:-1) * JNIUtil::GetViewJoystickX();
-        controller_y[1] = ((SettingsManager::GetInvertYEnabled())?1:-1) * JNIUtil::GetViewJoystickY();
+    else{
+        controller_x[1] += ((SettingsManager::GetInvertXEnabled())?1:-1) * JNIUtil::GetViewJoystickX();
+        controller_y[1] += ((SettingsManager::GetInvertYEnabled())?1:-1) * JNIUtil::GetViewJoystickY();
     }
 #endif
 
@@ -4387,9 +4452,6 @@ void Game::UpdateControllers()
     if (controller_x[1] != 0.0f) {
 #ifndef __ANDROID__
         if (SettingsManager::GetComfortMode()) {
-#else
-        if (SettingsManager::GetComfortMode() && (JNIUtil::GetViewJoystickX() == 0 || JNIUtil::GetViewJoystickY() == 0)) {
-#endif
             if (fabsf(controller_x[1]) > snapturn_axis_threshold && fabsf(last_controller_x[1]) < snapturn_axis_threshold) {
                 if (controller_x[1] > 0.0f) {
                     player->SpinView(rot_speed, true);
@@ -4399,6 +4461,21 @@ void Game::UpdateControllers()
                 }
             }
         }
+#else
+        if (SettingsManager::GetComfortMode() && (JNIUtil::GetViewJoystickX() == 0 || JNIUtil::GetViewJoystickY() == 0)) {
+            if (!controller_manager->GetHMDManager() || (controller_manager->GetHMDManager() && !controller_manager->GetHMDManager()->GetEnabled())) {
+                player->SpinView(controller_x[1] * player->GetF("delta_time") * rot_speed, true);
+            }
+            else if (fabsf(controller_x[1]) > snapturn_axis_threshold && fabsf(last_controller_x[1]) < snapturn_axis_threshold) {
+                if (controller_x[1] > 0.0f) {
+                    player->SpinView(rot_speed, true);
+                }
+                else {
+                    player->SpinView(-rot_speed, true);
+                }
+            }
+        }
+#endif
         else {
             player->SpinView(controller_x[1] * player->GetF("delta_time") * rot_speed, true);
         }
@@ -4433,43 +4510,48 @@ void Game::UpdateControllers()
 
 #ifdef __ANDROID__
 
-    if (controller_manager->GetHMDManager() && controller_manager->GetHMDManager()->GetEnabled()){
+    if (controller_manager->GetHMDManager() && controller_manager->GetHMDManager()->GetEnabled() && !JNIUtil::GetGamepadConnected()){
         SettingsManager::SetMicAlwaysOn(true);
         return;
     }
-
-    //Enable user always speaking
-    bool b =  JNIUtil::GetAlwaysSpeaking();
-    SettingsManager::SetMicAlwaysOn(b);
-
-    if (!b) {
-        player->SetB("speaking", JNIUtil::GetSpeaking());
+    else{
+        SettingsManager::SetMicAlwaysOn(JNIUtil::GetAlwaysSpeaking());
     }
 
-    //Let user fly
-    player->SetB("flying", JNIUtil::GetFlying());
+    if (!JNIUtil::GetGamepadConnected()) {
+        //Enable user always speaking
+        bool b =  JNIUtil::GetAlwaysSpeaking();
+        SettingsManager::SetMicAlwaysOn(b);
 
-    //Let user jump
-    if (!player->GetB("flying")) {
-        player->SetB("jump", JNIUtil::GetJumping());
-    }
-
-    //Translate user; let user run past certain threshold
-    if (state_can_walk && !player->GetB("entering_text")) {
-        if (!pinching) {
-            player->SetB("running", JNIUtil::GetRunning());
+        if (!b) {
+            player->SetB("speaking", JNIUtil::GetSpeaking());
         }
-    }
-    else {
-        player->SetB("walk_forward", false);
-        player->SetB("walk_back", false);
-        player->SetB("walk_left", false);
-        player->SetB("walk_right", false);
-        player->DoSpinLeft(false);
-        player->DoSpinRight(false);
-        player->SetB("fly_up", false);
-        player->SetB("fly_down", false);
-        player->SetB("jump", false);
+
+        //Let user fly
+        player->SetB("flying", JNIUtil::GetFlying());
+
+        //Let user jump
+        if (!player->GetB("flying")) {
+            player->SetB("jump", JNIUtil::GetJumping());
+        }
+
+        //Translate user; let user run past certain threshold
+        if (state_can_walk && !player->GetB("entering_text")) {
+            if (!pinching) {
+                player->SetB("running", JNIUtil::GetRunning());
+            }
+        }
+        else {
+            player->SetB("walk_forward", false);
+            player->SetB("walk_back", false);
+            player->SetB("walk_left", false);
+            player->SetB("walk_right", false);
+            player->DoSpinLeft(false);
+            player->DoSpinRight(false);
+            player->SetB("fly_up", false);
+            player->SetB("fly_down", false);
+            player->SetB("jump", false);
+        }
     }
 
     //Change user view using gyroscope (if enabled)
@@ -4516,7 +4598,7 @@ void Game::UpdateVirtualKeyboard()
 
     //update state of virtual keyboard if HMD is enabled
     if ((player->GetB("hmd_enabled") || controller_manager->GetUsingGamepad()) && text_entry && !virtualkeyboard->GetVisible()) { //show keyboard if hidden and needed
-//    if (text_entry && !virtualkeyboard->GetVisible()) { //uncomment this and comment above for testing with mouse
+    //if (text_entry && !virtualkeyboard->GetVisible()) { //uncomment this and comment above for testing with mouse
         QVector3D z = -player->GetV("dir");
         z.setY(0.0f);
         z.normalize();

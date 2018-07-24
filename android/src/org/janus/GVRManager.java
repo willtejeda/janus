@@ -116,14 +116,14 @@ public class GVRManager
         public long getGvrContext()
         {
             int count = 0;
-            while(!gvr_setup && count < 100){
+            while(!gvr_setup && count < 10){
                 try {
                     Thread.sleep(100);
                 } catch (Exception e) {
                 }
                 count++;
 
-                if (count == 100) gvrContext = 0;
+                if (count == 10) gvrContext = 0;
             }
             return gvrContext;
         }

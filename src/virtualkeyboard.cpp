@@ -5,7 +5,6 @@ VirtualKeyboard::VirtualKeyboard() :
     capslock(false),
     visible(false)
 {
-#ifndef __ANDROID__
     mouse_pressed[0] = false;
     mouse_pressed[1] = false;
 
@@ -102,7 +101,6 @@ VirtualKeyboard::VirtualKeyboard() :
         jstokeys[jsid] = cit.key();
 //        qDebug() << "Loading keyboard... " << cit.value();
     }
-#endif
 }
 
 void VirtualKeyboard::SetWebSurface(QPointer <AbstractWebSurface> w)

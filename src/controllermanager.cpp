@@ -177,6 +177,12 @@ void ControllerManager::DrawGL(QPointer <AssetShader> shader, QMatrix4x4 player_
         return;
     }
 
+#ifdef __ANDROID__
+    if (JNIUtil::GetGamepadConnected()) {
+        return;
+    }
+#endif
+
     //controllers
     const QString hmd = hmd_manager->GetHMDType();
 
@@ -292,11 +298,12 @@ void ControllerManager::Update(const bool use_gamepad)
         }
     }
 
+#ifndef __ANDROID__
     if (hmd_manager && hmd_manager->GetEnabled() && hmd_manager->GetNumControllers() > 0) {
         UpdateControllers();
     }    
     else if (use_gamepad) {
-#if !defined(__APPLE__) && !defined(__ANDROID__)
+#if !defined(__APPLE__)
         GamepadUpdate();
         if (GamepadIsConnected(GAMEPAD_0)) {
             UpdateGamepad(GAMEPAD_0);
@@ -314,6 +321,14 @@ void ControllerManager::Update(const bool use_gamepad)
             UpdateGamepad(GAMEPAD_3);
             using_gamepad = true;
         }
+#endif
+#else
+    if (hmd_manager && hmd_manager->GetEnabled() && hmd_manager->GetNumControllers() > 0 && !JNIUtil::GetGamepadConnected()) {
+        UpdateControllers();
+    }
+    else if (JNIUtil::GetGamepadConnected()) {
+        UpdateGamepad();
+        using_gamepad = true;
 #endif
     }    
 
@@ -509,9 +524,10 @@ void ControllerManager::UpdateControllers()
     }
 }
 
-#if !defined(__APPLE__) && !defined(__ANDROID__)
+#if !defined(__APPLE__)
 void ControllerManager::UpdateGamepad(GAMEPAD_DEVICE dev)
 {    
+#ifndef __ANDROID__
     if (!GamepadIsConnected(dev)) {
 //        printf("%d) n/a\n", dev);
         return;
@@ -544,6 +560,38 @@ void ControllerManager::UpdateGamepad(GAMEPAD_DEVICE dev)
     b[1][4] = GamepadButtonDown(dev, BUTTON_DPAD_RIGHT);
     b[1][5] = GamepadButtonDown(dev, BUTTON_DPAD_DOWN);
     b[1][6] = GamepadButtonDown(dev, BUTTON_RIGHT_THUMB);
+#else
+    if (!JNIUtil::GetGamepadConnected()) {
+        return;
+    }
+
+    s[0].x = qMax(-1.0f, qMin(1.0f, JNIUtil::GetLeftStickX()));
+    s[0].y = qMax(-1.0f, qMin(1.0f, JNIUtil::GetLeftStickY()));
+    s[1].x = qMax(-1.0f, qMin(1.0f, JNIUtil::GetRightStickX()));
+    s[1].y = qMax(-1.0f, qMin(1.0f, JNIUtil::GetRightStickY()));
+
+    s[0].t[0].value = JNIUtil::GetTriggerLeft();
+    s[1].t[0].value = JNIUtil::GetTriggerRight();
+
+    bool b[2][7];
+    b[0][0] = JNIUtil::GetButtonY();
+    b[0][1] = JNIUtil::GetButtonX();
+    b[0][2] = JNIUtil::GetButtonBack();
+    b[0][3] = JNIUtil::GetButtonStart();
+    b[0][4] = JNIUtil::GetButtonLeftShoulder();
+    b[0][5] = JNIUtil::GetButtonRightShoulder();
+    b[0][6] = JNIUtil::GetButtonLeftThumb();
+
+    b[1][0] = JNIUtil::GetButtonB();
+    b[1][1] = JNIUtil::GetButtonA();
+    b[1][2] = JNIUtil::GetDpadLeft();
+    b[1][3] = JNIUtil::GetDpadUp();
+    b[1][4] = JNIUtil::GetDpadRight();
+    b[1][5] = JNIUtil::GetDpadDown();
+    b[1][6] = JNIUtil::GetButtonRightThumb();
+
+    //qDebug() << "VALUES" << s[0].t[0].value << s[1].t[1].value << s[0].x << s[0].y << s[1].x << s[1].y << b[0][0]<< b[0][1]<< b[0][2]<< b[0][3]<< b[0][4]<< b[0][5]<< b[0][6]<< b[1][0]<< b[1][1]<< b[1][2]<< b[1][3]<< b[1][4]<< b[1][5]<< b[1][6];
+#endif
 
     for (int i=0; i<2; ++i) {
         for (int j=0; j<7; ++j) {
@@ -552,12 +600,12 @@ void ControllerManager::UpdateGamepad(GAMEPAD_DEVICE dev)
 
             if (b[i][j] && !s[i].b[j].pressed) {
                 s[i].b[j].pressed = true;
-                s[i].b[j].proc_press = true;                
+                s[i].b[j].proc_press = true;
             }
             else if (!b[i][j] && s[i].b[j].pressed) {
                 s[i].b[j].pressed = false;
                 s[i].b[j].proc_release = true;
-            }            
+            }
         }
 
         //update triggers
@@ -571,7 +619,7 @@ void ControllerManager::UpdateGamepad(GAMEPAD_DEVICE dev)
             else if (t_val < 0.9f && s[i].t[j].pressed) {
                 s[i].t[j].pressed = false;
                 s[i].t[j].proc_release = true;
-            }           
+            }
         }
     }
 }

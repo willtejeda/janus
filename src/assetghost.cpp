@@ -307,29 +307,22 @@ void AssetGhost::ConvertPacketToFrame(const QVariantMap & map, GhostFrame & fram
         frame.speaking = true;
     }
 
-    if (m.contains("audio")) {        
-        frame.sound_buffers.push_back(QByteArray::fromBase64(m["audio"].toByteArray())); //Old
+    if (m.contains("audio")) {
+        QByteArray b = QByteArray::fromBase64(m["audio"].toByteArray());
+        frame.sound_buffers.push_back(b); //Old
+        frame.current_sound_level = MathUtil::GetSoundLevel(b);
     }
 
     if (m.contains("audio_opus")) {
-        QByteArray encoded = QByteArray::fromBase64(m["audio_opus"].toByteArray());
-        QByteArray decoded = AudioUtil::decode(encoded);
-        //qDebug() << "ENCODED MICBUFFER" << encoded.size(); // << compressed_buffer; // << mic_buffers.first().toBase64();
-        //qDebug() << "DECODED MICBUFFER" << AudioUtil::decode(encoded).size() << "\n";
-        frame.sound_buffers.push_back(decoded);
-        frame.current_sound_level = MathUtil::GetSoundLevel(decoded);
-        //frame.sound_buffers.push_back(QByteArray::fromBase64(m["audio"].toByteArray())); //Old
+        frame.sound_buffers.push_back(m["audio_opus"].toByteArray());
+        frame.current_sound_level = (m.contains("sound_level"))?m["sound_level"].toFloat():1.0f;
     }
 
     int i=0;
 
     while (m.contains("audio_opus"+QString::number(i)) && i < 30) {
-        QByteArray encoded = QByteArray::fromBase64(m["audio_opus"+QString::number(i)].toByteArray());
-        QByteArray decoded = AudioUtil::decode(encoded);
-        //qDebug() << "ENCODED MICBUFFER" << encoded.size(); // << compressed_buffer; // << mic_buffers.first().toBase64();
-        //qDebug() << "DECODED MICBUFFER" << decoded.size() << "\n";
-        frame.sound_buffers.push_back(decoded);
-        frame.current_sound_level = MathUtil::GetSoundLevel(decoded);
+        frame.sound_buffers.push_back(m["audio_opus"+QString::number(i)].toByteArray());
+        frame.current_sound_level = (m.contains("sound_level"))?m["sound_level"].toFloat():1.0f;
         ++i;
     }
 

@@ -1384,7 +1384,8 @@ void RoomObject::UpdateMedia()
 
                 SoundManager::buffer_input_queue.pop_front();
                 //49.8 bugfix - use the buffer size (which can vary), not a fixed size causing portions of audio not to play
-                QByteArray & b = sound_buffers.front();
+                QByteArray b = AudioUtil::decode(QByteArray::fromBase64(sound_buffers.front()));
+                //ghost_frame.current_sound_level = MathUtil::GetSoundLevel(b);
 
                 alBufferData(myBuff, AL_FORMAT_MONO16, b.data(), b.size(), sound_buffers_sample_rate);
 
