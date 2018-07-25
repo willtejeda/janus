@@ -142,6 +142,7 @@ public class WebViewManager
             }
             // super.onDraw( canvas ); // <- Uncomment this if you want to show the original view
         }
+
         public void setTextureWidth(int w) {
             width = w;
         }
@@ -220,7 +221,7 @@ public class WebViewManager
                     webView.getSettings().setDomStorageEnabled(true);
                     webView.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
                     webView.getSettings().setMediaPlaybackRequiresUserGesture(false);
-                    //webView.getSettings().setOffscreenPreRaster(true);
+                    webView.getSettings().setOffscreenPreRaster(true);
                     webView.getSettings().setUserAgentString("Desktop"); //Android
                     webView.setWebViewClient(new WebViewClient() {
                         @Override
