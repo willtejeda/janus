@@ -61,7 +61,7 @@ Building on windows
 
 https://developer.microsoft.com/en-us/windows/hardware/windows-driver-kit
 
-Building on linux (Ubuntu 16.04 LTS; Debian 8.5)
+Building on linux (Ubuntu 18.04 LTS)
 ================================================
 
 === Automated ===
