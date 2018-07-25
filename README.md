@@ -64,7 +64,8 @@ https://developer.microsoft.com/en-us/windows/hardware/windows-driver-kit
 Building on linux (Ubuntu 16.04 LTS; Debian 8.5)
 ================================================
 
-== Automated ==
+=== Automated ===
+
 1) Clone the repository using Git:
 	`git clone https://github.com/janusvr/janus`
 
@@ -74,7 +75,8 @@ Building on linux (Ubuntu 16.04 LTS; Debian 8.5)
 3) Once completed, your new JanusVR build can be found inside `dist/linux/` in the root of your source repo.
    To run Janus, just type `dist/linux/janusvr -render 2d`
 
-== Manual ==
+=== Manual ===
+
 For now, to compile manually please read the instructions found in the automated build script that
 is located in the root of the source repository (`build-janusvr-linux.sh`).
 
