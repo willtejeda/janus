@@ -355,10 +355,6 @@ public class JanusActivity extends org.qtproject.qt5.android.bindings.QtActivity
             webViewManager.createNewWebView(tag);
         }
 
-        public void updateWebView(int tag) {
-            webViewManager.updateWebView(tag);
-        }
-
         public void removeWebView(int tag) {
             webViewManager.removeWebView(tag);
         }
