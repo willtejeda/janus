@@ -121,7 +121,7 @@ void Game::CheckInternetConnection(QNetworkReply *reply)
     if(reply->bytesAvailable() && !internet_connected)
     {
         internet_connected = true;
-        if (env) env->ReloadRoom();
+        //if (env) env->ReloadRoom();
     }
     else if (!reply->bytesAvailable() && internet_connected)
     {
@@ -369,7 +369,7 @@ void Game::Update()
     UpdateFollowMode();
 
     //update VOIP
-    UpdateMedia();
+    UpdateAudio();
 
     //update assets
     UpdateAssets();   
@@ -5591,19 +5591,6 @@ void Game::UpdateMenuObject()
     multi_players->SetPartyMode(SettingsManager::GetPartyModeEnabled());
 
     WebAsset::SetUseCache(SettingsManager::GetCacheEnabled());
-}
-
-void Game::UpdateMedia()
-{
-    UpdateAudio();
-    if  (env && env->GetCurRoom())
-    {
-        QList <QPointer <Room> > visible_rooms = env->GetCurRoom()->GetVisibleRooms();
-        for  (int i=0; i<visible_rooms.size(); ++i) {
-            QPointer <Room> r = visible_rooms[i];
-            r->UpdateMedia(multi_players);
-        }
-    }
 }
 
 void Game::UpdateAudio()

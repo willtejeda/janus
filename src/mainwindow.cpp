@@ -657,11 +657,15 @@ void MainWindow::Update()
             JNIUtil::SetControlsVisible(true, SettingsManager::GetShowViewJoystick());
     }
 #endif
-#endif
-
+    if (!urlbar->hasFocus() && glwidget->GetGrab() && urlbar->text() != game->GetPlayer()->GetS("url")) {
+        urlbar->setText(game->GetPlayer()->GetS("url"));
+    }
+#else
     if (!urlbar->hasFocus() && urlbar->text() != game->GetPlayer()->GetS("url")) {
         urlbar->setText(game->GetPlayer()->GetS("url"));
     }
+#endif
+
 
     //59.3 - disable pocketspace toggle button if there is no other current viewed room to toggle to
     if (game->GetEnvironment()->GetLastRoom().isNull() && button_home->isVisible()) {
@@ -806,7 +810,11 @@ void MainWindow::TimeOut()
     RendererInterface::m_pimpl->ConfigureSamples(sampleCount);
 
     //Check for changes to enhanced depth precision setting
+#ifdef __ANDROID__
+    RendererInterface::m_pimpl->SetIsUsingEnhancedDepthPrecision(false);
+#else
     RendererInterface::m_pimpl->SetIsUsingEnhancedDepthPrecision(SettingsManager::GetEnhancedDepthPrecisionEnabled());
+#endif
 
     Update();    
     glwidget->update();      
