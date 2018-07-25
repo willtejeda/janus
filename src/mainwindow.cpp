@@ -977,6 +977,12 @@ void MainWindow::Initialize()
         break;
     }
 
+#ifdef __ANDROID__
+    game->GetPlayer()->SetS("device_type", "android");
+#else
+    game->GetPlayer()->SetS("device_type", "desktop");
+#endif
+
     qDebug() << "MainWindow::InitializeGame() - HMD/render type:" << game->GetPlayer()->GetS("hmd_type");
 
     //game->SetPlayerHeight(rift_render.GetPlayerEyeHeight());
