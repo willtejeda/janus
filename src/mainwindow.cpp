@@ -465,12 +465,6 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
                     QMouseEvent e2(QEvent::MouseButtonPress, url_bar_tab->tabBar()->mapFromGlobal(mapToGlobal(e->pos())), Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
                     url_bar_tab->mousePressEvent(&e2);
                 }
-                /*else if (social_window_tab->tabBar()->tabAt(social_window_tab->tabBar()->mapFromGlobal(mapToGlobal(e->pos()))) < 0 &&
-                         url_bar_tab->tabBar()->tabAt(url_bar_tab->tabBar()->mapFromGlobal(mapToGlobal(e->pos()))) < 0)
-                    //Register events to glwidget if tab bar is pressed, but there is no tab under it
-                {
-                    glwidget->SetGrab(true);
-                }*/
 
                 if (glwidget->GetGrab() &&
                     (social_window_tab->tabBar()->tabAt(social_window_tab->tabBar()->mapFromGlobal(mapToGlobal(e->pos()))) >= 0 || //Clicked on tab
@@ -481,10 +475,6 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
                 {
                     glwidget->SetGrab(false); //Reset grab, allow users to register mouse events to URL bar and social window
                                               //Only if user clicks outside of glwidget, inside a tab or at the tab's widget
-                }
-                else
-                {
-                    glwidget->SetGrab(true);
                 }
 
                 JNIUtil::HideKeyboard();
@@ -511,23 +501,6 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
             {
                 QMouseEvent e2(QEvent::MouseButtonPress, url_bar_tab->tabBar()->mapFromGlobal(mapToGlobal(e->pos())), Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
                 url_bar_tab->mouseReleaseEvent(&e2);
-            }
-
-            if ((strcmp(obj->metaObject()->className(), "QOpenGLWidget") == 0 || strcmp(obj->metaObject()->className(), "QTabBar") == 0 || strcmp(obj->metaObject()->className(), "QTabWidget") == 0)
-                    && QApplication::focusWidget() && strcmp(QApplication::focusWidget()->metaObject()->className(), "QLineEdit") == 0) //Remove focus from a line edit if glwidget or tab is clicked
-            {
-                if (QApplication::focusWidget() == urlbar && urlbar->isModified()) urlbar->setModified(false);
-                QApplication::focusWidget()->clearFocus();
-                glwidget->SetGrab(true);
-            }
-
-            if (strcmp(obj->metaObject()->className(), "QLineEdit") == 0 && obj == urlbar) //Select all if URL bar is focused on
-            {
-                if (!urlbar->hasSelectedText() && !urlbar->isModified())
-                {
-                    urlbar->setModified(true);
-                    urlbar->selectAll();
-                }
             }
 
             if ((QWidget *) obj != settings_window && !settings_window->children().contains(obj)
