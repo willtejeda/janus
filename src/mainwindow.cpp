@@ -476,6 +476,14 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
                     glwidget->SetGrab(false); //Reset grab, allow users to register mouse events to URL bar and social window
                                               //Only if user clicks outside of glwidget, inside a tab or at the tab's widget
                 }
+                else if (!glwidget->GetGrab() &&
+                         !(social_window_tab->tabBar()->tabAt(social_window_tab->tabBar()->mapFromGlobal(mapToGlobal(e->pos()))) >= 0 || //Clicked on tab
+                          (social_window_tab->rect().contains(social_window_tab->mapFromGlobal(mapToGlobal(e->pos()))) && !social_window_tab->tabBar()->rect().contains(social_window_tab->tabBar()->mapFromGlobal(mapToGlobal(e->pos())))) || //Clicked on tab widget
+                         (url_bar_tab->tabBar()->tabAt(url_bar_tab->tabBar()->mapFromGlobal(mapToGlobal(e->pos()))) >= 0 ||
+                          (url_bar_tab->rect().contains(url_bar_tab->mapFromGlobal(mapToGlobal(e->pos()))) && !url_bar_tab->tabBar()->rect().contains(url_bar_tab->tabBar()->mapFromGlobal(mapToGlobal(e->pos())))))))
+                {
+                    glwidget->SetGrab(true); //Grab on mouse press if user doesn't click on any tabs
+                }
 
                 JNIUtil::HideKeyboard();
             }
