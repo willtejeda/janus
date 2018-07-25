@@ -54,7 +54,7 @@ cp -v janusvr $BUILD_DIR
 ln -v -s $(pwd)/assets $BUILD_DIR/assets
 cp -v -r dependencies/linux/* $BUILD_DIR
 
-echo -e "\n[*] Adding depedencies from OS to distribution directory"
+echo -e "\n[#] PATCH 1: Adding depedencies from OS to distribution directory"
 cp -v /usr/lib/x86_64-linux-gnu/libBulletDynamics.so.2.87	$BUILD_DIR
 cp -v /usr/lib/x86_64-linux-gnu/libBulletCollision.so.2.87	$BUILD_DIR
 cp -v /usr/lib/x86_64-linux-gnu/libLinearMath.so.2.87		$BUILD_DIR
