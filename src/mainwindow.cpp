@@ -553,6 +553,10 @@ void MainWindow::Update()
     }
 
 #ifdef __ANDROID__
+    // Need to always be in VR mode for Gear/Go
+    if (!paused && hmd_manager && (hmd_manager->GetHMDType() == "go" || hmd_manager->GetHMDType() == "gear") && !hmd_manager->GetEnabled()) {
+        EnterVR();
+    }
 
     //Request user remove headset to accept permissions if user is still in MODE_GVR
     if (require_permissions){
