@@ -554,7 +554,7 @@ void MainWindow::Update()
 
 #ifdef __ANDROID__
     // Need to always be in VR mode for Gear/Go
-    if (!paused && hmd_manager && (hmd_manager->GetHMDType() == "go" || hmd_manager->GetHMDType() == "gear") && !hmd_manager->GetEnabled()) {
+    if (!paused && !require_permissions && hmd_manager && (hmd_manager->GetHMDType() == "go" || hmd_manager->GetHMDType() == "gear") && (!hmd_manager->GetEnabled() || !JNIUtil::GetShowingVR())) {
         EnterVR();
     }
 
@@ -562,17 +562,17 @@ void MainWindow::Update()
     if (require_permissions){
         if (GLWidget::GetDisplayMode() == MODE_2D && !asked_permissions){
             //If user removed headset, request permissions
+            asked_permissions = true;
             JNIUtil::AskPermissions();
             game->SetRemoveHeadset(false);
-            asked_permissions = true;
         }
         else if (GLWidget::GetDisplayMode() == MODE_GVR && !asked_permissions){
             //Only show image requesting user to remove headset if in VR mode
             game->SetRemoveHeadset(true);
         }
         else if (GLWidget::GetDisplayMode() == MODE_GEAR && !asked_permissions){
-            JNIUtil::AskPermissions();
             asked_permissions = true;
+            JNIUtil::AskPermissions();
         }
 
         if (asked_permissions && JNIUtil::GetAnsweredPermissions()){
@@ -589,7 +589,7 @@ void MainWindow::Update()
             require_permissions = false;
             asked_permissions = false;
 
-            if (GLWidget::GetDisplayMode() == MODE_GEAR) {
+            if (hmd_manager && (hmd_manager->GetHMDType() == "go" || hmd_manager->GetHMDType() == "gear")) {
                 EnterVR();
             }
 #ifndef OCULUS_SUBMISSION_BUILD
