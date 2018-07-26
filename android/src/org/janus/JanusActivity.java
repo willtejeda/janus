@@ -910,6 +910,10 @@ public class JanusActivity extends org.qtproject.qt5.android.bindings.QtActivity
                         button_start = true;
                         handled = true;
                         break;
+                    case KeyEvent.KEYCODE_BUTTON_SELECT:
+                        button_back = true;
+                        handled = true;
+                        break;
                     case KeyEvent.KEYCODE_BACK:
                         button_back = true;
                         handled = true;
@@ -995,6 +999,10 @@ public class JanusActivity extends org.qtproject.qt5.android.bindings.QtActivity
                         break;
                     case KeyEvent.KEYCODE_BUTTON_START:
                         button_start = false;
+                        handled = true;
+                        break;
+                    case KeyEvent.KEYCODE_BUTTON_SELECT:
+                        button_back = false;
                         handled = true;
                         break;
                     case KeyEvent.KEYCODE_BACK:
@@ -1111,17 +1119,6 @@ public class JanusActivity extends org.qtproject.qt5.android.bindings.QtActivity
 
         @Override
         public void onInputDeviceRemoved(int deviceId) {
-            //Check if connected devices still contains a gamepad
-            boolean connected = false;
-            int[] devices = mInputManager.getInputDeviceIds();
-            for (int i = 0; i < devices.length; i++) {
-                if ((mInputManager.getInputDevice(devices[i]).getSources() & InputDevice.SOURCE_GAMEPAD) == InputDevice.SOURCE_GAMEPAD
-                || (mInputManager.getInputDevice(devices[i]).getSources() & InputDevice.SOURCE_JOYSTICK) == InputDevice.SOURCE_JOYSTICK) {
-                    connected = true;
-                    break;
-                }
-            }
-            gamepad_connected = connected;
         }
 
         //============================================================================================================
