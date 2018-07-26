@@ -8,7 +8,7 @@
 <!--
     <application android:hardwareAccelerated="true" android:name="org.qtproject.qt5.android.bindings.QtApplication" android:keepScreenOn="true" android:label="JanusVR" android:icon="@drawable/icon" android:debuggable="false">
             <meta-data android:name="com.samsung.android.vr.application.mode" android:value="vr_only"/>
-            <activity android:configChanges="density|orientation|uiMode|screenLayout|screenSize|smallestScreenSize|layoutDirection|locale|fontScale|keyboard|keyboardHidden|navigation" android:name="org.janus.JanusActivity" android:label="JanusVR" android:screenOrientation="landscape" android:launchMode="singleTask" android:resizeableActivity="false" android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" android:excludeFromRecents="true">
+            <activity android:configChanges="density|orientation|uiMode|screenLayout|screenSize|smallestScreenSize|layoutDirection|locale|fontScale|keyboard|keyboardHidden|navigation" android:name="org.janus.JanusActivity" android:label="JanusVR" android:screenOrientation="landscape" android:launchMode="singleTask" android:resizeableActivity="false" android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" android:excludeFromRecents="true">    
 -->
     <!---->
             <!--Normal app-->
