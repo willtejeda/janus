@@ -63,6 +63,9 @@ void MediaPlayer::SetupOutput(MediaContext * ctx, QString vid_url, const bool lo
     if (!ctx->setup){
         MediaPlayer::ClearOutput(ctx);
 
+        ctx->video_lock.lock();
+        ctx->audio_lock.lock();
+
         ctx->setup = true;
         ctx->audio_only = audio_only;
         ctx->player = this;
@@ -121,6 +124,9 @@ void MediaPlayer::SetupOutput(MediaContext * ctx, QString vid_url, const bool lo
         else {
             qDebug("MediaPlayer::SetupOutput - Error: Failed to alloc data in VideoSurface::SetupOutput.");
         }
+
+        ctx->audio_lock.unlock();
+        ctx->video_lock.unlock();
     }
 }
 
@@ -143,7 +149,7 @@ void MediaPlayer::ClearOutput(MediaContext * ctx)
     ctx->audio_lock.lock();
 
     if (ctx->media_player){
-        QtConcurrent::run(&MediaPlayer::ClearVLC, ctx);
+        QtConcurrent::run(&MediaPlayer::ClearVLC, ctx).waitForFinished();
     }
 
     if (ctx->openal_source > 0) {
@@ -227,10 +233,14 @@ void MediaPlayer::Play(MediaContext * ctx)
 
 void MediaPlayer::slotPlay(MediaContext *ctx)
 {
+    ctx->video_lock.lock();
+    ctx->audio_lock.lock();
     if (ctx->media_player && !ctx->playing && libvlc_media_player_is_playing(ctx->media_player) == 0){
         libvlc_media_player_play(ctx->media_player);
         ctx->playing = true;
     }
+    ctx->audio_lock.unlock();
+    ctx->video_lock.unlock();
 }
 
 void MediaPlayer::Restart(MediaContext * ctx)
@@ -240,11 +250,15 @@ void MediaPlayer::Restart(MediaContext * ctx)
 
 void MediaPlayer::slotRestart(MediaContext *ctx)
 {
+    ctx->video_lock.lock();
+    ctx->audio_lock.lock();
     if (ctx->media_player){
         libvlc_media_player_stop(ctx->media_player);
         libvlc_media_player_play(ctx->media_player);
         ctx->playing = true;
     }
+    ctx->audio_lock.unlock();
+    ctx->video_lock.unlock();
 }
 
 void MediaPlayer::Seek(MediaContext * ctx, const float pos)
@@ -254,9 +268,13 @@ void MediaPlayer::Seek(MediaContext * ctx, const float pos)
 
 void MediaPlayer::slotSeek(MediaContext *ctx, float pos)
 {
+    ctx->video_lock.lock();
+    ctx->audio_lock.lock();
     if (ctx->media_player && libvlc_media_player_is_seekable(ctx->media_player)) {
         libvlc_media_player_set_time(ctx->media_player, pos*1000.0f);
     }
+    ctx->audio_lock.unlock();
+    ctx->video_lock.unlock();
 }
 
 void MediaPlayer::Pause(MediaContext * ctx)
@@ -266,10 +284,14 @@ void MediaPlayer::Pause(MediaContext * ctx)
 
 void MediaPlayer::slotPause(MediaContext *ctx)
 {
+    ctx->video_lock.lock();
+    ctx->audio_lock.lock();
     if (ctx->media_player && ctx->playing && libvlc_media_player_can_pause(ctx->media_player)){
         libvlc_media_player_pause(ctx->media_player); //Pause if playing
         ctx->playing = false;
     }
+    ctx->audio_lock.unlock();
+    ctx->video_lock.unlock();
 }
 
 void MediaPlayer::Stop(MediaContext * ctx)
@@ -279,10 +301,14 @@ void MediaPlayer::Stop(MediaContext * ctx)
 
 void MediaPlayer::slotStop(MediaContext *ctx)
 {
+    ctx->video_lock.lock();
+    ctx->audio_lock.lock();
     if (ctx->media_player) {
         libvlc_media_player_stop(ctx->media_player);
         ctx->playing = false;
     }
+    ctx->audio_lock.unlock();
+    ctx->video_lock.unlock();
 }
 
 float MediaPlayer::GetCurTime(MediaContext * ctx) const

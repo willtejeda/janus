@@ -464,8 +464,9 @@ void ControllerManager::UpdateControllers()
                 else if (hmd_manager->GetHMDType() == "daydream") { // Only one daydream controller
                     if (j == 0) {
                         //Thumbpad for teleporting and clicks
-                        b_pressed = hmd_manager->GetControllerThumbpadPressed(i);
-                        b_hover = hmd_manager->GetControllerThumbpadTouched(i);
+                        float dist = sqrt(pow(hmd_manager->GetControllerThumbpad(i).x(), 2) + pow(hmd_manager->GetControllerThumbpad(i).y(), 2));
+                        b_pressed = hmd_manager->GetControllerThumbpadPressed(i) && (dist < 0.3f);
+                        b_hover = hmd_manager->GetControllerThumbpadTouched(i) && (dist < 0.3f);
                     }
                     else if (j == 1) {
                         //App button pocketspace
