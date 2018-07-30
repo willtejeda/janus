@@ -384,7 +384,7 @@ void MediaPlayer::UpdateLeftRightTextures(MediaContext * ctx)
                     RendererInterface::m_pimpl->UpdateTextureHandleData(ctx->m_texture_handles[i].get(),0 ,0, 0,
                             ctx->img[i]->width(), ctx->img[i]->height(), GL_RGBA, GL_UNSIGNED_BYTE, (void *)ctx->img[i]->constBits(), ctx->img[i]->width() * ctx->img[i]->height() * 4);
 #else
-                    RendererInterface::m_pimpl->UpdateTextureHandleData(ctx->m_texture_handles[i]->get(),0 ,0, 0,
+                    RendererInterface::m_pimpl->UpdateTextureHandleData(ctx->m_texture_handles[i].get(),0 ,0, 0,
                             ctx->img[i]->width(), ctx->img[i]->height(), GL_BGRA, GL_UNSIGNED_BYTE, (void *)ctx->img[i]->constBits(), ctx->img[i]->width() * ctx->img[i]->height() * 4);
 #endif
                     RendererInterface::m_pimpl->GenerateTextureHandleMipMap(ctx->m_texture_handles[i].get());
