@@ -382,7 +382,7 @@ void ControllerManager::UpdateControllers()
                 //Thumbpad: use y for moving and x for turning
                 if (i == 0) {
                     if (hmd_manager->GetControllerThumbpadTouched(0) && hmd_manager->GetControllerThumbpadPressed(0)){
-                        s[1].x = hmd_manager->GetControllerThumbpad(0).x();
+                        s[1].x = (fabs(hmd_manager->GetControllerThumbpad(i).y()) < 0.35f)?hmd_manager->GetControllerThumbpad(0).x():0.0f;
                     }
                     //else if (hmd_manager->GetControllerThumbpadTouched(0)){
                     //    s[0].x = hmd_manager->GetControllerThumbpad(0).x();
