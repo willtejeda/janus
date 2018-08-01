@@ -1672,8 +1672,8 @@ void Room::UpdateJS(QPointer <Player> player)
             if (script->GetFinished()) {
 
                 //update objects stuff
-//                qDebug() << script->HasRoomFunction("onLoad") << script->GetOnLoadInvoked();
                 if (!script->GetOnLoadInvoked()) {
+//                    qDebug() << "scriptonload" << script << script->HasRoomFunction("onLoad") << script->GetOnLoadInvoked();
                     script->SetOnLoadInvoked(true);
                     QList<QPointer <RoomObject> > objectsAdded = script->DoRoomLoad(envobjects, player);
                     LogErrorOnException();
