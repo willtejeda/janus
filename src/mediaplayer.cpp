@@ -783,6 +783,4 @@ void MediaPlayer::flush(void *data, int64_t )
 void MediaPlayer::drain(void *data)
 {
     (void) data;
-    /*audio_lock.lock();
-    audio_lock.unlock();*/
 }

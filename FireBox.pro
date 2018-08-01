@@ -252,10 +252,12 @@ unix:macx:HEADERS -= "src/gamepad.h"
 #Remove dependencies unused by Android
 android:SOURCES -= "src/gamepad.c" \
     "src/vivemanager.cpp" \    
-    "src/cefwebview.cpp"
+    "src/cefwebview.cpp" \
+    "src/filteredcubemapmanager.cpp"
 android:HEADERS -= "src/gamepad.h" \
     "src/vivemanager.h" \    
-    "src/cefwebview.h"
+    "src/cefwebview.h" \
+    "src/filteredcubemapmanager.h"
 android:SOURCES += "src/androidwebview.cpp" \
     "src/slidingtabwidget.cpp" \
     "src/jniutil.cpp" \

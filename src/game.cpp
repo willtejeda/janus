@@ -97,8 +97,10 @@ Game::~Game()
     //    qDebug() << "Game::DoExitNow()";
     TextureManager::Clear();    
 
+#ifndef __ANDROID__
     //access filtered cubemap thing
     FilteredCubemapManager::GetSingleton()->SetShutdown(true);
+#endif
 
     MathUtil::FlushErrorLog();
 
@@ -169,8 +171,10 @@ void Game::Initialize()
     bool cache_setting = WebAsset::GetUseCache();
     WebAsset::SetUseCache(cache_setting);
 
+#ifndef __ANDROID__
     FilteredCubemapManager* cubemap_manager = FilteredCubemapManager::GetSingleton();
     cubemap_manager->Initialize();
+#endif
 }
 
 void Game::AddPrivateWebsurface()

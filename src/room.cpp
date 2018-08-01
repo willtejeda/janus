@@ -175,9 +175,11 @@ void Room::Clear()
     }
     envobjects.clear();
 
+#ifndef __ANDROID__
     //clear/reset cubemaps related room properties
     qint64 room_url_md5 = MathUtil::hash(GetS("url"));
     FilteredCubemapManager::GetSingleton()->RemoveFromProcessing(room_url_md5, false);
+#endif
 
     if (page) {
         page->Clear();
@@ -806,6 +808,7 @@ void Room::BindCubemaps(QPointer <AssetShader> shader)
     bool const has_radiance_cubemap = !cubemap_radiance.isNull();
     bool const has_irradiance_cubemap = !cubemap_irradiance.isNull();
 
+#ifndef __ANDROID__
     // If we have a valid loaded cubemap and either of our radiance and irradiance maps are null
     // and we haven't already requested cubemap processing then save out the faces of the cubemap and
     // register them for processing.
@@ -893,6 +896,7 @@ void Room::BindCubemaps(QPointer <AssetShader> shader)
             cubemap_manager->RemoveFromProcessing(room_url_md5, !is_room_local);
         }
     }
+#endif
 
     if (has_radiance_cubemap)
     {

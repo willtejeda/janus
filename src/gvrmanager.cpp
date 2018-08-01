@@ -193,7 +193,7 @@ void GVRManager::Update()
     m_eye_view_matrices[GVR_RIGHT_EYE] = v;
 
     QMatrix4x4 p = SymmetricPerspectiveMatrixFromView(left_viewport.GetSourceFov(), right_viewport.GetSourceFov(), m_avatar_near_clip, m_avatar_far_clip);
-    QMatrix4x4 p2 = SymmetricPerspectiveMatrixFromView(left_viewport.GetSourceFov(), right_viewport.GetSourceFov(), m_avatar_near_clip, m_avatar_far_clip);
+    QMatrix4x4 p2 = SymmetricPerspectiveMatrixFromView(left_viewport.GetSourceFov(), right_viewport.GetSourceFov(), m_near_clip, m_far_clip);
     m_eye_projection_matrices[GVR_LEFT_EYE + 2] = p;
     m_eye_projection_matrices[GVR_RIGHT_EYE + 2] = p;
     m_eye_projection_matrices[GVR_LEFT_EYE] = p2;

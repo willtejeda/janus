@@ -1312,6 +1312,7 @@ void GLWidget::paintGL()
     case MODE_2D:
     default:
     {        
+#if !(defined(OCULUS_SUBMISSION_BUILD) && defined(ANDROID))
         // Make sure we have no FBO bound here, so that the render-thread won't have texture binding issues
         // when it tries to copy it's resulting texture to our FBO color layer.
         RendererInterface::m_pimpl->BindFBOToDraw(FBO_TEXTURE_BITFIELD::NONE);
@@ -1379,6 +1380,7 @@ void GLWidget::paintGL()
 #else
         MathUtil::glFuncs->glBlitFramebuffer(0,    0, 1280, 720,
                                              0,    0, width(), height(), GL_COLOR_BUFFER_BIT, GL_NEAREST);
+#endif
 #endif
 
         break;
