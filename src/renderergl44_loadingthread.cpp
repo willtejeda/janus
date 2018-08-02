@@ -1,6 +1,6 @@
 #include "renderergl44_loadingthread.h"
 
-#if !defined(__APPLE__) && !defined(__ANDROID__)
+#if !defined(__APPLE__)
 RendererGL44_LoadingThread::RendererGL44_LoadingThread()
 {
 

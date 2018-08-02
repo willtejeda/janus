@@ -4838,9 +4838,9 @@ void Game::EndOpInteractionDefault(const int i)
                 for (auto & each_portal : envobjects) {
                     if (each_portal && each_portal->GetType() == "link" && each_portal != o) {
                         if (each_portal->GetB("open") && each_portal->GetB("visible") && !each_portal->GetB("auto_load")) {
-                            if (env->ClearRoom(each_portal)) {
-                                each_portal->SetB("open", false);
-                            }
+                            each_portal->SetB("open", false);
+                            if (env->GetCurRoom()->GetConnectedPortal(each_portal))
+                                env->GetCurRoom()->GetConnectedPortal(each_portal)->SetB("open", false);
                         }
                     }
                 }

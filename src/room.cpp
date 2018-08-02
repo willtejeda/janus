@@ -4938,7 +4938,7 @@ QList <QPointer <Room> > Room::GetVisibleRooms() {
                 r->GetParentObject() && r->GetParentObject()->GetB("open")) {
             l.push_back(r);
         }
-    }    
+    }
 
     return l;
 }

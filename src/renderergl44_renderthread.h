@@ -2,7 +2,7 @@
 #define RENDERERGL44_RENDERTHREAD_H
 
 
-#if !defined(__APPLE__) && !defined(__ANDROID__)
+#if !defined(__APPLE__)
 #include <QObject>
 #include <QImage>
 #include <QWindow>

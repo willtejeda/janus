@@ -1,6 +1,6 @@
 #include "renderergl44_renderthread.h"
 
-#if !defined(__APPLE__) && !defined(__ANDROID__)
+#if !defined(__APPLE__)
 RendererGL44_RenderThread::RendererGL44_RenderThread()
     : m_max_compute_work_groups(0),
       m_gl_surface(nullptr),

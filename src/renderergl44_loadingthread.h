@@ -1,7 +1,7 @@
 #ifndef RENDERERGL44_LOADINGTHREAD_H
 #define RENDERERGL44_LOADINGTHREAD_H
 
-#if !defined(__APPLE__) && !defined(__ANDROID__)
+#if !defined(__APPLE__)
 #include <QThread>
 #include <QObject>
 #include <memory>

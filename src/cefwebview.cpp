@@ -1,7 +1,5 @@
 #include "cefwebview.h"
 
-#ifndef __ANDROID__
-
 QList <CefRefPtr<CefBrowser> > CEFWebView::browser_list;
 
 CEFRenderProcessHandler::CEFRenderProcessHandler()
@@ -636,5 +634,3 @@ void CEFWebView::Shutdown()
     }    
 //    browser_list.clear();
 }
-
-#endif
