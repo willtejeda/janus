@@ -1894,7 +1894,7 @@ void RoomObject::SetF(const char * name, const float f)
 
 float RoomObject::GetF(const char * name) const
 {    
-    if (props) {
+    if (props && props->property(name).isValid()) {
         return props->property(name).toFloat();
     }
     return 0.0f;
@@ -1909,7 +1909,7 @@ void RoomObject::SetI(const char * name, const int i)
 
 int RoomObject::GetI(const char * name) const
 {
-    if (props) {
+    if (props && props->property(name).isValid()) {
         return props->property(name).toInt();
     }
     return 0;
@@ -1924,7 +1924,7 @@ void RoomObject::SetB(const char * name, const bool b)
 
 bool RoomObject::GetB(const char * name) const
 {    
-    if (props) {
+    if (props && props->property(name).isValid()) {
         return props->property(name).toString().toLower() == "true";
     }
     return false;
@@ -1939,7 +1939,7 @@ void RoomObject::SetS(const char * name, const QString s)
 
 QString RoomObject::GetS(const char * name) const
 {
-    if (props) {
+    if (props && props->property(name).isValid()) {
         return props->GetS(name);
     }
     return QString();
@@ -1954,7 +1954,7 @@ void RoomObject::SetC(const char * name, const QColor c)
 
 QColor RoomObject::GetC(const char * name) const
 {
-    if (props) {
+    if (props && props->property(name).isValid()) {
         return props->GetC(name);
     }
     return QColor(255,255,255);
