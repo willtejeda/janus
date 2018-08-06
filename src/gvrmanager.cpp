@@ -95,7 +95,7 @@ void GVRManager::InitializeGL()
     buffer_viewports.SetBufferViewport((size_t) 0, left_viewport);
     buffer_viewports.SetBufferViewport((size_t) 1, right_viewport);
 
-    std::vector<gvr::BufferSpec> specs;
+    QVector<gvr::BufferSpec> specs;
 
     specs.push_back(gvr_api->CreateBufferSpec());
     specs[0].SetSize(idealTextureSize);

@@ -136,7 +136,7 @@ void RoomObject::Clear()
         alGetSourcei(openal_stream_source, AL_BUFFERS_QUEUED, &buffers_to_dequeue);
         if (buffers_to_dequeue > 0)
         {
-            std::vector<ALuint> buffHolder;
+            QVector<ALuint> buffHolder;
             buffHolder.resize(buffers_to_dequeue);
             alSourceUnqueueBuffers(openal_stream_source, buffers_to_dequeue, buffHolder.data());
             for (int i=0;i<buffers_to_dequeue;++i) {
@@ -464,17 +464,17 @@ bool RoomObject::GetRaycastIntersection(const QMatrix4x4 transform, QList <QVect
                 {
                     // Get the unordered_map of Meshes(QVector <GeomTriangle>) that use this material
                     GeomMaterial & material = obj->GetGeom()->GetData().GetMaterial(materials[k]);
-                    std::vector<std::vector<GeomTriangle>>& triangles_map = material.triangles;
-                    std::vector<GeomVBOData>& vbo_map = material.vbo_data;
-                    std::vector<std::pair<uint32_t, size_t>>& mesh_keys = material.mesh_keys;
+                    QVector<QVector<GeomTriangle>>& triangles_map = material.triangles;
+                    QVector<GeomVBOData>& vbo_map = material.vbo_data;
+                    QVector<QPair<uint32_t, size_t>>& mesh_keys = material.mesh_keys;
                     size_t const mesh_count = mesh_keys.size();
 
                     // For each mesh that uses this material of this AssetObject
                     for (unsigned int mesh_index = 0; mesh_index < mesh_count; ++mesh_index)
                     {
-                        const std::vector<GeomTriangle> & triangles = triangles_map[mesh_keys[mesh_index].second];
+                        const QVector<GeomTriangle> & triangles = triangles_map[mesh_keys[mesh_index].second];
                         const GeomVBOData & vbo_data = vbo_map[mesh_keys[mesh_index].second];
-                        const std::vector<QMatrix4x4>& mesh_instance_transforms = vbo_data.m_instance_transforms;
+                        const QVector <QMatrix4x4>& mesh_instance_transforms = vbo_data.m_instance_transforms;
 
                         // For each instance of this mesh
                         QVector3D ray_pos_instance_space;
@@ -495,7 +495,7 @@ bool RoomObject::GetRaycastIntersection(const QMatrix4x4 transform, QList <QVect
                             ray_dir_instance_space.normalize();
 
                             // Raycast against the first 16k triangles of a mesh
-                            const size_t triangle_loop_count = std::min(triangles.size(), size_t(16384));
+                            const size_t triangle_loop_count = qMin(triangles.size(), 16384);
                             for (size_t i = 0; i < triangle_loop_count; ++i)
                             {
                                 // per-triangle test
@@ -1368,7 +1368,7 @@ void RoomObject::UpdateMedia()
         alGetSourcei(openal_stream_source, AL_BUFFERS_PROCESSED, &availBuffers);
         //qDebug() << availBuffers;
         if (availBuffers > 0) {
-            std::vector<ALuint> buffHolder;
+            QVector<ALuint> buffHolder;
 //                buffHolder.reserve(SoundManager::buffer_input_pool.size()); // An array to hold catch the unqueued buffers
             buffHolder.resize(availBuffers); //49.50 crash with audio on Windows
             alSourceUnqueueBuffers(openal_stream_source, availBuffers, buffHolder.data());

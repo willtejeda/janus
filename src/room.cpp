@@ -989,7 +989,7 @@ void Room::DrawGL(MultiPlayerManager *multi_players, QPointer <Player> player, c
     // Build list of Lights that exist in this room
     LightContainer light_container;
     GetLights(&light_container);
-    light_container.m_lights.emplace_back(Light());
+    light_container.m_lights.push_back(Light());
     renderer->PushLightContainer(&light_container, renderer->GetStencilFunc().GetStencilReferenceValue());
 
     BindShader(room_shader);
