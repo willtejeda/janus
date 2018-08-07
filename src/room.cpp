@@ -263,7 +263,7 @@ void Room::SetF(const char * name, const float f)
 
 float Room::GetF(const char * name) const
 {
-    if (props) {
+    if (props && props->property(name).isValid()) {
         return props->property(name).toFloat();
     }
     return 0.0f;
@@ -278,7 +278,7 @@ void Room::SetI(const char * name, const int i)
 
 int Room::GetI(const char * name) const
 {
-    if (props) {
+    if (props && props->property(name).isValid()) {
         return props->property(name).toInt();
     }
     return 0;
@@ -293,7 +293,7 @@ void Room::SetB(const char * name, const bool b)
 
 bool Room::GetB(const char * name) const
 {
-    if (props) {
+    if (props && props->property(name).isValid()) {
         return props->property(name).toString().toLower() == "true";
     }
     return false;
@@ -308,7 +308,7 @@ void Room::SetS(const char * name, const QString s)
 
 QString Room::GetS(const char * name) const
 {
-    if (props) {
+    if (props && props->property(name).isValid()) {
         return props->property(name).toString();
     }
     return QString();
@@ -323,7 +323,7 @@ void Room::SetC(const char * name, const QColor c)
 
 QColor Room::GetC(const char * name) const
 {
-    if (props) {
+    if (props && props->property(name).isValid()) {
         return MathUtil::GetStringAsColour(props->property(name).toString());
     }
     return QColor(255,255,255);
@@ -989,7 +989,7 @@ void Room::DrawGL(MultiPlayerManager *multi_players, QPointer <Player> player, c
     // Build list of Lights that exist in this room
     LightContainer light_container;
     GetLights(&light_container);
-    light_container.m_lights.emplace_back(Light());
+    light_container.m_lights.push_back(Light());
     renderer->PushLightContainer(&light_container, renderer->GetStencilFunc().GetStencilReferenceValue());
 
     BindShader(room_shader);

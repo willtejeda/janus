@@ -1214,7 +1214,7 @@ void GLWidget::paintGL()
         cameras.clear();
         cameras.reserve(7);
 
-        std::vector<QVector4D> viewports;
+        QVector<QVector4D> viewports;
         viewports.reserve(6);
         // This is a 3x2 grid layout to use all of the available framebuffer space
         viewports.push_back(QVector4D(cube_face_dim * 0.0f, cube_face_dim * 0.0f, cube_face_dim, cube_face_dim)); // X+
