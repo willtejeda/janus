@@ -12,12 +12,6 @@ buildscript {
 allprojects {
     repositories {
         jcenter()
-        /*maven {
-            url 'https://index.taskcluster.net/v1/task/gecko.v2.mozilla-central.nightly.latest.mobile.android-aarch64-opt/artifacts/public/android/maven'
-        }
-        maven {
-            url 'https://index.taskcluster.net/v1/task/gecko.v2.mozilla-central.nightly.latest.mobile.android-api-16-opt/artifacts/public/android/maven'
-        }*/
     }
 }
 
@@ -75,7 +69,7 @@ android {
         ndk {
             abiFilters "armeabi", "armeabi-v7a", "x86"
         }
-        versionCode 43
+        versionCode 44
         versionName "60.00"
     }
 
