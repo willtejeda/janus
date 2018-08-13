@@ -20,7 +20,6 @@ apply plugin: 'com.android.application'
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.google.vr:sdk-base:1.130.0'
-    //compile 'org.mozilla:geckoview-nightly-armeabi-v7a:61.0.20180427102247'
 }
 
 /*
