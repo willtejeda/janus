@@ -4443,7 +4443,7 @@ void Game::UpdateControllers()
         }
     }
     else{
-        controller_x[1] += ((SettingsManager::GetInvertXEnabled())?1:-1) * JNIUtil::GetViewJoystickX();
+        controller_x[1] += ((SettingsManager::GetInvertXEnabled())?-1:1) * JNIUtil::GetViewJoystickX();
         controller_y[1] += ((SettingsManager::GetInvertYEnabled())?1:-1) * JNIUtil::GetViewJoystickY();
     }
 #endif
