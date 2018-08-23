@@ -166,7 +166,7 @@ void AndroidWebView::keyPressEvent(QKeyEvent * e)
 {
     unsigned int code = GetCode(e);
     unsigned int modifiers = GetModifiers(e);
-    qDebug() << "keycode" << code << (modifiers & AMETA_SHIFT_ON) << (modifiers & AMETA_ALT_ON) << (modifiers & AMETA_CTRL_ON);
+    //qDebug() << "keycode" << code << (modifiers & AMETA_SHIFT_ON) << (modifiers & AMETA_ALT_ON) << (modifiers & AMETA_CTRL_ON);
     JNIUtil::KeyPressWebView(androidID(), code, modifiers);
 }
 
@@ -174,7 +174,7 @@ void AndroidWebView::keyReleaseEvent(QKeyEvent * e)
 {
     unsigned int code = GetCode(e);
     unsigned int modifiers = GetModifiers(e);
-    qDebug() << "keycode" << code << (modifiers & AMETA_SHIFT_ON) << (modifiers & AMETA_ALT_ON) << (modifiers & AMETA_CTRL_ON);
+    //qDebug() << "keycode" << code << (modifiers & AMETA_SHIFT_ON) << (modifiers & AMETA_ALT_ON) << (modifiers & AMETA_CTRL_ON);
     JNIUtil::KeyReleaseWebView(androidID(), code, modifiers);
 }
 

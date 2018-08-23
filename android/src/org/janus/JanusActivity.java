@@ -469,12 +469,12 @@ public class JanusActivity extends org.qtproject.qt5.android.bindings.QtActivity
             webViewManager.mouseReleaseWebView(tag,x,y);
         }
 
-        public void keyPressWebView(int tag, int x, int y) {
-            webViewManager.mousePressWebView(tag,x,y);
+        public void keyPressWebView(int tag, int code, int state) {
+            webViewManager.keyPressWebView(tag,code,state);
         }
 
-        public void keyReleaseWebView(int tag, int x, int y) {
-            webViewManager.mouseReleaseWebView(tag,x,y);
+        public void keyReleaseWebView(int tag, int code, int state) {
+            webViewManager.keyReleaseWebView(tag,code,state);
         }
 
         public boolean getRepaintRequestedAtWebView(int tag) {

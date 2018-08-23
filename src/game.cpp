@@ -4684,14 +4684,26 @@ void Game::SetGamepadButtonPress(const bool b)
     gamepad_button_press = b;
 }
 
-void Game::StartOpInteractionTeleport(const int )
+void Game::StartOpInteractionTeleport(const int i)
 {
+#ifdef __ANDROID__
+    if (virtualkeyboard->GetKeySelected(player->GetCursorObject(i)) != 0){
+        return;
+    }
+#endif
+
     state = JVR_STATE_INTERACT_TELEPORT;
     teleport_held_time.start();
 }
 
 void Game::EndOpInteractionTeleport(const int i)
 {
+#ifdef __ANDROID__
+    if (virtualkeyboard->GetKeySelected(player->GetCursorObject(i)) != 0){
+        return;
+    }
+#endif
+
 //    qDebug() << "Game::EndOpInteractionTeleport" << i << GetAllowTeleport(i);
     QPointer <Room> r = env->GetCurRoom();    
     QPointer <RoomObject> cursor_obj = r->GetRoomObject(player->GetCursorObject(i));

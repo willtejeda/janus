@@ -74,8 +74,6 @@ public class WebViewManager
         int width = 1000;
         int height = 800;
 
-        View focussed = null;
-
         public AWebView(Context context){
             super(context);
             super.setWillNotDraw(false);
@@ -87,10 +85,6 @@ public class WebViewManager
 
         public int computeVerticalScrollRange(){
             return super.computeVerticalScrollRange();
-        }
-
-        public View getFocusView(){
-            return focussed;
         }
 
         // draw magic
@@ -120,28 +114,31 @@ public class WebViewManager
 
             try {
                 HitTestResult h = AWebView.this.getHitTestResult();
-                if (h.getType() == WebView.HitTestResult.SRC_ANCHOR_TYPE || h.getType() == WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE || h.getType() == WebView.HitTestResult.IMAGE_TYPE){
-                    //Log.i("HITTESTRESULT", h.getExtra());
-                    if (!(hitTestsList.containsKey((Integer)AWebView.this.getTag()) && hitTestsList.get((Integer)AWebView.this.getTag()) == h.getExtra())) {
-                        hitTestLockList.get((Integer)AWebView.this.getTag()).lock();
-                        if (!hitTestsList.containsKey((Integer)AWebView.this.getTag()) || hitTestsList.get((Integer)AWebView.this.getTag()) == ""){
-                            hitTestsList.put((Integer) AWebView.this.getTag(), h.getExtra());
-                        }
-                        hitTestLockList.get((Integer) AWebView.this.getTag()).unlock();
-                        hitTestsList.put((Integer) AWebView.this.getTag(), h.getExtra());
-                    }
-                }
-                else if (h.getType() == WebView.HitTestResult.EDIT_TEXT_TYPE) {
+                if (h.getType() == WebView.HitTestResult.EDIT_TEXT_TYPE) {
                     hitTestLockList.get((Integer)AWebView.this.getTag()).lock();
                     String s = "janus://content_editable";
                     hitTestsList.put((Integer) AWebView.this.getTag(), s);
-                    focussed = AWebView.this.findFocus();
                     hitTestLockList.get((Integer)AWebView.this.getTag()).unlock();
+                }
+                else {
+                    if (h.getType() == WebView.HitTestResult.SRC_ANCHOR_TYPE || h.getType() == WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE || h.getType() == WebView.HitTestResult.IMAGE_TYPE){
+                        //Log.i("HITTESTRESULT", h.getExtra());
+                        if (!(hitTestsList.containsKey((Integer)AWebView.this.getTag()) && hitTestsList.get((Integer)AWebView.this.getTag()) == h.getExtra())) {
+                            hitTestLockList.get((Integer)AWebView.this.getTag()).lock();
+                            if (!hitTestsList.containsKey((Integer)AWebView.this.getTag()) || hitTestsList.get((Integer)AWebView.this.getTag()) == ""){
+                                hitTestsList.put((Integer) AWebView.this.getTag(), h.getExtra());
+                            }
+                            hitTestLockList.get((Integer) AWebView.this.getTag()).unlock();
+                            hitTestsList.put((Integer) AWebView.this.getTag(), h.getExtra());
+                        }
+                    }
+                    AWebView.this.zoomOut();
                 }
             }
             finally{
                 if (webViewLockList.containsKey((Integer) AWebView.this.getTag())) webViewLockList.get((Integer) AWebView.this.getTag()).unlock();
             }
+
             // super.onDraw( canvas ); // <- Uncomment this if you want to show the original view
         }
 
@@ -259,7 +256,7 @@ public class WebViewManager
                 //webView.setLayerType(View.LAYER_TYPE_HARDWARE, rgbSwapPaint);
 
                 webViewsList.add(webView);
-                webView.setEnabled(false);
+                webView.setFocusable(true);
 
                 updatesEnabledList.put(msg.what, new ReentrantLock());
                 repaintRequestedList.put(msg.what, false);
@@ -1001,7 +998,9 @@ public class WebViewManager
                     KeyEvent e = new KeyEvent(
                             SystemClock.uptimeMillis(), SystemClock.uptimeMillis(),
                             KeyEvent.ACTION_DOWN, msg.arg1, 0, msg.arg2);
-                    viewToPress.getFocusView().dispatchKeyEvent(e);
+
+                    //viewToPress.requestFocus(View.FOCUS_DOWN|View.FOCUS_UP);
+                    viewToPress.dispatchKeyEvent(e);
                 }
                 //repaintRequestedList.put(msg.what, true);
             }
@@ -1035,7 +1034,8 @@ public class WebViewManager
                     KeyEvent e = new KeyEvent(
                             SystemClock.uptimeMillis(), SystemClock.uptimeMillis(),
                             KeyEvent.ACTION_UP, msg.arg1, 0, msg.arg2);
-                    viewToRelease.getFocusView().dispatchKeyEvent(e);
+                    //viewToRelease.requestFocus(View.FOCUS_DOWN|View.FOCUS_UP);
+                    viewToRelease.dispatchKeyEvent(e);
                 }
                 //repaintRequestedList.put(msg.what, true);
             }
