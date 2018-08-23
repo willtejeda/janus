@@ -18,6 +18,7 @@ import android.os.Message;
 import android.os.Vibrator;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.ActionMode;
 import android.view.inputmethod.InputMethodManager;
 import android.view.Gravity;
 import android.view.Surface;
@@ -253,6 +254,16 @@ public class JanusActivity extends org.qtproject.qt5.android.bindings.QtActivity
             return gearManager.getShowingVR() || gvrManager.getShowingVR();
         }
 
+        @Override
+        public void onActionModeStarted(ActionMode mode) {
+            super.onActionModeStarted(mode);
+
+            if (!getShowingVR()){
+                mode.getMenu().clear();
+                mode.getMenu().close();
+            }
+        }
+
         //============================================================================================================
         //Splash
         //============================================================================================================
@@ -455,6 +466,14 @@ public class JanusActivity extends org.qtproject.qt5.android.bindings.QtActivity
         }
 
         public void mouseReleaseWebView(int tag, int x, int y) {
+            webViewManager.mouseReleaseWebView(tag,x,y);
+        }
+
+        public void keyPressWebView(int tag, int x, int y) {
+            webViewManager.mousePressWebView(tag,x,y);
+        }
+
+        public void keyReleaseWebView(int tag, int x, int y) {
             webViewManager.mouseReleaseWebView(tag,x,y);
         }
 

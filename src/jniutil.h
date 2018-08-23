@@ -69,6 +69,8 @@ public:
     static void MousePressWebView(int tag, int x, int y);
     static void MouseMoveWebView(int tag, int x, int y);
     static void MouseReleaseWebView(int tag, int x, int y);
+    static void KeyPressWebView(int tag, int code, int state);
+    static void KeyReleaseWebView(int tag, int code, int state);
     static bool GetRepaintRequestedAtWebView(int tag);
     static bool GetScrollRequestedAtWebView(int tag);
     static bool GetURLChangedAtWebView(int tag);
@@ -164,6 +166,8 @@ private:
     static jmethodID m_mousePressWebViewMID;
     static jmethodID m_mouseMoveWebViewMID;
     static jmethodID m_mouseReleaseWebViewMID;
+    static jmethodID m_keyPressWebViewMID;
+    static jmethodID m_keyReleaseWebViewMID;
     static jmethodID m_getRepaintRequestedAtWebViewMID;
     static jmethodID m_getScrollRequestedAtWebViewMID;
     static jmethodID m_getURLChangedAtWebViewMID;

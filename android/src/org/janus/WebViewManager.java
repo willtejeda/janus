@@ -74,6 +74,8 @@ public class WebViewManager
         int width = 1000;
         int height = 800;
 
+        View focussed = null;
+
         public AWebView(Context context){
             super(context);
             super.setWillNotDraw(false);
@@ -87,10 +89,13 @@ public class WebViewManager
             return super.computeVerticalScrollRange();
         }
 
+        public View getFocusView(){
+            return focussed;
+        }
+
         // draw magic
         @Override
-        public void onDraw( Canvas canvas ) {
-            // Requires a try/catch for .lockCanvas( null )
+        protected void onDraw( Canvas canvas ) {
 
             if (webViewLockList.containsKey((Integer)AWebView.this.getTag())) webViewLockList.get((Integer)AWebView.this.getTag()).lock();
             else {
@@ -125,6 +130,13 @@ public class WebViewManager
                         hitTestLockList.get((Integer) AWebView.this.getTag()).unlock();
                         hitTestsList.put((Integer) AWebView.this.getTag(), h.getExtra());
                     }
+                }
+                else if (h.getType() == WebView.HitTestResult.EDIT_TEXT_TYPE) {
+                    hitTestLockList.get((Integer)AWebView.this.getTag()).lock();
+                    String s = "janus://content_editable";
+                    hitTestsList.put((Integer) AWebView.this.getTag(), s);
+                    focussed = AWebView.this.findFocus();
+                    hitTestLockList.get((Integer)AWebView.this.getTag()).unlock();
                 }
             }
             finally{
@@ -247,6 +259,7 @@ public class WebViewManager
                 //webView.setLayerType(View.LAYER_TYPE_HARDWARE, rgbSwapPaint);
 
                 webViewsList.add(webView);
+                webView.setEnabled(false);
 
                 updatesEnabledList.put(msg.what, new ReentrantLock());
                 repaintRequestedList.put(msg.what, false);
@@ -955,6 +968,74 @@ public class WebViewManager
                             SystemClock.uptimeMillis(), SystemClock.uptimeMillis(),
                             MotionEvent.ACTION_UP, msg.arg1, msg.arg2, 0);
                     viewToRelease.dispatchTouchEvent(e);
+                }
+                //repaintRequestedList.put(msg.what, true);
+            }
+            finally{
+                if (webViewLockList.containsKey(msg.what)) webViewLockList.get(msg.what).unlock();
+            }
+        }
+    };
+
+    public void keyPressWebView(int tag, int code, int state) {
+        Message msg = new Message();
+        msg.what = tag;
+        msg.arg1 = code;
+        msg.arg2 = state;
+
+        keyPressWebViewHandler.sendMessage(msg);
+    }
+
+    protected Handler keyPressWebViewHandler = new Handler() {
+        public void handleMessage(Message msg) {
+            if (webViewLockList.containsKey(msg.what)) webViewLockList.get(msg.what).lock();
+            else{
+                keyPressWebViewHandler.sendMessage(msg);
+                return;
+            }
+            try{
+                AWebView viewToPress = null;
+                viewToPress = (AWebView) findWebViewByTag(msg.what);
+
+                if (viewToPress != null) {
+                    KeyEvent e = new KeyEvent(
+                            SystemClock.uptimeMillis(), SystemClock.uptimeMillis(),
+                            KeyEvent.ACTION_DOWN, msg.arg1, 0, msg.arg2);
+                    viewToPress.getFocusView().dispatchKeyEvent(e);
+                }
+                //repaintRequestedList.put(msg.what, true);
+            }
+            finally{
+                if (webViewLockList.containsKey(msg.what)) webViewLockList.get(msg.what).unlock();
+            }
+        }
+    };
+
+    public void keyReleaseWebView(int tag, int code, int state) {
+        Message msg = new Message();
+        msg.what = tag;
+        msg.arg1 = code;
+        msg.arg2 = state;
+
+        keyReleaseWebViewHandler.sendMessage(msg);
+    }
+
+    protected Handler keyReleaseWebViewHandler = new Handler() {
+        public void handleMessage(Message msg) {
+            if (webViewLockList.containsKey(msg.what)) webViewLockList.get(msg.what).lock();
+            else{
+                keyReleaseWebViewHandler.sendMessage(msg);
+                return;
+            }
+            try{
+                AWebView viewToRelease = null;
+                viewToRelease = (AWebView) findWebViewByTag(msg.what);
+
+                if (viewToRelease != null) {
+                    KeyEvent e = new KeyEvent(
+                            SystemClock.uptimeMillis(), SystemClock.uptimeMillis(),
+                            KeyEvent.ACTION_UP, msg.arg1, 0, msg.arg2);
+                    viewToRelease.getFocusView().dispatchKeyEvent(e);
                 }
                 //repaintRequestedList.put(msg.what, true);
             }

@@ -39,6 +39,8 @@ jmethodID JNIUtil::m_setUpdatesEnabledWebViewMID = NULL;
 jmethodID JNIUtil::m_mousePressWebViewMID = NULL;
 jmethodID JNIUtil::m_mouseMoveWebViewMID = NULL;
 jmethodID JNIUtil::m_mouseReleaseWebViewMID = NULL;
+jmethodID JNIUtil::m_keyPressWebViewMID = NULL;
+jmethodID JNIUtil::m_keyReleaseWebViewMID = NULL;
 jmethodID JNIUtil::m_getRepaintRequestedAtWebViewMID = NULL;
 jmethodID JNIUtil::m_getScrollRequestedAtWebViewMID = NULL;
 jmethodID JNIUtil::m_getURLChangedAtWebViewMID = NULL;
@@ -168,6 +170,8 @@ void JNIUtil::Initialize()
         m_mousePressWebViewMID = jniEnv->GetMethodID(cls, "mousePressWebView", "(III)V");
         m_mouseMoveWebViewMID = jniEnv->GetMethodID(cls, "mouseMoveWebView", "(III)V");
         m_mouseReleaseWebViewMID = jniEnv->GetMethodID(cls, "mouseReleaseWebView", "(III)V");
+        m_keyPressWebViewMID = jniEnv->GetMethodID(cls, "keyPressWebView", "(III)V");
+        m_keyReleaseWebViewMID = jniEnv->GetMethodID(cls, "keyReleaseWebView", "(III)V");
         m_getRepaintRequestedAtWebViewMID = jniEnv->GetMethodID(cls, "getRepaintRequestedAtWebView", "(I)Z");
         m_getScrollRequestedAtWebViewMID = jniEnv->GetMethodID(cls, "getScrollRequestedAtWebView", "(I)Z");
         m_getURLChangedAtWebViewMID = jniEnv->GetMethodID(cls, "getURLChangedAtWebView", "(I)Z");
@@ -462,10 +466,15 @@ WebHitTestResult JNIUtil::GetHitTestContentWebView(int tag)
     if (m_getHitTestContentMID){
         QAndroidJniEnvironment jniEnv;
         jstring url_jstring = (jstring) jniEnv->CallObjectMethod(m_objectRef, m_getHitTestContentMID, tag);
-        h.link_url = QUrl(QString(jniEnv->GetStringUTFChars(url_jstring, 0)));
+        QString url_string = QString(jniEnv->GetStringUTFChars(url_jstring, 0));
+        if (url_string == "janus://content_editable") {
+            h.editable = true;
+        }
+        else {
+            h.link_url = QUrl(url_string);
+        }
         jniEnv->DeleteLocalRef(url_jstring);
         //TODO: add content editable
-        //h.editable = qh.isContentEditable();
         //h.selected = qh.isContentSelected();
         h.bounding_rect = QRect();
         h.is_null = false;
@@ -579,6 +588,22 @@ void JNIUtil::MouseReleaseWebView(int tag, int x, int y)
     if (m_mouseReleaseWebViewMID){
         QAndroidJniEnvironment jniEnv;
         jniEnv->CallVoidMethod(m_objectRef, m_mouseReleaseWebViewMID, tag, x, y);
+    }
+}
+
+void JNIUtil::KeyPressWebView(int tag, int code, int state)
+{
+    if (m_keyPressWebViewMID){
+        QAndroidJniEnvironment jniEnv;
+        jniEnv->CallVoidMethod(m_objectRef, m_keyPressWebViewMID, tag, code, state);
+    }
+}
+
+void JNIUtil::KeyReleaseWebView(int tag, int code, int state)
+{
+    if (m_keyReleaseWebViewMID){
+        QAndroidJniEnvironment jniEnv;
+        jniEnv->CallVoidMethod(m_objectRef, m_keyReleaseWebViewMID, tag, code, state);
     }
 }
 
