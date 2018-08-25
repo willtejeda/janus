@@ -3512,7 +3512,7 @@ void Game::EditModeRotate(QPointer<RoomObject> obj, const int x, const int y, co
         zdir = MathUtil::GetRotatedAxis(z_rotate_rad, zdir, player_zdir);
     }
 
-    obj->SetInterpolate(true);
+    obj->SetInterpolate(false);
     obj->SetInterpolation();
 
     obj->SetXDirs(xdir, ydir, zdir);
@@ -3520,6 +3520,7 @@ void Game::EditModeRotate(QPointer<RoomObject> obj, const int x, const int y, co
         obj->SnapXDirsToMajorAxis();
     }
     obj->SetB("sync", true);
+    obj->SetInterpolate(true);
 }
 
 void Game::EditModeScale(QPointer<RoomObject> obj, const int x, const int y, const int z)
