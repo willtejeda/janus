@@ -16,6 +16,7 @@
 
 #include "mathutil.h"
 #include "rendererinterface.h"
+#include "cookiejar.h"
 #include "abstractwebview.h"
 
 class MainWindow;
@@ -42,6 +43,8 @@ public:
     static void SetVRModeEnabled(bool b);
     static void HideSplash();
     static void SetProgressBar(int i);
+
+    static void UpdateCookies();
 
     static void CreateNewWebView(int tag);
     static void RemoveWebView(int tag);
@@ -140,6 +143,7 @@ private:
     static jmethodID m_hideSplashMID;
     static jmethodID m_setProgressBarMID;
 
+    static jmethodID m_getCookieMID;
     static jmethodID m_createNewWebViewMID;
     static jmethodID m_removeWebViewMID;
     static jmethodID m_attachWebViewToMainLayoutMID;

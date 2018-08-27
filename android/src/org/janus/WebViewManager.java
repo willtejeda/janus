@@ -1,13 +1,23 @@
 package org.janus;
 
 import java.lang.Thread;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.IntBuffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.TimeZone;
+import java.util.LinkedList;
+import java.util.StringTokenizer;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -39,6 +49,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager.LayoutParams;
+import android.webkit.CookieManager;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -69,10 +82,13 @@ public class WebViewManager
     private final ColorMatrixColorFilter colorFilter = new ColorMatrixColorFilter(colorMatrix);
     private final Paint rgbSwapPaint = new Paint();
 
+    private LinkedList<String> cookies = new LinkedList<String>();
+
     class AWebView extends WebView
     {
         int width = 1000;
         int height = 800;
+        String old_cookies = "";
 
         public AWebView(Context context){
             super(context);
@@ -110,6 +126,40 @@ public class WebViewManager
                 }
                 bitmapsList.put((Integer)AWebView.this.getTag(), b);
             } catch ( Exception e ) {
+            }
+
+            CookieManager cm = CookieManager.getInstance();
+            String c = cm.getCookie(this.getUrl());
+
+            if (!c.equals("") && !c.equals(old_cookies))
+            {
+                try {
+                    old_cookies = c;
+
+                    URI uri = new URI(this.getUrl());
+                    String host = uri.getHost();
+                    String domain = host.startsWith("www.") ? host.substring(4) : host;
+
+                    Log.i("new janus-cookies", c);
+
+                    /*Date expdate= new Date();
+                    expdate.setTime (expdate.getTime() + (1000 * 60 * 60 * 24));
+                    DateFormat df = new SimpleDateFormat("EEE, dd-MMM-yyyy HH:mm:ss zzz");
+                    df.setTimeZone(TimeZone.getTimeZone("GMT"));
+                    String expiry = df.format(expdate);*/
+
+                    StringTokenizer cookielist = new StringTokenizer(c, ";");
+
+                    while (cookielist.hasMoreTokens()) {
+                        String cookie = cookielist.nextToken().trim() + ";Path=/;Domain=." + domain + ";HttpOnly"; //";Expires=" + expiry +
+                        //Log.d("janus-cookie on draw", cookie);
+                        if (!cookies.contains(cookie)) {
+                            cookies.push(cookie);
+                        }
+                    }
+                }
+                catch (Exception e){
+                }
             }
 
             try {
@@ -188,6 +238,13 @@ public class WebViewManager
         rgbSwapPaint.setColorFilter(colorFilter);
     }
 
+    public String getCookie() {
+        if (!cookies.isEmpty()) {
+            return cookies.pop();
+        }
+        return "";
+    }
+
     public void createNewWebView(int tag) {
         Message msg = new Message();
         msg.what = tag;
@@ -218,6 +275,32 @@ public class WebViewManager
                 webView.getSettings().setOffscreenPreRaster(true);
                 webView.getSettings().setUserAgentString("Desktop"); //Android
                 webView.setWebViewClient(new WebViewClient() {
+                    @Override
+                    public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+                        if (request != null && request.getUrl() != null && request.getMethod().equalsIgnoreCase("get")) {
+                            String scheme = request.getUrl().getScheme().trim();
+                            if (scheme.equalsIgnoreCase("http") || scheme.equalsIgnoreCase("https")) {
+                                return executeRequest(request.getUrl().toString());
+                            }
+                        }
+                        return null;
+                    }
+
+                    private WebResourceResponse executeRequest(String url) {
+                        try {
+                            URLConnection connection = new URL(url).openConnection();
+                            String cookie  = connection.getHeaderField("Set-Cookie");
+                            if(cookie != null) {
+                                //Log.d("janus-cookie intercepted", cookie);
+                                cookies.push(cookie);
+                            }
+                            return null;
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        return null;
+                    }
+
                     @Override
                     public boolean shouldOverrideUrlLoading(WebView view, String url) {
                         return false;

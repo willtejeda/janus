@@ -328,6 +328,10 @@ void Game::Update()
     //Update AssetRecordings
     UpdateAssetRecordings();
 
+#ifdef __ANDROID__
+    JNIUtil::UpdateCookies();
+#endif
+
     //Update "player"
     RoomObject::SetDrawAssetObjectTeleport(state == JVR_STATE_INTERACT_TELEPORT);
 

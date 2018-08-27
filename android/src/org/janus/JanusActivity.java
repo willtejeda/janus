@@ -361,6 +361,10 @@ public class JanusActivity extends org.qtproject.qt5.android.bindings.QtActivity
         //WebView
         //============================================================================================================
 
+        public String getCookie() {
+            return webViewManager.getCookie();
+        }
+
         public void createNewWebView(int tag) {
             webViewManager.createNewWebView(tag);
         }

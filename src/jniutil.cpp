@@ -13,6 +13,7 @@ jmethodID JNIUtil::m_hideSplashMID = NULL;
 jmethodID JNIUtil::m_setVRModeEnabledMID = NULL;
 jmethodID JNIUtil::m_setProgressBarMID = NULL;
 
+jmethodID JNIUtil::m_getCookieMID = NULL;
 jmethodID JNIUtil::m_createNewWebViewMID = NULL;
 jmethodID JNIUtil::m_removeWebViewMID = NULL;
 jmethodID JNIUtil::m_attachWebViewToMainLayoutMID = NULL;
@@ -144,6 +145,7 @@ void JNIUtil::Initialize()
          */
 
         //Webview
+        m_getCookieMID = jniEnv->GetMethodID(cls, "getCookie", "()Ljava/lang/String;");
         m_createNewWebViewMID = jniEnv->GetMethodID(cls, "createNewWebView", "(I)V");
         m_removeWebViewMID = jniEnv->GetMethodID(cls, "removeWebView", "(I)V");
         m_attachWebViewToMainLayoutMID = jniEnv->GetMethodID(cls, "attachWebViewToMainLayout", "(I)V");
@@ -306,6 +308,34 @@ void JNIUtil::SetProgressBar(int i)
     {
         QAndroidJniEnvironment jniEnv;
         jniEnv->CallVoidMethod(m_objectRef, m_setProgressBarMID, i);
+    }
+}
+
+void JNIUtil::UpdateCookies()
+{
+    if (m_getCookieMID){
+        QAndroidJniEnvironment jniEnv;
+        jstring cookie_jstring = (jstring) jniEnv->CallObjectMethod(m_objectRef, m_getCookieMID);
+        QString s = QString(jniEnv->GetStringUTFChars(cookie_jstring, 0));
+        //qDebug() << "updating janus-cookie" << s;
+        if (s != "") {
+            QByteArray ba = s.toLatin1();
+            jniEnv->DeleteLocalRef(cookie_jstring);
+            QList<QNetworkCookie> cookies = QNetworkCookie::parseCookies(ba);
+
+            for (QList<QNetworkCookie>::iterator it=cookies.begin(); it!=cookies.end(); ++it) {
+                //qDebug() << "jni-janus-cookies" << it->domain() << it->name() << it->value();
+
+                QString domainStr = it->domain();
+                if (!domainStr.isEmpty() && domainStr.at(0) == '.') {
+                    domainStr.remove(0,1);
+                }
+                domainStr = QString("http://") + domainStr;
+
+                CookieJar::cookie_jar->setCookiesFromUrl(QList<QNetworkCookie>({*it}), domainStr);
+            }
+            CookieJar::cookie_jar->SaveToDisk();
+        }
     }
 }
 
