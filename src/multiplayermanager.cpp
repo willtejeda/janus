@@ -289,6 +289,12 @@ bool MultiPlayerManager::GetEnabled()
 
 void MultiPlayerManager::Update(QPointer <Player> player, const QString & url, const QList <QString> adjacent_urls, const QString & name, const bool room_allows_party_mode)
 {    
+    if (player.isNull()) {
+        return;
+    }
+
+    const float delta_time = player->GetF("delta_time");
+
     if (user_ghost) {
         user_ghost->SetS("anim_id", player->GetS("anim_id"));
         if (user_ghost->GetGhostAssetObjects().contains(user_ghost->GetS("body_id"))) {
@@ -533,7 +539,7 @@ void MultiPlayerManager::Update(QPointer <Player> player, const QString & url, c
                     p->Play();
                 }
 
-                p->Update(player->GetF("delta_time"));
+                p->Update(delta_time);
                 if (current_in_room.contains(p) && !players_in_room.contains(playerIndex.key())){
     //                Analytics::PostEvent("user", "joined", player->GetID());
                     players_in_room[playerIndex.key()] = p;
@@ -675,7 +681,7 @@ void MultiPlayerManager::SetCursorPosition(const QVector3D & cpos, const QVector
     pending_pos = true;
 }
 
-void MultiPlayerManager::AddMicBuffers(const QList <QByteArray> & buffers)
+void MultiPlayerManager::AddMicBuffers(const QList <QByteArray> buffers)
 {
     mic_buffers += buffers;
     if (recording) {

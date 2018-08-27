@@ -124,7 +124,7 @@ public:
     bool SetChatMessage(QPointer <Player> player, const QString & s);
     void SetSendPortal(const QString & s, const QString & js_id);    
     void SetCursorPosition(const QVector3D & cpos, const QVector3D & cxdir, const QVector3D & cydir, const QVector3D & czdir, const float cscale);    
-    void AddMicBuffers(const QList <QByteArray> & buffers);
+    void AddMicBuffers(const QList <QByteArray> buffers);
 
     void SetHMD(const QString & s);
 

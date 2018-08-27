@@ -532,7 +532,7 @@ void SoundManager::Update(QPointer <Player> player)
 //    }
 }
 
-QList <QByteArray> & SoundManager::GetMicBuffers()
+QList <QByteArray> SoundManager::GetMicBuffers()
 {
     return input_mic_buffers;
 }
