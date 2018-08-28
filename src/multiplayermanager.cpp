@@ -287,14 +287,8 @@ bool MultiPlayerManager::GetEnabled()
     return enabled;
 }
 
-void MultiPlayerManager::Update(QPointer <Player> player, const QString & url, const QList <QString> adjacent_urls, const QString & name, const bool room_allows_party_mode)
+void MultiPlayerManager::Update(QPointer <Player> player, const QString & url, const QList <QString> adjacent_urls, const QString & name, const bool room_allows_party_mode, const float delta_time)
 {    
-    if (player.isNull()) {
-        return;
-    }
-
-    const float delta_time = player->GetF("delta_time");
-
     if (user_ghost) {
         user_ghost->SetS("anim_id", player->GetS("anim_id"));
         if (user_ghost->GetGhostAssetObjects().contains(user_ghost->GetS("body_id"))) {
