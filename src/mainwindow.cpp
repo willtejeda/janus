@@ -1401,25 +1401,36 @@ void MainWindow::SetupMenuWidgets()
     connect(bookmarkMenu, SIGNAL(triggered(QAction*)), this, SLOT(ActionOpenURL(QAction *)));
 
 #ifndef __ANDROID__
-    webspaceMenu = new QMenu("Webspace", this);
-    webspaceMenu->addAction(newAct);
-    webspaceMenu->addAction(openAct);
-    webspaceMenu->addAction(saveAct);
-    webspaceMenu->addAction(saveAsAct);
-    webspaceMenu->addSeparator();
-    webspaceMenu->addAction(importLocalAct);
-    webspaceMenu->addAction(importRemoteAct);
+    fileMenu = new QMenu("File", this);
+    fileMenu->addAction(newAct);
+    fileMenu->addAction(openAct);
+    fileMenu->addAction(saveAct);
+    fileMenu->addAction(saveAsAct);
+    fileMenu->addSeparator();
+    fileMenu->addAction(importLocalAct);
+    fileMenu->addAction(importRemoteAct);
+    fileMenu->addSeparator();
+#ifndef __ANDROID__
+    fileMenu->addAction(saveThumbAct);
+#endif
+    fileMenu->addAction(saveScreenshotAct);
+    fileMenu->addAction(saveEquiAct);
 
-    panelsMenu = new QMenu("Panels", this);
-    panelsMenu->addAction(socialAct);
-    panelsMenu->addAction(navigationAct);
-    panelsMenu->addSeparator();
-    panelsMenu->addAction(assetAct);
-    panelsMenu->addAction(hierarchyAct);
-    panelsMenu->addAction(propertiesAct);
-    panelsMenu->addSeparator();
-    panelsMenu->addAction(codeEditorAct);
-    connect(panelsMenu, SIGNAL(aboutToShow()), this, SLOT(ActionOpenWindow()));
+    windowMenu = new QMenu("Window", this);
+    windowMenu->addAction(socialAct);
+    windowMenu->addAction(navigationAct);
+    windowMenu->addSeparator();
+    windowMenu->addAction(assetAct);
+    windowMenu->addAction(hierarchyAct);
+    windowMenu->addAction(propertiesAct);
+    windowMenu->addSeparator();
+    windowMenu->addAction(codeEditorAct);
+    windowMenu->addSeparator();
+#ifndef __ANDROID__
+    windowMenu->addSeparator();
+    windowMenu->addAction(toggleFullscreenAct);
+#endif
+    connect(windowMenu, SIGNAL(aboutToShow()), this, SLOT(ActionOpenWindow()));
 
     usersMenu = new QMenu("Users", this);
     usersMenu->addAction(startRecordingAct);
@@ -1430,28 +1441,16 @@ void MainWindow::SetupMenuWidgets()
     connect(usersMenu, SIGNAL(aboutToShow()), this, SLOT(ActionOpenEdit()));
 #endif
 
-    viewMenu = new QMenu("View", this);
-#ifndef __ANDROID__
-    viewMenu->addAction(saveThumbAct);
-#endif
-    viewMenu->addAction(saveScreenshotAct);
-    viewMenu->addAction(saveEquiAct);
-#ifndef __ANDROID__
-    viewMenu->addSeparator();
-    viewMenu->addAction(toggleFullscreenAct);
-#endif
-
     ellipsisMenu = new QMenu(this);
 #ifndef __ANDROID__
-    ellipsisMenu->addMenu(webspaceMenu);
+    ellipsisMenu->addMenu(fileMenu);
+    ellipsisMenu->addMenu(windowMenu);
+    ellipsisMenu->addMenu(usersMenu);
 #endif
+
     ellipsisMenu->addMenu(bookmarkMenu);
     ellipsisMenu->addSeparator();
-    ellipsisMenu->addMenu(viewMenu);
-#ifndef __ANDROID__
-    ellipsisMenu->addMenu(panelsMenu);
-    ellipsisMenu->addMenu(usersMenu);
-#else
+#ifdef __ANDROID__
     ellipsisMenu->addSeparator();
     //ellipsisMenu->addAction(togglePerfAct);
     ellipsisMenu->addAction(enterVRAct);
