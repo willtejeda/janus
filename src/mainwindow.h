@@ -215,6 +215,7 @@ private:
     QMenu * ellipsisMenu;
     QPushButton * button_ellipsis;
 
+    QWidget * topbarwidget;
     QPushButton * button_back;    
     QPushButton * button_forward;
     QPushButton * button_reload;    

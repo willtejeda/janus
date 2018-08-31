@@ -1180,7 +1180,7 @@ void MainWindow::SetupWidgets()
     w4->setFixedHeight(btn_size);
 #endif
 
-    QWidget * w3 = new QWidget();
+    topbarwidget = new QWidget();
     QHBoxLayout * l3 = new QHBoxLayout();
     l3->addWidget(button_back);
     l3->addWidget(button_forward);
@@ -1191,13 +1191,13 @@ void MainWindow::SetupWidgets()
     l3->addWidget(button_ellipsis);
     l3->setSpacing(0);
     l3->setMargin(0);
-    w3->setLayout(l3);
+    topbarwidget->setLayout(l3);
 #ifndef __ANDROID__
-    w3->setMaximumHeight(32);
+    topbarwidget->setMaximumHeight(32);
 #else
-    w3->setFixedHeight(btn_size);
+    topbarwidget->setFixedHeight(btn_size);
 #endif
-    w3->setStyleSheet("QWidget {color: #FFFFFF; background: #2F363B;}"
+    topbarwidget->setStyleSheet("QWidget {color: #FFFFFF; background: #2F363B;}"
                         "QPushButton:hover, QPushButton:selected {background: #3E4D54;}" //Hover: #3E4D54; Click: #1F2227;
                         "QPushButton::menu-indicator {image: url("");}"); //Hover: #3E4D54; Click: #1F2227;
 
@@ -1208,13 +1208,13 @@ void MainWindow::SetupWidgets()
     l2->setMargin(0);
     //add top panel widget (optionally disabled if demo_enabled is true and demo_ui is false)
     if (!SettingsManager::GetDemoModeEnabled() || SettingsManager::GetDemoModeUI()) {
-        l2->addWidget(w3);
+        l2->addWidget(topbarwidget);
     }
     l2->addWidget(glwidget);
 #else
     QWidget * w5 = new QWidget();
     QVBoxLayout * l5 = new QVBoxLayout();
-    l5->addWidget(w3);
+    l5->addWidget(topbarwidget);
     w5->setLayout(l5);
     w5->setFixedHeight(btn_size + 32);
     w5->setStyleSheet("QWidget {color: #FFFFFF; background: #2F363B;}"); //Hover: #3E4D54; Click: #1F2227;
@@ -1820,6 +1820,7 @@ void MainWindow::ActionToggleFullscreen()
         setGeometry(s->availableGeometry());
     }
     fullscreened = !fullscreened;
+    topbarwidget->setVisible(!fullscreened);
 }
 
 void MainWindow::ActionEllipsisMenu()
