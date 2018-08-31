@@ -651,6 +651,11 @@ void MainWindow::Update()
     }
 #endif
 
+    //60.0 - top bar widget visibility
+    const bool vis = !(fullscreened && glwidget->GetGrab());
+    if (topbarwidget && topbarwidget->isVisible() != vis) {
+        topbarwidget->setVisible(vis);
+    }
 
     //59.3 - disable pocketspace toggle button if there is no other current viewed room to toggle to
     if (game->GetEnvironment()->GetLastRoom().isNull() && button_home->isVisible()) {
@@ -1820,7 +1825,6 @@ void MainWindow::ActionToggleFullscreen()
         setGeometry(s->availableGeometry());
     }
     fullscreened = !fullscreened;
-    topbarwidget->setVisible(!fullscreened);
 }
 
 void MainWindow::ActionEllipsisMenu()
