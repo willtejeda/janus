@@ -651,6 +651,11 @@ void MainWindow::Update()
     }
 #endif
 
+    //60.0 - top bar widget visibility
+    const bool vis = !(fullscreened && glwidget->GetGrab());
+    if (topbarwidget && topbarwidget->isVisible() != vis) {
+        topbarwidget->setVisible(vis);
+    }
 
     //59.3 - disable pocketspace toggle button if there is no other current viewed room to toggle to
     if (game->GetEnvironment()->GetLastRoom().isNull() && button_home->isVisible()) {
@@ -1180,7 +1185,7 @@ void MainWindow::SetupWidgets()
     w4->setFixedHeight(btn_size);
 #endif
 
-    QWidget * w3 = new QWidget();
+    topbarwidget = new QWidget();
     QHBoxLayout * l3 = new QHBoxLayout();
     l3->addWidget(button_back);
     l3->addWidget(button_forward);
@@ -1191,13 +1196,13 @@ void MainWindow::SetupWidgets()
     l3->addWidget(button_ellipsis);
     l3->setSpacing(0);
     l3->setMargin(0);
-    w3->setLayout(l3);
+    topbarwidget->setLayout(l3);
 #ifndef __ANDROID__
-    w3->setMaximumHeight(32);
+    topbarwidget->setMaximumHeight(32);
 #else
-    w3->setFixedHeight(btn_size);
+    topbarwidget->setFixedHeight(btn_size);
 #endif
-    w3->setStyleSheet("QWidget {color: #FFFFFF; background: #2F363B;}"
+    topbarwidget->setStyleSheet("QWidget {color: #FFFFFF; background: #2F363B;}"
                         "QPushButton:hover, QPushButton:selected {background: #3E4D54;}" //Hover: #3E4D54; Click: #1F2227;
                         "QPushButton::menu-indicator {image: url("");}"); //Hover: #3E4D54; Click: #1F2227;
 
@@ -1208,13 +1213,13 @@ void MainWindow::SetupWidgets()
     l2->setMargin(0);
     //add top panel widget (optionally disabled if demo_enabled is true and demo_ui is false)
     if (!SettingsManager::GetDemoModeEnabled() || SettingsManager::GetDemoModeUI()) {
-        l2->addWidget(w3);
+        l2->addWidget(topbarwidget);
     }
     l2->addWidget(glwidget);
 #else
     QWidget * w5 = new QWidget();
     QVBoxLayout * l5 = new QVBoxLayout();
-    l5->addWidget(w3);
+    l5->addWidget(topbarwidget);
     w5->setLayout(l5);
     w5->setFixedHeight(btn_size + 32);
     w5->setStyleSheet("QWidget {color: #FFFFFF; background: #2F363B;}"); //Hover: #3E4D54; Click: #1F2227;
@@ -1396,25 +1401,36 @@ void MainWindow::SetupMenuWidgets()
     connect(bookmarkMenu, SIGNAL(triggered(QAction*)), this, SLOT(ActionOpenURL(QAction *)));
 
 #ifndef __ANDROID__
-    webspaceMenu = new QMenu("Webspace", this);
-    webspaceMenu->addAction(newAct);
-    webspaceMenu->addAction(openAct);
-    webspaceMenu->addAction(saveAct);
-    webspaceMenu->addAction(saveAsAct);
-    webspaceMenu->addSeparator();
-    webspaceMenu->addAction(importLocalAct);
-    webspaceMenu->addAction(importRemoteAct);
+    fileMenu = new QMenu("File", this);
+    fileMenu->addAction(newAct);
+    fileMenu->addAction(openAct);
+    fileMenu->addAction(saveAct);
+    fileMenu->addAction(saveAsAct);
+    fileMenu->addSeparator();
+    fileMenu->addAction(importLocalAct);
+    fileMenu->addAction(importRemoteAct);
+    fileMenu->addSeparator();
+#ifndef __ANDROID__
+    fileMenu->addAction(saveThumbAct);
+#endif
+    fileMenu->addAction(saveScreenshotAct);
+    fileMenu->addAction(saveEquiAct);
 
-    panelsMenu = new QMenu("Panels", this);
-    panelsMenu->addAction(socialAct);
-    panelsMenu->addAction(navigationAct);
-    panelsMenu->addSeparator();
-    panelsMenu->addAction(assetAct);
-    panelsMenu->addAction(hierarchyAct);
-    panelsMenu->addAction(propertiesAct);
-    panelsMenu->addSeparator();
-    panelsMenu->addAction(codeEditorAct);
-    connect(panelsMenu, SIGNAL(aboutToShow()), this, SLOT(ActionOpenWindow()));
+    windowMenu = new QMenu("Window", this);
+    windowMenu->addAction(socialAct);
+    windowMenu->addAction(navigationAct);
+    windowMenu->addSeparator();
+    windowMenu->addAction(assetAct);
+    windowMenu->addAction(hierarchyAct);
+    windowMenu->addAction(propertiesAct);
+    windowMenu->addSeparator();
+    windowMenu->addAction(codeEditorAct);
+    windowMenu->addSeparator();
+#ifndef __ANDROID__
+    windowMenu->addSeparator();
+    windowMenu->addAction(toggleFullscreenAct);
+#endif
+    connect(windowMenu, SIGNAL(aboutToShow()), this, SLOT(ActionOpenWindow()));
 
     usersMenu = new QMenu("Users", this);
     usersMenu->addAction(startRecordingAct);
@@ -1425,28 +1441,16 @@ void MainWindow::SetupMenuWidgets()
     connect(usersMenu, SIGNAL(aboutToShow()), this, SLOT(ActionOpenEdit()));
 #endif
 
-    viewMenu = new QMenu("View", this);
-#ifndef __ANDROID__
-    viewMenu->addAction(saveThumbAct);
-#endif
-    viewMenu->addAction(saveScreenshotAct);
-    viewMenu->addAction(saveEquiAct);
-#ifndef __ANDROID__
-    viewMenu->addSeparator();
-    viewMenu->addAction(toggleFullscreenAct);
-#endif
-
     ellipsisMenu = new QMenu(this);
 #ifndef __ANDROID__
-    ellipsisMenu->addMenu(webspaceMenu);
+    ellipsisMenu->addMenu(fileMenu);
+    ellipsisMenu->addMenu(windowMenu);
+    ellipsisMenu->addMenu(usersMenu);
 #endif
+
     ellipsisMenu->addMenu(bookmarkMenu);
     ellipsisMenu->addSeparator();
-    ellipsisMenu->addMenu(viewMenu);
-#ifndef __ANDROID__
-    ellipsisMenu->addMenu(panelsMenu);
-    ellipsisMenu->addMenu(usersMenu);
-#else
+#ifdef __ANDROID__
     ellipsisMenu->addSeparator();
     //ellipsisMenu->addAction(togglePerfAct);
     ellipsisMenu->addAction(enterVRAct);

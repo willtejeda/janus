@@ -12,8 +12,10 @@ Game::Game() :
     gamepad_button_press(false),
     draw_cursor(false),
     cursor_active(-1),
-    rmb_held(false)
+    rmb_held(false),
+    delta_time(0.0f)
 {
+    deltat_time.start();
     player = new Player();
 
 #ifdef __ANDROID__
@@ -303,7 +305,14 @@ void Game::Update()
         RequestInternetConnection();
         network_timer.restart();
     }
-#endif      
+#endif
+
+    //delta_t processing
+    delta_time = 0.0;
+    if (deltat_time.elapsed() > 0) {
+        delta_time = double(deltat_time.restart()) / 1000.0;
+    }
+    player->SetF("delta_time", delta_time);
 
     //deallocation includes opengl delete calls
     if (!do_exit) {
@@ -5667,10 +5676,10 @@ void Game::UpdateMultiplayer()
             room_url_no_anchor = room_url_no_anchor.left(room_url_no_anchor.indexOf("#"));
         }
 
-        multi_players->Update(player, room_url_no_anchor, adjacent_urls, room_name, room_allows_party_mode);
+        multi_players->Update(player, room_url_no_anchor, adjacent_urls, room_name, room_allows_party_mode, delta_time);
         QPointer <RoomObject> g = multi_players->GetPlayer();
         if (g) {
-            g->Update(player->GetF("delta_time"));
+            g->Update(delta_time);
         }
 
         //any reset to make?
