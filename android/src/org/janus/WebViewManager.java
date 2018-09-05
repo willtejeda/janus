@@ -962,6 +962,32 @@ public class WebViewManager
 
                     webView.setWebViewClient(new WebViewClient() {
                         @Override
+                        public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+                            if (request != null && request.getUrl() != null && request.getMethod().equalsIgnoreCase("get")) {
+                                String scheme = request.getUrl().getScheme().trim();
+                                if (scheme.equalsIgnoreCase("http") || scheme.equalsIgnoreCase("https")) {
+                                    return executeRequest(request.getUrl().toString());
+                                }
+                            }
+                            return null;
+                        }
+
+                        private WebResourceResponse executeRequest(String url) {
+                            try {
+                                URLConnection connection = new URL(url).openConnection();
+                                String cookie  = connection.getHeaderField("Set-Cookie");
+                                if(cookie != null) {
+                                    //Log.d("janus-cookie intercepted", cookie);
+                                    cookies.push(cookie);
+                                }
+                                return null;
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            return null;
+                        }
+
+                        @Override
                         public boolean shouldOverrideUrlLoading(WebView view, String url) {
                             return false;
                         }
@@ -969,8 +995,22 @@ public class WebViewManager
                         @Override
                         public void onPageFinished(WebView view, String url) {
                             Integer tag = (Integer) view.getTag();
-                            urlList.put(tag, view.getUrl());
-                            urlChangedList.put(tag, true);
+
+                            if (webViewLockList.containsKey(tag)) webViewLockList.get(tag).lock();
+                            else{
+                                return;
+                            }
+
+                            try {
+                                urlList.put(tag, view.getUrl());
+                                urlChangedList.put(tag, true);
+
+                                horizontalRangeList.put(tag, ((AWebView) view).computeHorizontalScrollRange());
+                                verticalRangeList.put(tag, ((AWebView) view).computeVerticalScrollRange());
+                            }
+                            finally {
+                                if (webViewLockList.containsKey(tag)) webViewLockList.get(tag).unlock();
+                            }
                         }
                     });
                     //repaintRequestedList.put(msg.what, true);
