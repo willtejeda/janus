@@ -225,8 +225,8 @@ private:
     QPushButton * button_bookmark;
     int button_bookmark_state;
     QPointer <GLWidget> glwidget;
-#ifndef __ANDROID__
     QMenu *fileMenu;
+#ifndef __ANDROID__
     QMenu *usersMenu;
     QMenu *windowMenu;
 #endif

@@ -131,7 +131,7 @@ public class WebViewManager
             CookieManager cm = CookieManager.getInstance();
             String c = cm.getCookie(this.getUrl());
 
-            if (!c.equals("") && !c.equals(old_cookies))
+            if (c != null && !c.equals("") && !c.equals(old_cookies))
             {
                 try {
                     old_cookies = c;
@@ -140,7 +140,7 @@ public class WebViewManager
                     String host = uri.getHost();
                     String domain = host.startsWith("www.") ? host.substring(4) : host;
 
-                    Log.i("new janus-cookies", c);
+                    //Log.i("new janus-cookies", c);
 
                     /*Date expdate= new Date();
                     expdate.setTime (expdate.getTime() + (1000 * 60 * 60 * 24));
@@ -275,32 +275,6 @@ public class WebViewManager
                 webView.getSettings().setOffscreenPreRaster(true);
                 webView.getSettings().setUserAgentString("Desktop"); //Android
                 webView.setWebViewClient(new WebViewClient() {
-                    @Override
-                    public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-                        if (request != null && request.getUrl() != null && request.getMethod().equalsIgnoreCase("get")) {
-                            String scheme = request.getUrl().getScheme().trim();
-                            if (scheme.equalsIgnoreCase("http") || scheme.equalsIgnoreCase("https")) {
-                                return executeRequest(request.getUrl().toString());
-                            }
-                        }
-                        return null;
-                    }
-
-                    private WebResourceResponse executeRequest(String url) {
-                        try {
-                            URLConnection connection = new URL(url).openConnection();
-                            String cookie  = connection.getHeaderField("Set-Cookie");
-                            if(cookie != null) {
-                                //Log.d("janus-cookie intercepted", cookie);
-                                cookies.push(cookie);
-                            }
-                            return null;
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        return null;
-                    }
-
                     @Override
                     public boolean shouldOverrideUrlLoading(WebView view, String url) {
                         return false;
@@ -961,32 +935,6 @@ public class WebViewManager
                     hitTestLockList.get(msg.what).lock();
 
                     webView.setWebViewClient(new WebViewClient() {
-                        @Override
-                        public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-                            if (request != null && request.getUrl() != null && request.getMethod().equalsIgnoreCase("get")) {
-                                String scheme = request.getUrl().getScheme().trim();
-                                if (scheme.equalsIgnoreCase("http") || scheme.equalsIgnoreCase("https")) {
-                                    return executeRequest(request.getUrl().toString());
-                                }
-                            }
-                            return null;
-                        }
-
-                        private WebResourceResponse executeRequest(String url) {
-                            try {
-                                URLConnection connection = new URL(url).openConnection();
-                                String cookie  = connection.getHeaderField("Set-Cookie");
-                                if(cookie != null) {
-                                    //Log.d("janus-cookie intercepted", cookie);
-                                    cookies.push(cookie);
-                                }
-                                return null;
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                            return null;
-                        }
-
                         @Override
                         public boolean shouldOverrideUrlLoading(WebView view, String url) {
                             return false;

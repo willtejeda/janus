@@ -1400,8 +1400,8 @@ void MainWindow::SetupMenuWidgets()
     connect(bookmarkMenu, SIGNAL(aboutToShow()), this, SLOT(ActionOpenBookmarks()));
     connect(bookmarkMenu, SIGNAL(triggered(QAction*)), this, SLOT(ActionOpenURL(QAction *)));
 
-#ifndef __ANDROID__
     fileMenu = new QMenu("File", this);
+#ifndef __ANDROID__
     fileMenu->addAction(newAct);
     fileMenu->addAction(openAct);
     fileMenu->addAction(saveAct);
@@ -1410,12 +1410,13 @@ void MainWindow::SetupMenuWidgets()
     fileMenu->addAction(importLocalAct);
     fileMenu->addAction(importRemoteAct);
     fileMenu->addSeparator();
-#ifndef __ANDROID__
     fileMenu->addAction(saveThumbAct);
-#endif
+#else
     fileMenu->addAction(saveScreenshotAct);
     fileMenu->addAction(saveEquiAct);
+#endif
 
+#ifndef __ANDROID__
     windowMenu = new QMenu("Window", this);
     windowMenu->addAction(socialAct);
     windowMenu->addAction(navigationAct);
@@ -1442,8 +1443,9 @@ void MainWindow::SetupMenuWidgets()
 #endif
 
     ellipsisMenu = new QMenu(this);
-#ifndef __ANDROID__
     ellipsisMenu->addMenu(fileMenu);
+
+#ifndef __ANDROID__
     ellipsisMenu->addMenu(windowMenu);
     ellipsisMenu->addMenu(usersMenu);
 #endif

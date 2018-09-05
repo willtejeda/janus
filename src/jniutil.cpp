@@ -317,8 +317,8 @@ void JNIUtil::UpdateCookies()
         QAndroidJniEnvironment jniEnv;
         jstring cookie_jstring = (jstring) jniEnv->CallObjectMethod(m_objectRef, m_getCookieMID);
         QString s = QString(jniEnv->GetStringUTFChars(cookie_jstring, 0));
-        //qDebug() << "updating janus-cookie" << s;
         if (s != "") {
+            //qDebug() << "updating janus-cookie" << s;
             QByteArray ba = s.toLatin1();
             jniEnv->DeleteLocalRef(cookie_jstring);
             QList<QNetworkCookie> cookies = QNetworkCookie::parseCookies(ba);
