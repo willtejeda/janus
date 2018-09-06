@@ -91,6 +91,24 @@ private:
 
 };
 
+class CEFCookieVisitor : public CefCookieVisitor
+{
+public:
+    CEFCookieVisitor();
+    bool Visit(const CefCookie& cookie, int count, int total, bool& deleteCookie);
+
+private:
+    QString StringFromCefString(cef_string_t s)
+    {
+        CefString cef_string;
+        cef_string.Attach(&s, false);
+        return QString(cef_string.ToString().c_str());
+    }
+
+public:
+    IMPLEMENT_REFCOUNTING(CEFCookieVisitor);
+};
+
 class CEFDOMVisitor : public CefDOMVisitor
 {
 public:
@@ -116,7 +134,7 @@ public:
 
 };
 
-class CEFRenderHandler : public CefRenderHandler        
+class CEFRenderHandler : public CefRenderHandler
 {
 public:
 
@@ -260,5 +278,7 @@ private:
     bool browser_focus;
 
     static QList <CefRefPtr<CefBrowser> > browser_list;
+
+    QPointer <CookieJar> cookie_jar;
 };
 #endif // CEFWEBVIEW_H
