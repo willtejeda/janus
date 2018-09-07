@@ -113,76 +113,54 @@ public class WebViewManager
             }
 
             try {
-                Bitmap b = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-                Canvas c = new Canvas(b);
-                //c.scale(1, -1, w/2, h/2);
-                float xScale = c.getWidth() / (float)c.getWidth();
-                c.scale(xScale, xScale);
-                c.translate(-getScrollX(), -getScrollY());
-                super.onDraw(c); // Call the WebView onDraw targetting the canvas
-
-                if (bitmapsList.get((Integer)AWebView.this.getTag()) != null){
-                    bitmapsList.get((Integer)AWebView.this.getTag()).recycle();
-                }
-                bitmapsList.put((Integer)AWebView.this.getTag(), b);
-            } catch ( Exception e ) {
-            }
-
-            CookieManager cm = CookieManager.getInstance();
-            String c = cm.getCookie(this.getUrl());
-
-            if (c != null && !c.equals("") && !c.equals(old_cookies))
-            {
                 try {
-                    old_cookies = c;
+                    Bitmap b = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+                    Canvas c = new Canvas(b);
+                    //c.scale(1, -1, w/2, h/2);
+                    float xScale = c.getWidth() / (float)c.getWidth();
+                    c.scale(xScale, xScale);
+                    c.translate(-getScrollX(), -getScrollY());
+                    super.onDraw(c); // Call the WebView onDraw targetting the canvas
 
-                    URI uri = new URI(this.getUrl());
-                    String host = uri.getHost();
-                    String domain = host.startsWith("www.") ? host.substring(4) : host;
-
-                    //Log.i("new janus-cookies", c);
-
-                    /*Date expdate= new Date();
-                    expdate.setTime (expdate.getTime() + (1000 * 60 * 60 * 24));
-                    DateFormat df = new SimpleDateFormat("EEE, dd-MMM-yyyy HH:mm:ss zzz");
-                    df.setTimeZone(TimeZone.getTimeZone("GMT"));
-                    String expiry = df.format(expdate);*/
-
-                    StringTokenizer cookielist = new StringTokenizer(c, ";");
-
-                    while (cookielist.hasMoreTokens()) {
-                        String cookie = cookielist.nextToken().trim() + ";Path=/;Domain=." + domain + ";HttpOnly"; //";Expires=" + expiry +
-                        //Log.d("janus-cookie on draw", cookie);
-                        if (!cookies.contains(cookie)) {
-                            cookies.push(cookie);
-                        }
+                    if (bitmapsList.get((Integer)AWebView.this.getTag()) != null){
+                        bitmapsList.get((Integer)AWebView.this.getTag()).recycle();
                     }
+                    bitmapsList.put((Integer)AWebView.this.getTag(), b);
+                } catch ( Exception e ) {
                 }
-                catch (Exception e){
-                }
-            }
 
-            try {
-                HitTestResult h = AWebView.this.getHitTestResult();
-                if (h.getType() == WebView.HitTestResult.EDIT_TEXT_TYPE) {
-                    hitTestLockList.get((Integer)AWebView.this.getTag()).lock();
-                    String s = "janus://content_editable";
-                    hitTestsList.put((Integer) AWebView.this.getTag(), s);
-                    hitTestLockList.get((Integer)AWebView.this.getTag()).unlock();
-                }
-                else {
-                    if (h.getType() == WebView.HitTestResult.SRC_ANCHOR_TYPE || h.getType() == WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE || h.getType() == WebView.HitTestResult.IMAGE_TYPE){
-                        //Log.i("HITTESTRESULT", h.getExtra());
-                        if (!(hitTestsList.containsKey((Integer)AWebView.this.getTag()) && hitTestsList.get((Integer)AWebView.this.getTag()) == h.getExtra())) {
-                            hitTestLockList.get((Integer)AWebView.this.getTag()).lock();
-                            if (!hitTestsList.containsKey((Integer)AWebView.this.getTag()) || hitTestsList.get((Integer)AWebView.this.getTag()) == ""){
-                                hitTestsList.put((Integer) AWebView.this.getTag(), h.getExtra());
+                CookieManager cm = CookieManager.getInstance();
+                String c = cm.getCookie(this.getUrl());
+
+                if (c != null && !c.equals("") && !c.equals(old_cookies))
+                {
+                    try {
+                        old_cookies = c;
+
+                        URI uri = new URI(this.getUrl());
+                        String host = uri.getHost();
+                        String domain = host.startsWith("www.") ? host.substring(4) : host;
+
+                        //Log.i("new janus-cookies", c);
+
+                        /*Date expdate= new Date();
+                        expdate.setTime (expdate.getTime() + (1000 * 60 * 60 * 24));
+                        DateFormat df = new SimpleDateFormat("EEE, dd-MMM-yyyy HH:mm:ss zzz");
+                        df.setTimeZone(TimeZone.getTimeZone("GMT"));
+                        String expiry = df.format(expdate);*/
+
+                        StringTokenizer cookielist = new StringTokenizer(c, ";");
+
+                        while (cookielist.hasMoreTokens()) {
+                            String cookie = cookielist.nextToken().trim() + ";Path=/;Domain=." + domain + ";HttpOnly"; //";Expires=" + expiry +
+                            //Log.d("janus-cookie on draw", cookie);
+                            if (!cookies.contains(cookie)) {
+                                cookies.push(cookie);
                             }
-                            hitTestLockList.get((Integer) AWebView.this.getTag()).unlock();
-                            hitTestsList.put((Integer) AWebView.this.getTag(), h.getExtra());
                         }
                     }
-                    AWebView.this.zoomOut();
+                    catch (Exception e){
+                    }
                 }
             }
             finally{
@@ -896,79 +874,87 @@ public class WebViewManager
 
                 if (viewToPress != null) {
                     WebView webView = (WebView) viewToPress;
-                    webView.setWebViewClient(new WebViewClient(){
-                        @Override
-                        public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                            //Log.i("OVERRIDINGURL",url);
-                            hitTestLockList.get((Integer)view.getTag()).lock();
-
-                            view.setWebViewClient(new WebViewClient() {
-                                @Override
-                                public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                                    return false;
-                                }
-
-                                @Override
-                                public void onPageFinished(WebView view, String url) {
-                                    Integer tag = (Integer) view.getTag();
-                                    urlList.put(tag, view.getUrl());
-                                    urlChangedList.put(tag, true);
-                                }
-                            });
-
-                            hitTestLockList.get((Integer)view.getTag()).unlock();
-                            return true;
-                        }
-                    });
-
-                    //Simulate touch press/release to get hittest
-                    MotionEvent e1 = MotionEvent.obtain(
-                            SystemClock.uptimeMillis(), SystemClock.uptimeMillis(),
-                            MotionEvent.ACTION_DOWN, msg.arg1, msg.arg2, 0);
-                    viewToPress.dispatchTouchEvent(e1);
-                    MotionEvent e2 = MotionEvent.obtain(
-                            SystemClock.uptimeMillis(), SystemClock.uptimeMillis(),
-                            MotionEvent.ACTION_UP, msg.arg1, msg.arg2, 0);
-                    viewToPress.dispatchTouchEvent(e2);
-
-                    //Actual mouse press
-                    hitTestLockList.get(msg.what).lock();
-
-                    webView.setWebViewClient(new WebViewClient() {
-                        @Override
-                        public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                            return false;
-                        }
-
-                        @Override
-                        public void onPageFinished(WebView view, String url) {
-                            Integer tag = (Integer) view.getTag();
-
-                            if (webViewLockList.containsKey(tag)) webViewLockList.get(tag).lock();
-                            else{
-                                return;
-                            }
-
-                            try {
-                                urlList.put(tag, view.getUrl());
-                                urlChangedList.put(tag, true);
-
-                                horizontalRangeList.put(tag, ((AWebView) view).computeHorizontalScrollRange());
-                                verticalRangeList.put(tag, ((AWebView) view).computeVerticalScrollRange());
-                            }
-                            finally {
-                                if (webViewLockList.containsKey(tag)) webViewLockList.get(tag).unlock();
-                            }
-                        }
-                    });
-                    //repaintRequestedList.put(msg.what, true);
 
                     MotionEvent e = MotionEvent.obtain(
                             SystemClock.uptimeMillis(), SystemClock.uptimeMillis(),
                             MotionEvent.ACTION_DOWN, msg.arg1, msg.arg2, 0);
 
                     viewToPress.dispatchTouchEvent(e);
-                    hitTestLockList.get(msg.what).unlock();
+
+                    // Hit tests
+                    HitTestResult h = webView.getHitTestResult();
+                    if (h.getType() == WebView.HitTestResult.EDIT_TEXT_TYPE) {
+                        hitTestLockList.get(msg.what).lock();
+                        String s = "janus://content_editable";
+                        hitTestsList.put(msg.what, s);
+                        hitTestLockList.get(msg.what).unlock();
+                    }
+                    else {
+                        if (h.getType() == WebView.HitTestResult.SRC_ANCHOR_TYPE || h.getType() == WebView.HitTestResult.IMAGE_TYPE){
+                            //Log.i("HITTESTRESULT", h.getExtra());
+                            if (!(hitTestsList.containsKey(msg.what) && hitTestsList.get(msg.what) == h.getExtra())) {
+                                hitTestLockList.get(msg.what).lock();
+                                if (!hitTestsList.containsKey(msg.what) || hitTestsList.get(msg.what) == ""){
+                                    hitTestsList.put(msg.what, h.getExtra());
+                                }
+                                hitTestLockList.get(msg.what).unlock();
+                                hitTestsList.put(msg.what, h.getExtra());
+                            }
+                        }
+                        else if (h.getType() == WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE) {
+                            webView.setWebViewClient(new WebViewClient(){
+                                @Override
+                                public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                                    //Log.i("OVERRIDINGURL",url);
+                                    hitTestLockList.get((Integer)view.getTag()).lock();
+                                    hitTestsList.put((Integer) view.getTag(), url);
+
+                                    view.setWebViewClient(new WebViewClient() {
+                                        @Override
+                                        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                                            return false;
+                                        }
+
+                                        @Override
+                                        public void onPageFinished(WebView view, String url) {
+                                            Integer tag = (Integer) view.getTag();
+
+                                            if (webViewLockList.containsKey(tag)) webViewLockList.get(tag).lock();
+                                            else{
+                                                return;
+                                            }
+
+                                            try {
+                                                urlList.put(tag, view.getUrl());
+                                                urlChangedList.put(tag, true);
+
+                                                horizontalRangeList.put(tag, ((AWebView) view).computeHorizontalScrollRange());
+                                                verticalRangeList.put(tag, ((AWebView) view).computeVerticalScrollRange());
+                                            }
+                                            finally {
+                                                if (webViewLockList.containsKey(tag)) webViewLockList.get(tag).unlock();
+                                            }
+                                        }
+                                    });
+
+                                    hitTestLockList.get((Integer)view.getTag()).unlock();
+                                    return true;
+                                }
+                            });
+
+                            //Simulate touch press/release to get hittest
+                            MotionEvent e1 = MotionEvent.obtain(
+                                    SystemClock.uptimeMillis(), SystemClock.uptimeMillis(),
+                                    MotionEvent.ACTION_DOWN, msg.arg1, msg.arg2, 0);
+                            viewToPress.dispatchTouchEvent(e1);
+                            MotionEvent e2 = MotionEvent.obtain(
+                                    SystemClock.uptimeMillis(), SystemClock.uptimeMillis(),
+                                    MotionEvent.ACTION_UP, msg.arg1, msg.arg2, 0);
+                            viewToPress.dispatchTouchEvent(e2);
+                        }
+
+                        webView.zoomOut();
+                    }
                 }
             }
             finally{
