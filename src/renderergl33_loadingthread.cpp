@@ -172,7 +172,7 @@ void RendererGL33_LoadingThread::UpgradeShaderSource(QByteArray & p_shader_sourc
     p_shader_source.replace("#ifdef GL_FRAGMENT_PRECISION_HIGH\r\n      precision highp float;\r\n#else\r\n      precision mediump float;\r\n#endif\r\n","");
     p_shader_source.replace("uniform lowp","uniform");
 
-    qDebug() << p_shader_source;
+    //qDebug() << p_shader_source;
     p_shader_source.replace("uniform vec4 iUseSkelAnim;",  "uniform vec4 iUseFlags;");
     p_shader_source.replace("uniform vec4 iUseLighting;",  "");
 #endif
