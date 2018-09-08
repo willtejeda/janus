@@ -5,6 +5,9 @@ Asset::Asset()
     props = new DOMNode();
     SetS("_type", "asset");        
 //    qDebug() << "Asset::Asset()" << props;
+
+    //60.0 - make js_id property invalid for Assets
+    props->setProperty("js_id", QVariant());
 }
 
 void Asset::SetV(const char * name, const QVector3D p)
