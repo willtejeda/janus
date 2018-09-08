@@ -2653,8 +2653,10 @@ void Game::SaveRoom(const QString out_filename)
     //or it ends in .htm or .html (and can thus be overwritten)
     QFileInfo check_file(out_filename);
     if (check_file.exists()) {
-        if (out_filename.right(3).toLower() != "htm" && out_filename.right(4).toLower() != "html") {
-            qDebug() << "Game::SaveFireBoxRoom() - error: cannot overwrite non-html files on local filesystem";
+        if (out_filename.right(3).toLower() != "htm"
+                && out_filename.right(4).toLower() != "html"
+                && out_filename.right(4).toLower() != "json") {
+            qDebug() << "Game::SaveFireBoxRoom() - error: cannot overwrite non-html/json files on local filesystem";
             return;
         }
 
@@ -2664,17 +2666,17 @@ void Game::SaveRoom(const QString out_filename)
 
     QPointer <Room> r = env->GetCurRoom();
 
-    const bool success0 = r->SaveXML(out_filename);
-    const bool success1 = r->SaveJSON(out_filename + ".json");
-    if (success0 && success1) {
-        SoundManager::Play(SOUND_SAVED, false, player->GetV("pos"), 1.0f);
+    bool success;
+    if (out_filename.right(4).toLower() == "json") {
+        success = r->SaveJSON(out_filename);
+    }
+    else {
+        success = r->SaveXML(out_filename);
     }
 
-    //save to clipboard
-    QString room_code;
-    QTextStream ofs(&room_code);
-    r->SaveXML(ofs);
-    QApplication::clipboard()->setText(room_code);
+    if (success) {
+        SoundManager::Play(SOUND_SAVED, false, player->GetV("pos"), 1.0f);
+    }
 
     //add URL to saved file to workspaces list
     bookmarks->AddWorkspace(QUrl(out_filename).toString(), r->GetS("title"));

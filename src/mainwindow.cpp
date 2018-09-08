@@ -1515,7 +1515,7 @@ void MainWindow::ActionSave()
 
 void MainWindow::ActionSaveAs()
 {
-    QString filename = QFileDialog::getSaveFileName(this, "Save As...", MathUtil::GetWorkspacePath(), tr("HTML (*.html)"));
+    QString filename = QFileDialog::getSaveFileName(this, "Save As...", MathUtil::GetWorkspacePath(), tr("HTML (*.html);; JSON (*.json)"));
     if (!filename.isNull()) {
         game->SaveRoom(filename);
     }
