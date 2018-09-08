@@ -3671,15 +3671,15 @@ void Game::SetWindowSize(const QSize s)
 
 void Game::CreateNewWorkspace(const QString path)
 {    
-    //create new path
-    const QString abs_path = path + "/index.html";
-    const QString abs_file_url = QUrl::fromLocalFile(abs_path).toString();
-
     //create directory structure for it
     QDir path_dir(path);
     if (!path_dir.exists()) {
         path_dir.mkpath(".");
-    }   
+    }
+
+    //create new path
+    const QString abs_path = path + "/index.html";
+    const QString portal_url = QUrl::fromLocalFile(abs_path).toString();
 
     QPointer <Room> r = new Room();
     r->SetS("url", abs_path);
@@ -3689,11 +3689,11 @@ void Game::CreateNewWorkspace(const QString path)
 
     //generate blank/default template room and save
     //we always load the portal locally
-    CreatePortal(abs_file_url, false);
+    CreatePortal(portal_url, false);
 
     //do portal for multiplayer
     SoundManager::Play(SOUND_SAVED, false, player->GetV("pos"), 1.0f);
-    bookmarks->AddWorkspace(abs_file_url);
+    bookmarks->AddWorkspace(abs_path);
 }
 
 void Game::UpdateControllers()
