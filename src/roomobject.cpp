@@ -2993,8 +2993,15 @@ QString RoomObject::GetXMLCode(const bool show_defaults) const
 
     if (props) {
         QList <QByteArray> p = props->dynamicPropertyNames();
+
+        //60.0 - ensure id is always the first attribute shown for room objects
+        const QString id = props->GetS("id");
+        if (id.length() > 0) {
+            code_str += QString(" id=\"") + id + "\"";
+        }
+
         for (int i=0; i<p.size(); ++i) {
-            const bool save_attrib = props->GetSaveAttribute(p[i].data(), show_defaults);
+            const bool save_attrib = (props->GetSaveAttribute(p[i].data(), show_defaults) && QString(p[i]) != "id");
     //        qDebug() << "attrib" << p[i] << save_attrib;
             if (save_attrib) {
                 code_str += QString(" ") + QString(p[i]) + "=\"" + props->GetS(p[i]) + "\"";
