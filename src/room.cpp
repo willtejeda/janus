@@ -2497,7 +2497,7 @@ void Room::SaveXML(QTextStream & ofs)
     ofs << "<body>\n";
     ofs << "<!--\n";
     ofs << "<FireBoxRoom>\n";
-    ofs << "<assets>\n";
+    ofs << "<Assets>\n";
 
     //iterate over all asset types
     QList <QPointer <Asset> > assets = GetAllAssets();
@@ -2507,8 +2507,8 @@ void Room::SaveXML(QTextStream & ofs)
         }
     }
 
-    ofs << "</assets>\n";
-    ofs << "<room";
+    ofs << "</Assets>\n";
+    ofs << "<Room";
 
     //write out all room attributes
     QVariantMap rd;
@@ -2591,7 +2591,7 @@ void Room::SaveXML(QTextStream & ofs)
         }
     }
 
-    ofs << "</room>\n";
+    ofs << "</Room>\n";
     ofs << "</FireBoxRoom>\n";
     ofs << "-->\n";
     ofs << "<script src=\"https://web.janusvr.com/janusweb.js\"></script>\n";

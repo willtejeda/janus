@@ -324,6 +324,45 @@ void RoomObject::SetType(const QString t)
 //    qDebug() << "RoomObject::SetType"  << GetJSID() << GetID() << "allocated" << objects_allocated << "type" << GetType();
 }
 
+QString RoomObject::GetTagName() const
+{
+    const QString t = GetType();
+
+    if (t == "image") {
+        return "Image";
+    }
+    else if (t == "object") {
+        return "Object";
+    }
+    else if (t == "video") {
+        return "Video";
+    }
+    else if (t == "text") {
+        return "Text";
+    }
+    else if (t == "ghost") {
+        return "Ghost";
+    }
+    else if (t == "paragraph") {
+        return "Paragraph";
+    }
+    else if (t == "sound") {
+        return "Sound";
+    }
+    else if (t == "image3d") {
+        return "Image3D";
+    }
+    else if (t == "link") {
+        return "Link";
+    }
+    else if (t == "particle") {
+        return "Particle";
+    }
+    else if (t == "light") {
+        return "Light";
+    }
+}
+
 QString RoomObject::GetType() const
 {
     return GetS("_type");
@@ -2948,8 +2987,9 @@ QVariantMap RoomObject::GetJSONCode(const bool show_defaults) const
 QString RoomObject::GetXMLCode(const bool show_defaults) const
 {        
     const QString t = GetType();
+    const QString tagname = GetTagName();
 
-    QString code_str = QString("<") + t;
+    QString code_str = QString("<") + tagname;
 
     if (props) {
         QList <QByteArray> p = props->dynamicPropertyNames();

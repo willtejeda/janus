@@ -5,6 +5,7 @@ AssetScript::AssetScript(QPointer <Room> r) :
     room(r)
 {
     SetS("_type", "assetscript");
+    SetS("_tagname", "AssetScript");
     script_engine = r->GetScriptEngine();
     global_scope = script_engine->globalObject();
     roomObject = global_scope.property("room");
