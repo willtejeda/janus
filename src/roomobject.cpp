@@ -2994,14 +2994,33 @@ QString RoomObject::GetXMLCode(const bool show_defaults) const
     if (props) {
         QList <QByteArray> p = props->dynamicPropertyNames();
 
-        //60.0 - ensure id is always the first attribute shown for room objects
-        const QString id = props->GetS("id");
-        if (id.length() > 0) {
-            code_str += QString(" id=\"") + id + "\"";
+        QList <QByteArray> list_order;
+        list_order.push_back("id");
+        list_order.push_back("js_id");
+        list_order.push_back("pos");
+        list_order.push_back("xdir");
+        list_order.push_back("ydir");
+        list_order.push_back("zdir");
+        list_order.push_back("scale");
+        list_order.push_back("col");
+        list_order.push_back("collision_id");
+        list_order.push_back("collision_scale");
+        list_order.push_back("lighting");
+        list_order.push_back("cull_face");
+        list_order.push_back("draw_order");
+
+        //60.0 - ensure specific ordering for a few key attributes
+        while (!list_order.isEmpty()) {
+            const QByteArray s = list_order.last();
+            list_order.pop_back();
+            if (p.contains(s)) {
+                p.removeAll(s);
+                p.push_front(s);
+            }
         }
 
         for (int i=0; i<p.size(); ++i) {
-            const bool save_attrib = (props->GetSaveAttribute(p[i].data(), show_defaults) && QString(p[i]) != "id");
+            const bool save_attrib = props->GetSaveAttribute(p[i].data(), show_defaults) ;
     //        qDebug() << "attrib" << p[i] << save_attrib;
             if (save_attrib) {
                 code_str += QString(" ") + QString(p[i]) + "=\"" + props->GetS(p[i]) + "\"";
