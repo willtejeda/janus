@@ -857,7 +857,7 @@ bool MultiPlayerManager::SetChatMessage(QPointer <Player> player, const QString 
     else {
         //qDebug() << "MultiPlayerManager::SetTextMessage() " << s;
 //        Analytics::PostEvent("player", "chat");
-        chat_message = s;
+        chat_message = s.toHtmlEscaped(); //60.0 adds escape characters for double quotes, etc., so they send properly
         AddChatMessage(user_ghost->GetS("id") + QString(" ") + s, QColor(64,192,64));
         return true;
     }
