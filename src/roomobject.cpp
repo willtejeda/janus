@@ -3062,7 +3062,7 @@ QString RoomObject::GetXMLCode(const bool show_defaults) const
         }
 
         //closing tag
-        code_str += QString("</") + t + QString(">");
+        code_str += QString("</") + tagname + QString(">");
     }
 
     return code_str;
