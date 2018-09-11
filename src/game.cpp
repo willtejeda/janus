@@ -163,8 +163,12 @@ void Game::Initialize()
     const float s = 0.02f * 2.5f;
     info_text_geom.SetFixedSize(true, s);
     info2_text_geom.SetFixedSize(true, s);
+
     speaking_text_geom.SetFixedSize(true, s);
+    speaking_text_geom.AddText("(Speaking)", QColor(255,64,64));
+
 	recording_text_geom.SetFixedSize(true, s);     
+    recording_text_geom.AddText("(Recording)", QColor(255,64,64));
 
     //TextureManager::Initialize();
 
@@ -3146,15 +3150,6 @@ void Game::UpdateOverlays()
                 }
             }
         }
-    }
-
-    //Update colour/scale of "speaking" text
-    if (player->GetB("speaking")) {
-        const float s = SoundManager::GetMicLevel();
-        const int v = qMax(0, qMin(255, int(512.0f * s)));
-        const QColor c(255 - v, 255, 255 - v);
-        speaking_text_geom.Clear();
-        speaking_text_geom.AddText("(Speaking)", c);
     }
 }
 
