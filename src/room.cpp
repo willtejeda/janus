@@ -2582,11 +2582,14 @@ void Room::SaveXML(QTextStream & ofs)
     }
     ofs << ">\n";
 
-    //write the environment objects out, easy
+    //60.0 - write out only root level envobjects (nested/child ones get
+    //       output by their parent)
     for (QPointer <RoomObject> & obj : envobjects) {
-        if (obj && obj->GetSaveToMarkup() &&
-                (obj->GetType() != "link" ||
-                 (obj->GetType() == "link" && obj != GetEntranceObject() && obj->GetSaveToMarkup()))) {
+        if (obj && obj->GetSaveToMarkup()
+                && obj->GetParentObject().isNull() //root-level condition
+                && (obj->GetType() != "link" ||
+                    (obj->GetType() == "link"
+                     && obj != GetEntranceObject()))) {
             ofs << obj->GetXMLCode(false) << "\n";
         }
     }
