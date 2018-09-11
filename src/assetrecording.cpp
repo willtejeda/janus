@@ -9,6 +9,7 @@ AssetRecording::AssetRecording() :
     mutex.lock();
 //    qDebug() << "AssetRecording::AssetRecording()";
     SetS("_type", "assetrecording");
+    SetS("_tagname", "AssetRecording");
     SetI("sample_rate", 44100);
     dt_time.start();
     mutex.unlock();

@@ -163,8 +163,12 @@ void Game::Initialize()
     const float s = 0.02f * 2.5f;
     info_text_geom.SetFixedSize(true, s);
     info2_text_geom.SetFixedSize(true, s);
+
     speaking_text_geom.SetFixedSize(true, s);
-    recording_text_geom.SetFixedSize(true, s);
+    speaking_text_geom.AddText("(Speaking)", QColor(255,64,64));
+
+	recording_text_geom.SetFixedSize(true, s);     
+    recording_text_geom.AddText("(Recording)", QColor(255,64,64));
 
     //TextureManager::Initialize();
 
@@ -2692,8 +2696,10 @@ void Game::SaveRoom(const QString out_filename)
     //or it ends in .htm or .html (and can thus be overwritten)
     QFileInfo check_file(out_filename);
     if (check_file.exists()) {
-        if (out_filename.right(3).toLower() != "htm" && out_filename.right(4).toLower() != "html") {
-            qDebug() << "Game::SaveFireBoxRoom() - error: cannot overwrite non-html files on local filesystem";
+        if (out_filename.right(3).toLower() != "htm"
+                && out_filename.right(4).toLower() != "html"
+                && out_filename.right(4).toLower() != "json") {
+            qDebug() << "Game::SaveFireBoxRoom() - error: cannot overwrite non-html/json files on local filesystem";
             return;
         }
 
@@ -2703,17 +2709,17 @@ void Game::SaveRoom(const QString out_filename)
 
     QPointer <Room> r = env->GetCurRoom();
 
-    const bool success0 = r->SaveXML(out_filename);
-    const bool success1 = r->SaveJSON(out_filename + ".json");
-    if (success0 && success1) {
-        SoundManager::Play(SOUND_SAVED, false, player->GetV("pos"), 1.0f);
+    bool success;
+    if (out_filename.right(4).toLower() == "json") {
+        success = r->SaveJSON(out_filename);
+    }
+    else {
+        success = r->SaveXML(out_filename);
     }
 
-    //save to clipboard
-    QString room_code;
-    QTextStream ofs(&room_code);
-    r->SaveXML(ofs);
-    QApplication::clipboard()->setText(room_code);
+    if (success) {
+        SoundManager::Play(SOUND_SAVED, false, player->GetV("pos"), 1.0f);
+    }
 
     //add URL to saved file to workspaces list
     bookmarks->AddWorkspace(QUrl(out_filename).toString(), r->GetS("title"));
@@ -3183,15 +3189,6 @@ void Game::UpdateOverlays()
                 }
             }
         }
-    }
-
-    //Update colour/scale of "speaking" text
-    if (player->GetB("speaking")) {
-        const float s = SoundManager::GetMicLevel();
-        const int v = qMax(0, qMin(255, int(512.0f * s)));
-        const QColor c(255 - v, 255, 255 - v);
-        speaking_text_geom.Clear();
-        speaking_text_geom.AddText("(Speaking)", c);
     }
 }
 
@@ -3707,16 +3704,16 @@ void Game::SetWindowSize(const QSize s)
 }
 
 void Game::CreateNewWorkspace(const QString path)
-{
-    //create new path
-    const QString abs_path = path + "/index.html";
-    const QString abs_file_url = QUrl::fromLocalFile(abs_path).toString();
-
+{    
     //create directory structure for it
     QDir path_dir(path);
     if (!path_dir.exists()) {
         path_dir.mkpath(".");
     }
+
+    //create new path
+    const QString abs_path = path + "/index.html";
+    const QString portal_url = QUrl::fromLocalFile(abs_path).toString();
 
     QPointer <Room> r = new Room();
     r->SetS("url", abs_path);
@@ -3726,11 +3723,11 @@ void Game::CreateNewWorkspace(const QString path)
 
     //generate blank/default template room and save
     //we always load the portal locally
-    CreatePortal(abs_file_url, false);
+    CreatePortal(portal_url, false);
 
     //do portal for multiplayer
     SoundManager::Play(SOUND_SAVED, false, player->GetV("pos"), 1.0f);
-    bookmarks->AddWorkspace(abs_file_url);
+    bookmarks->AddWorkspace(abs_path);
 }
 
 void Game::UpdateControllers()

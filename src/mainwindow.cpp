@@ -1468,26 +1468,18 @@ void MainWindow::SetupMenuWidgets()
 
 QString MainWindow::GetNewWorkspaceDirectory()
 {
-    bool available = false;
+    QDir d;
     int val = 0;
-    QString path;
-
-    while (!available) {
+    while (true) {
         ++val;
-
-        //build an enumerated path
-        const QString number = QString("%1").arg(val, 3, 10, QChar('0'));
-        path = MathUtil::GetWorkspacePath() + "/workspace" + number;
-
         //check that workspace directory does not exist
-        QDir d;
-        d.setPath(path);
+        d.setPath(MathUtil::GetWorkspacePath() + "workspace" +
+               QString("%1").arg(val, 3, 10, QChar('0')));
         if (!d.exists()) {
-            available = true;
+            break;
         }
     }
-
-    return path;
+    return d.path();
 }
 
 void MainWindow::ActionNew()
@@ -1515,7 +1507,7 @@ void MainWindow::ActionSave()
 
 void MainWindow::ActionSaveAs()
 {
-    QString filename = QFileDialog::getSaveFileName(this, "Save As...", MathUtil::GetWorkspacePath(), tr("HTML (*.html)"));
+    QString filename = QFileDialog::getSaveFileName(this, "Save As...", MathUtil::GetWorkspacePath(), tr("HTML (*.html);; JSON (*.json)"));
     if (!filename.isNull()) {
         game->SaveRoom(filename);
     }

@@ -29,6 +29,7 @@ AssetImage::AssetImage() :
 {
     mutex.lock();
     SetS("_type", "assetimage");
+    SetS("_tagname", "AssetImage");
 
     InitializeImporters();
     Unload();   

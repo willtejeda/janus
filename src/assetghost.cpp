@@ -5,6 +5,7 @@ AssetGhost::AssetGhost() :
 {
     mutex.lock();
     SetS("_type", "assetghost");
+    SetS("_tagname", "AssetGhost");
     mutex.unlock();
 }
 

@@ -4,6 +4,7 @@ AssetObject::AssetObject()
 {    
 //    qDebug() << "AssetObject::AssetObject" << props;
     SetS("_type", "assetobject");
+    SetS("_tagname", "AssetObject");
     geom = new Geom();
     tex_url_str = QVector <QString> (ASSETSHADER_NUM_TEXTURES, QString(""));    
     img_error = 0;       
@@ -282,3 +283,4 @@ float AssetObject::GetProgress()
 //    qDebug() << "AssetObject::GetProgress()" << this << this->GetS("src") << geom->GetProgress() << geom->GetTextureProgress();
     return (geom->GetProgress() + geom->GetTextureProgress()) * 0.5f;
 }
+
