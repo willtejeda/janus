@@ -5226,6 +5226,7 @@ void Game::DragAndDrop(const QString url_str, const QString drop_or_pin, const i
         }
         else if (t == "assetvideo") {
             r->AddAssetVideo(dynamic_cast<AssetVideo *>(new_asset.data()));
+            new_object->SetAssetVideo(dynamic_cast<AssetVideo *>(new_asset.data()));
             new_object->SetType("video");
             new_object->SetS("id", asset_id);
             new_object->SetS("cull_face", "none");
@@ -5233,6 +5234,7 @@ void Game::DragAndDrop(const QString url_str, const QString drop_or_pin, const i
         }
         else if (t == "assetsound") {
             r->AddAssetSound(dynamic_cast<AssetSound *>(new_asset.data()));
+            new_object->SetAssetSound(dynamic_cast<AssetSound *>(new_asset.data()));
             new_object->SetType("sound");
             new_object->SetS("id", asset_id);
         }
@@ -5312,11 +5314,11 @@ void Game::DragAndDrop(const QString url_str, const QString drop_or_pin, const i
     new_object->SetB("sync", true);
 
     if (new_object->GetAssetSound()){
-        new_object->GetAssetSound()->SetSrc(url_str, url_str);
+        //new_object->GetAssetSound()->SetSrc(url_str, url_str);
         new_object->GetAssetSound()->Play(new_object->GetMediaContext());
     }
     if (new_object->GetAssetVideo()){
-        new_object->GetAssetVideo()->SetSrc(url_str, url_str);
+        //new_object->GetAssetVideo()->SetSrc(url_str, url_str);
         new_object->GetAssetVideo()->Play(new_object->GetMediaContext());
     }
 }
