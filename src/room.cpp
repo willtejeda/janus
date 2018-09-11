@@ -2587,9 +2587,7 @@ void Room::SaveXML(QTextStream & ofs)
     for (QPointer <RoomObject> & obj : envobjects) {
         if (obj && obj->GetSaveToMarkup()
                 && obj->GetParentObject().isNull() //root-level condition
-                && (obj->GetType() != "link" ||
-                    (obj->GetType() == "link"
-                     && obj != GetEntranceObject()))) {
+                && obj != entrance_object) {
             ofs << obj->GetXMLCode(false) << "\n";
         }
     }
