@@ -5239,7 +5239,7 @@ void Game::DragAndDrop(const QString url_str, const QString drop_or_pin, const i
             r->AddAssetObject(dynamic_cast<AssetObject*>(new_asset.data()));
             new_object->SetType("object");
             new_object->SetS("id", asset_id);
-            new_object->SetS("collision_id", "cube");
+            new_object->SetS("collision_id", asset_id);
             new_object->SetRescaleOnLoad(false); //rescale object to unit diam on load
         }
         else if (t == "assetrecording") {
