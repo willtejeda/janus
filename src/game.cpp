@@ -1277,7 +1277,7 @@ void Game::mousePressEvent(QMouseEvent * e, const int cursor_index, const QSize 
                 websurface_selected[cursor_index] = o->GetAssetWebSurface();
                 QPoint cursor_pos(float(websurface_selected[cursor_index]->GetI("width"))*cursor_uv[cursor_index].x(),
                                   float(websurface_selected[cursor_index]->GetI("height"))*cursor_uv[cursor_index].y());
-                QMouseEvent e2(QEvent::MouseButtonPress, cursor_pos, Qt::MiddleButton, Qt::MiddleButton, Qt::NoModifier);
+                QMouseEvent e2(QEvent::MouseButtonPress, cursor_pos, Qt::RightButton, Qt::RightButton, Qt::NoModifier);
                 websurface_selected[cursor_index]->mousePressEvent(&e2, cursor_index);
             }
         }
