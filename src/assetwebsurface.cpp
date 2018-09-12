@@ -183,7 +183,7 @@ QUrl AssetWebSurface::GetLinkClicked(const int cursor_index)
     }
 }
 
-void AssetWebSurface::mousePressEvent(QMouseEvent * e, const int cursor_index)
+void AssetWebSurface::mousePressEvent(QMouseEvent * e, const int )
 {
 //    qDebug() << "AssetWebSurface::mousePressEvent" << this << e->pos();
     const int height = GetI("height");
@@ -197,11 +197,10 @@ void AssetWebSurface::mousePressEvent(QMouseEvent * e, const int cursor_index)
     if (webview) {
         QMouseEvent e2(QEvent::MouseButtonPress, e->pos(), e->button(), e->buttons(), e->modifiers());
         webview->mousePressEvent(&e2);
-        hit_test_result[cursor_index] = webview->getHitTestContent(e->pos());
     }
 }
 
-void AssetWebSurface::mouseMoveEvent(QMouseEvent * e, const int )
+void AssetWebSurface::mouseMoveEvent(QMouseEvent * e, const int cursor_index)
 {
 //    qDebug() << "AssetWebSurface::mouseMoveEvent" << this << e->pos();
     const int height = GetI("height");
@@ -211,6 +210,7 @@ void AssetWebSurface::mouseMoveEvent(QMouseEvent * e, const int )
     if (webview) {        
         QMouseEvent e2(QEvent::MouseMove, e->pos(), e->button(), e->buttons(), e->modifiers());
         webview->mouseMoveEvent(&e2); //TODO/BUG: uncommenting this causes render loop to stall when clicking UI URL bar thing
+        hit_test_result[cursor_index] = webview->getHitTestContent(e->pos());
     }
 }
 
