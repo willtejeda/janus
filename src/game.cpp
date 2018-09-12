@@ -1114,7 +1114,7 @@ void Game::mouseMoveEvent(QMouseEvent * e, const float x, const float y, const i
             QString url_str = websurface_selected[cursor_index]->GetLinkClicked(cursor_index).toString().trimmed();
             if (state != JVR_STATE_DRAGDROP && !(url_str == websurface_selected[cursor_index]->GetURL() || url_str == "") && ((e->buttons() & Qt::RightButton) > 0) && rmb_held_time.elapsed() > 500) {
                 DragAndDropFromWebsurface(keys[Qt::Key_Control]?"Drag+Drop":"Drag+Pin", cursor_index);
-                websurface_selected[cursor_index].clear();
+                //websurface_selected[cursor_index].clear();
             }
         }
 #endif
@@ -1474,10 +1474,7 @@ void Game::mouseReleaseEvent(QMouseEvent * e, const int cursor_index, const QSiz
             }
             else if (!r->GetB("locked") && SettingsManager::GetEditModeEnabled())
             {
-                if (websurface_selected[cursor_index] && rmb_held_time.elapsed() > 500) {
-                    DragAndDropFromWebsurface(keys[Qt::Key_Control]?"Drag+Drop":"Drag+Pin", cursor_index);
-                }
-                else {
+                if (!(websurface_selected[cursor_index] && rmb_held_time.elapsed() > 500)) {
                     if (player->GetCursorObject(cursor_index) == selected[cursor_index]) {
                         ClearSelection(cursor_index);
                     }
