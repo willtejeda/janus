@@ -421,7 +421,7 @@ void CEFWebView::mouseMoveEvent(QMouseEvent * e)
                 "else {alert('janus_hittest://' + n.src);}"
                 "}";
         //qDebug() << script.ToString().c_str();
-        browser->GetMainFrame()->ExecuteJavaScript(script,browser->GetMainFrame()->GetURL(), 0);
+        browser->GetFocusedFrame()->ExecuteJavaScript(script,browser->GetMainFrame()->GetURL(), 0);
         hit_test_timer.restart();
     }
 }
@@ -580,10 +580,7 @@ WebHitTestResult CEFWebView::getHitTestContent(QPoint p)
 
     h.link_url = QUrl(jsDialogHandler->getHitTest());
     h.bounding_rect = QRect();
-    if (jsDialogHandler->getHitTest() == "null" || jsDialogHandler->getHitTest() == "undefined")
-        h.is_null = true;
-    else
-        h.is_null = false;
+    h.is_null = (jsDialogHandler->getHitTest() == "null" || jsDialogHandler->getHitTest() == "undefined");
 
     return h;
 }
