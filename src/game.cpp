@@ -1112,7 +1112,7 @@ void Game::mouseMoveEvent(QMouseEvent * e, const float x, const float y, const i
             websurface_selected[cursor_index]->mouseMoveEvent(&e2, cursor_index);
 
             QString url_str = websurface_selected[cursor_index]->GetLinkClicked(cursor_index).toString().trimmed();
-            if (state != JVR_STATE_DRAGDROP && !(url_str == websurface_selected[cursor_index]->GetURL() || url_str == "") && ((e->buttons() & Qt::RightButton) > 0) && rmb_held_time.elapsed() > 500) {
+            if (state != JVR_STATE_DRAGDROP && !(url_str == websurface_selected[cursor_index]->GetURL() || url_str == "") && ((e->buttons() & Qt::RightButton) > 0) && rmb_held_time.elapsed() > 100) {
                 DragAndDropFromWebsurface(keys[Qt::Key_Control]?"Drag+Drop":"Drag+Pin", cursor_index);
                 //websurface_selected[cursor_index].clear();
             }
