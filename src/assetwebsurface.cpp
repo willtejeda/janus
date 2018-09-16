@@ -175,11 +175,11 @@ QUrl AssetWebSurface::GetLinkClicked(const int cursor_index)
             return hit_test_result[cursor_index].imageUrl();
         }
         else {
-            return "";
+            return QUrl("");
         }
     }
     else {
-        return "";
+        return QUrl("");
     }
 }
 
