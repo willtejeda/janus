@@ -976,23 +976,6 @@ void RoomObject::Update(const double dt_sec)
             textgeom_player_id->SetText(id);
         }
 
-        if (ghost_frame.hands.first.is_active || ghost_frame.hands.second.is_active) {
-            textgeom_player_id->SetColour(QColor(0,0,255));
-        }
-        else if (ghost_frame.editing) {
-            textgeom_player_id->SetColour(QColor(255,128,255));
-        }
-        else if (ghost_frame.speaking) {
-            const int v = qMin(255, int(512.0f*ghost_frame.current_sound_level));
-            textgeom_player_id->SetColour(QColor(255-v,255,255-v));
-        }
-        else if (ghost_frame.typing) {
-            textgeom_player_id->SetColour(QColor(255,255,0));
-        }
-        else {
-            textgeom_player_id->SetColour(QColor(255,255,255));
-        }
-
         //update active animation for avatar
         const QString body_id = GetS("body_id");
         QPointer <AssetObject> assetobj = ghost_assetobjs[body_id];
@@ -4267,7 +4250,25 @@ void RoomObject::DrawGhostUserIDChat(QPointer <AssetShader> shader)
     //draw grey box
     MathUtil::PushModelMatrix();
     MathUtil::ModelMatrix().scale(width, height, 1);
-    SpinAnimation::DrawPlaneGL(shader, QColor(0,0,0,128));
+
+    QColor col;
+    if (ghost_frame.speaking) {
+        const int v = qMin(255, int(512.0f*ghost_frame.current_sound_level));
+        col = QColor(0,v,0,128);
+    }
+    else if (ghost_frame.typing) {
+        col = QColor(128,128,0,128);
+    }
+    else if (ghost_frame.editing) {
+        col = QColor(128,0,128,128);
+    }
+    else if (ghost_frame.hands.first.is_active || ghost_frame.hands.second.is_active) {
+        col = QColor(0,0,128,128);
+    }
+    else {
+        col = QColor(0,0,0,128);
+    }
+    SpinAnimation::DrawPlaneGL(shader, col);
     MathUtil::PopModelMatrix();
 
     MathUtil::ModelMatrix().translate(0,height*0.5f-row_height*0.5f,0);
@@ -4290,6 +4291,7 @@ void RoomObject::DrawGhostUserIDChat(QPointer <AssetShader> shader)
     }
 
     MathUtil::PopModelMatrix();
+
 
     MathUtil::PushModelMatrix();
 

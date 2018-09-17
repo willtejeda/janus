@@ -318,8 +318,6 @@ private:
 
     TextGeom info_text_geom;
     TextGeom info2_text_geom;
-    TextGeom speaking_text_geom;
-	TextGeom recording_text_geom;    
 
     unsigned int global_uuid;
 

@@ -164,12 +164,6 @@ void Game::Initialize()
     info_text_geom.SetFixedSize(true, s);
     info2_text_geom.SetFixedSize(true, s);
 
-    speaking_text_geom.SetFixedSize(true, s);
-    speaking_text_geom.AddText("(Speaking)", QColor(255,64,64));
-
-	recording_text_geom.SetFixedSize(true, s);     
-    recording_text_geom.AddText("(Recording)", QColor(255,64,64));
-
     //TextureManager::Initialize();
 
     WebAsset::SetUseCache(SettingsManager::GetCacheEnabled());
@@ -3344,19 +3338,22 @@ void Game::DrawOverlaysGL()
 
         MathUtil::PushModelMatrix();
         MathUtil::MultModelMatrix(m);
-        MathUtil::MultModelMatrix(speaking_text_geom.GetModelMatrix());
-        MathUtil::ModelMatrix().scale(1.0f + s * 0.5f);
+        MathUtil::ModelMatrix().scale(0.1f*(1.0f + s * 0.5f));
+        shader->SetUseTexture(0, false);
         shader->UpdateObjectUniforms();
-        speaking_text_geom.DrawGL(shader);
+        SpinAnimation::DrawPlaneGL(shader, QColor(128,0,0));
+        shader->SetUseTexture(0, true);
         MathUtil::PopModelMatrix();
     }
     else if (player->GetB("recording")) {
         m.scale(0.25f);
         MathUtil::PushModelMatrix();
         MathUtil::MultModelMatrix(m);
-        MathUtil::MultModelMatrix(recording_text_geom.GetModelMatrix());
+        MathUtil::ModelMatrix().scale(0.1f*(1.0f));
+        shader->SetUseTexture(0, false);
         shader->UpdateObjectUniforms();
-        recording_text_geom.DrawGL(shader);
+        SpinAnimation::DrawPlaneGL(shader, QColor(192,0,0));
+        shader->SetUseTexture(0, true);
         MathUtil::PopModelMatrix();
     }
 
