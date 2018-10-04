@@ -72,8 +72,8 @@ void Player::SetF(const char * name, const float f)
 
 float Player::GetF(const char * name) const
 {
-    if (props && props->property(name).isValid()) {
-        return props->property(name).toFloat();
+    if (props) {
+        return props->GetF(name);
     }
     return 0.0f;
 }
@@ -81,14 +81,14 @@ float Player::GetF(const char * name) const
 void Player::SetI(const char * name, const int i)
 {
     if (props) {
-        props->setProperty(name, QString::number(i));
+        props->SetI(name, i);
     }
 }
 
 int Player::GetI(const char * name) const
 {
-    if (props && props->property(name).isValid()) {
-        return props->property(name).toInt();
+    if (props) {
+        return props->GetI(name);
     }
     return 0;
 }
@@ -96,14 +96,14 @@ int Player::GetI(const char * name) const
 void Player::SetB(const char * name, const bool b)
 {
     if (props) {
-        props->setProperty(name, b ? "true" : "false");
+        props->SetB(name, b);
     }
 }
 
 bool Player::GetB(const char * name) const
 {
-    if (props && props->property(name).isValid()) {
-        return props->property(name).toString().toLower() == "true";
+    if (props) {
+        return props->GetB(name);
     }
     return false;
 }
@@ -117,8 +117,8 @@ void Player::SetS(const char * name, const QString s)
 
 QString Player::GetS(const char * name) const
 {
-    if (props && props->property(name).isValid()) {
-        return props->property(name).toString();
+    if (props) {
+        return props->GetS(name);
     }
     return QString();
 }
@@ -126,14 +126,14 @@ QString Player::GetS(const char * name) const
 void Player::SetC(const char * name, const QColor c)
 {
     if (props) {
-        props->setProperty(name, MathUtil::GetColourAsString(c, false));
+        props->SetC(name, c);
     }
 }
 
 QColor Player::GetC(const char * name) const
 {
-    if (props && props->property(name).isValid()) {
-        return MathUtil::GetStringAsColour(props->property(name).toString());
+    if (props) {
+        return props->GetC(name);
     }
     return QColor(255,255,255);
 }

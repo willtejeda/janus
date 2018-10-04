@@ -45,14 +45,14 @@ QVector4D Asset::GetV4(const char * name) const
 void Asset::SetF(const char * name, const float f)
 {
     if (props) {
-        props->setProperty(name, QString::number(f));
+        props->SetF(name, f);
     }
 }
 
 float Asset::GetF(const char * name) const
 {
-    if (props && props->property(name).isValid()) {
-        return props->property(name).toFloat();
+    if (props) {
+        return props->GetF(name);
     }
     return 0.0f;
 }
@@ -60,14 +60,14 @@ float Asset::GetF(const char * name) const
 void Asset::SetI(const char * name, const int i)
 {
     if (props) {
-        props->setProperty(name, QString::number(i));
+        props->SetI(name, i);
     }
 }
 
 int Asset::GetI(const char * name) const
 {
-    if (props && props->property(name).isValid()) {
-        return props->property(name).toInt();
+    if (props) {
+        return props->GetI(name);
     }
     return 0;
 }
@@ -75,14 +75,14 @@ int Asset::GetI(const char * name) const
 void Asset::SetB(const char * name, const bool b)
 {
     if (props) {
-        props->setProperty(name, b ? "true" : "false");
+        props->SetB(name, b);
     }
 }
 
 bool Asset::GetB(const char * name) const
 {
-    if (props && props->property(name).isValid()) {
-        return props->property(name).toString().toLower() == "true";
+    if (props) {
+        return props->GetB(name);
     }
     return false;
 }
@@ -90,14 +90,14 @@ bool Asset::GetB(const char * name) const
 void Asset::SetS(const char * name, const QString s)
 {
     if (props) {
-        props->setProperty(name, s);
+        props->SetS(name, s);
     }
 }
 
 QString Asset::GetS(const char * name) const
 {
-    if (props && props->property(name).isValid()) {
-        return props->property(name).toString();
+    if (props) {
+        return props->GetS(name);
     }
     return QString();
 }
@@ -105,14 +105,14 @@ QString Asset::GetS(const char * name) const
 void Asset::SetC(const char * name, const QColor c)
 {
     if (props) {
-        props->setProperty(name, MathUtil::GetColourAsString(c, false));
+        props->SetC(name, c);
     }
 }
 
 QColor Asset::GetC(const char * name) const
 {
-    if (props && props->property(name).isValid()) {
-        return MathUtil::GetStringAsColour(props->property(name).toString());
+    if (props) {
+        return props->GetC(name);
     }
     return QColor(255,255,255);
 }
@@ -139,7 +139,7 @@ void Asset::SetProperties(const QVariantMap & d)
     for (it=d.begin(); it!=d.end(); ++it) {
 //        qDebug() << " " << it.key() << it.value().toString();
         if (!it.key().isEmpty()) {
-            props->setProperty(it.key().trimmed().toLower().toLatin1().data(), it.value());
+            props->SetS(it.key().trimmed().toLower(), it.value().toString());
         }
     }
 }

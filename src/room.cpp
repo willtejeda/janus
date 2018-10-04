@@ -257,14 +257,14 @@ QVector4D Room::GetV4(const char * name) const
 void Room::SetF(const char * name, const float f)
 {
     if (props) {
-        props->setProperty(name, QString::number(f));
+        props->SetF(name, f);
     }
 }
 
 float Room::GetF(const char * name) const
 {
-    if (props && props->property(name).isValid()) {
-        return props->property(name).toFloat();
+    if (props) {
+        return props->GetF(name);
     }
     return 0.0f;
 }
@@ -272,14 +272,14 @@ float Room::GetF(const char * name) const
 void Room::SetI(const char * name, const int i)
 {
     if (props) {
-        props->setProperty(name, QString::number(i));
+        props->SetI(name, i);
     }
 }
 
 int Room::GetI(const char * name) const
 {
-    if (props && props->property(name).isValid()) {
-        return props->property(name).toInt();
+    if (props) {
+        return props->GetI(name);
     }
     return 0;
 }
@@ -287,14 +287,14 @@ int Room::GetI(const char * name) const
 void Room::SetB(const char * name, const bool b)
 {
     if (props) {
-        props->setProperty(name, b ? "true" : "false");
+        props->SetB(name, b);
     }
 }
 
 bool Room::GetB(const char * name) const
 {
-    if (props && props->property(name).isValid()) {
-        return props->property(name).toString().toLower() == "true";
+    if (props) {
+        return props->GetB(name);
     }
     return false;
 }
@@ -302,14 +302,14 @@ bool Room::GetB(const char * name) const
 void Room::SetS(const char * name, const QString s)
 {
     if (props) {
-        props->setProperty(name, s);
+        props->SetS(name, s);
     }
 }
 
 QString Room::GetS(const char * name) const
 {
-    if (props && props->property(name).isValid()) {
-        return props->property(name).toString();
+    if (props) {
+        return props->GetS(name);
     }
     return QString();
 }
@@ -317,14 +317,14 @@ QString Room::GetS(const char * name) const
 void Room::SetC(const char * name, const QColor c)
 {
     if (props) {
-        props->setProperty(name, MathUtil::GetColourAsString(c, false));
+        props->SetC(name, c);
     }
 }
 
 QColor Room::GetC(const char * name) const
 {
-    if (props && props->property(name).isValid()) {
-        return MathUtil::GetStringAsColour(props->property(name).toString());
+    if (props) {
+        return props->GetC(name);
     }
     return QColor(255,255,255);
 }
@@ -336,7 +336,7 @@ void Room::SetProperties(const QVariantMap & d)
     for (it=d.begin(); it!=d.end(); ++it) {
 //        qDebug() << " " << it.key() << it.value().toString();
         if (!it.key().isEmpty()) {
-            props->setProperty(it.key().trimmed().toLower().toLatin1().data(), it.value());
+            props->SetS(it.key().trimmed().toLower().toLatin1().data(), it.value().toString());
         }
     }
 
@@ -1090,7 +1090,6 @@ void Room::DrawGL(MultiPlayerManager *multi_players, QPointer <Player> player, c
     }
 
     // Draw Roomobjects
-    BindShader(room_shader);
     for (QPointer <RoomObject> & obj : envobjects) {
         if (obj && obj->GetParentObject().isNull() && obj->GetType() != "link") {
 
@@ -1103,6 +1102,9 @@ void Room::DrawGL(MultiPlayerManager *multi_players, QPointer <Player> player, c
             if (using_shader) {
                 UnbindShader(room_shader);
                 BindShader(obj_shader);
+            }
+            else {
+                BindShader(room_shader);
             }
 
             obj->DrawGL(current_shader, render_left_eye, player_pos_trans);
@@ -4849,7 +4851,7 @@ QVariantMap Room::GetJSProperties()
 QPair <QVector3D, QVector3D> Room::GetResetVolume()
 {
     QPair <QVector3D, QVector3D> p;
-    QStringList s = props->property("reset_volume").toString().trimmed().split(" ");
+    QStringList s = props->GetS("reset_volume").trimmed().split(" ");
     if (s.size() >= 6) {
         p.first.setX(s[0].toFloat());
         p.first.setY(s[1].toFloat());

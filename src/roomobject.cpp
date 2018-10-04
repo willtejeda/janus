@@ -385,21 +385,8 @@ void RoomObject::SetProperties(QVariantMap d)
 //        qDebug() << " " << it.key() << it.value().toString();
         const QString key = it.key().trimmed().toLower();
         if (!key.isEmpty()) {
-            //59.13 - hack to support ScriptableVector
             if (props) {
-                if (!props->property(key.toLatin1().data()).isNull() && props->property(key.toLatin1().data()).value<ScriptableVector*>()) {
-                    const QString values = it.value().toString().trimmed();
-                    const QStringList splitvals = values.split(" ");
-                    if (splitvals.size() >= 4) {
-                        SetV4(key.toLatin1().data(), MathUtil::GetStringAsVector4(values));
-                    }
-                    else if (splitvals.size() >= 3) {
-                        SetV(key.toLatin1().data(), MathUtil::GetStringAsVector(values));
-                    }
-                }
-                else {
-                    props->setProperty(key.toLatin1().data(), it.value());
-                }
+                props->SetS(key.toLatin1().data(), it.value().toString());
             }
         }
     }
@@ -1910,14 +1897,14 @@ QVector4D RoomObject::GetV4(const char * name) const
 void RoomObject::SetF(const char * name, const float f)
 {
     if (props) {
-        props->setProperty(name, QString::number(f));
+        props->SetF(name, f);
     }
 }
 
 float RoomObject::GetF(const char * name) const
 {    
-    if (props && props->property(name).isValid()) {
-        return props->property(name).toFloat();
+    if (props) {
+        return props->GetF(name);
     }
     return 0.0f;
 }
@@ -1925,14 +1912,14 @@ float RoomObject::GetF(const char * name) const
 void RoomObject::SetI(const char * name, const int i)
 {
     if (props) {
-        props->setProperty(name, QString::number(i));
+        props->SetI(name, i);
     }
 }
 
 int RoomObject::GetI(const char * name) const
 {
-    if (props && props->property(name).isValid()) {
-        return props->property(name).toInt();
+    if (props) {
+        return props->GetI(name);
     }
     return 0;
 }
@@ -1940,14 +1927,14 @@ int RoomObject::GetI(const char * name) const
 void RoomObject::SetB(const char * name, const bool b)
 {
     if (props) {
-        props->setProperty(name, b ? "true" : "false");
+        props->SetB(name, b);
     }
 }
 
 bool RoomObject::GetB(const char * name) const
 {    
-    if (props && props->property(name).isValid()) {
-        return props->property(name).toString().toLower() == "true";
+    if (props) {
+        return props->GetB(name);
     }
     return false;
 }
@@ -1961,7 +1948,7 @@ void RoomObject::SetS(const char * name, const QString s)
 
 QString RoomObject::GetS(const char * name) const
 {
-    if (props && props->property(name).isValid()) {
+    if (props) {
         return props->GetS(name);
     }
     return QString();
@@ -1976,7 +1963,7 @@ void RoomObject::SetC(const char * name, const QColor c)
 
 QColor RoomObject::GetC(const char * name) const
 {
-    if (props && props->property(name).isValid()) {
+    if (props) {
         return props->GetC(name);
     }
     return QColor(255,255,255);

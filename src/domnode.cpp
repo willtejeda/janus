@@ -1,12 +1,36 @@
 #include "domnode.h"
 
 int DOMNode::next_uuid = 0;
-QMap <QString, QString> DOMNode::attrib_defaults;
-QMap <QString, QString> DOMNode::attrib_types;
+QPointer <DOMNode> DOMNode::default_object;
 
 DOMNode::DOMNode(QObject *parent): QObject(parent)
 {
-    //janus internals        
+    SetI("_uuid", NextUUID());
+    SetS("js_id", GetS("_uuid"));
+}
+
+DOMNode::~DOMNode()
+{
+//    qDebug() << "DOMNode::~DOMNode()" << this;
+    for (QList <QPointer <DOMNode> >::iterator it = children_nodes.begin(); it!=children_nodes.end(); ++it) {
+        if (!it->isNull()) {
+            delete *it;
+        }
+    }
+    children_nodes.clear();
+}
+
+void DOMNode::SetDefaultAttributes()
+{
+    if (default_object.isNull()) {
+        default_object = new DOMNode();
+        default_object->SetDefaults();
+    }
+}
+
+void DOMNode::SetDefaults()
+{
+    //janus internals
     SetS("_type", "object");
     SetI("_uuid", NextUUID());
     SetB("_text_changed", false);
@@ -232,85 +256,7 @@ DOMNode::DOMNode(QObject *parent): QObject(parent)
     SetS("tex_colorspace",  "sRGB");
     SetB("_save_to_markup", true);
     SetB("_primitive", false);
-
-    if (attrib_types.isEmpty()) {
-        //Set all defaults for attributes
-        QList <QByteArray> b = dynamicPropertyNames();
-        for (int i=0; i<b.size(); ++i) {
-            attrib_defaults[b[i]] = GetS(b[i]);
-//            qDebug() << "defaults" << b[i] << GetS(b[i]);
-        }       
-
-        attrib_types["tile"] = "object";
-
-        attrib_types["light_intensity"] = "light";
-        attrib_types["light_cone_angle"] = "light";
-        attrib_types["light_cone_exponent"] = "light";
-        attrib_types["light_range"] = "light";
-
-        attrib_types["text"] = "paragraph text";
-
-        attrib_types["play_once"] = "sound";
-        attrib_types["rect"] = "sound";
-        attrib_types["gain"] = "sound video";
-        attrib_types["outer_gain"] = "sound";
-        attrib_types["inner_angle"] = "sound";
-        attrib_types["outer_angle"] = "sound";
-        attrib_types["pitch"] = "sound";
-
-        attrib_types["back_color"] = "paragraph";
-        attrib_types["back_alpha"] = "paragraph";
-        attrib_types["text_color"] = "paragraph";
-
-        attrib_types["active"] = "link";
-        attrib_types["mirror"] = "link";
-        attrib_types["open"] = "link";
-        attrib_types["title"] = "link";
-        attrib_types["url"] = "link";
-
-        attrib_types["count"] = "particle";
-        attrib_types["rand_pos"] = "particle";
-        attrib_types["rand_vel"] = "particle";
-        attrib_types["rand_accel"] = "particle";
-        attrib_types["rand_col"] = "particle";
-        attrib_types["rand_scale"] = "particle";
-
-        //Name off attributes that are not generic, and specific to a certain class
-        attrib_types["use_local_asset"] = "room";
-        attrib_types["server"] = "room";
-        attrib_types["port"] = "room";
-        attrib_types["teleport_min_dist"] = "room";
-        attrib_types["teleport_max_dist"] = "room";
-        attrib_types["party_mode"] = "room";
-        attrib_types["cursor_visible"] = "room";
-        attrib_types["near_dist"] = "room";
-        attrib_types["far_dist"] = "room";
-        attrib_types["grab_dist"] = "room";
-        attrib_types["fog"] = "room";
-        attrib_types["fog_mode"] = "room";
-        attrib_types["fog_density"] = "room";
-        attrib_types["fog_start"] = "room";
-        attrib_types["fog_end"] = "room";
-        attrib_types["fog_col"] = "room";
-        attrib_types["gravity"] = "room";
-        attrib_types["jump_velocity"] = "room";
-        attrib_types["walk_speed"] = "room";
-        attrib_types["run_speed"] = "room";
-        attrib_types["reset_volume"] = "room";
-    }
 }
-
-DOMNode::~DOMNode()
-{
-//    qDebug() << "DOMNode::~DOMNode()" << this;
-    for (QList <QPointer <DOMNode> >::iterator it = children_nodes.begin(); it!=children_nodes.end(); ++it) {
-        if (!it->isNull()) {
-            delete *it;
-        }
-    }
-    children_nodes.clear();
-}
-
 void DOMNode::SetFwd(const ScriptableVector * v)
 {
     if (v) {
@@ -333,7 +279,7 @@ ScriptableVector * DOMNode::GetFwd() const
 
 void DOMNode::SetV(const char * name, const QVector3D p)
 {
-    if (property(name).isNull()) {
+    if (!property(name).isValid() || property(name).isNull()) {
         setProperty(name, QVariant::fromValue<ScriptableVector *>(new ScriptableVector(p.x(), p.y(), p.z(), this)));
     }
     else {
@@ -348,18 +294,21 @@ void DOMNode::SetV(const char * name, const QVector3D p)
 
 QVector3D DOMNode::GetV(const char * name) const
 {
-    if (!property(name).isNull()) {
+    if (property(name).isValid() && !property(name).isNull()) {
         ScriptableVector *v=qvariant_cast<ScriptableVector *>(property(name));
         if (v) {
             return QVector3D(v->GetX(), v->GetY(), v->GetZ());
         }
+    }
+    if (this != default_object) {
+        return default_object->GetV(name);
     }
     return QVector3D();
 }
 
 void DOMNode::SetV4(const char * name, const QVector4D p)
 {
-    if (property(name).isNull()) {
+    if (!property(name).isValid() || property(name).isNull()) {
         setProperty(name, QVariant::fromValue<ScriptableVector *>(new ScriptableVector(p.x(), p.y(), p.z(), p.w(), this)));
     }
     else {
@@ -375,11 +324,14 @@ void DOMNode::SetV4(const char * name, const QVector4D p)
 
 QVector4D DOMNode::GetV4(const char * name) const
 {
-    if (!property(name).isNull()) {
+    if (property(name).isValid() && !property(name).isNull()) {
         ScriptableVector *v=qvariant_cast<ScriptableVector *>(property(name));
         if (v) {
             return QVector4D(v->GetX(), v->GetY(), v->GetZ(), v->GetW());
         }
+    }
+    if (this != default_object) {
+        return default_object->GetV4(name);
     }
     return QVector4D();
 }
@@ -391,7 +343,13 @@ void DOMNode::SetF(const char * name, const float f)
 
 float DOMNode::GetF(const char * name) const
 {
-    return property(name).toFloat();
+    if (property(name).isValid()) {
+        return property(name).toFloat();
+    }
+    if (this != default_object) {
+        return default_object->GetF(name);
+    }
+    return 0.0f;
 }
 
 void DOMNode::SetI(const char * name, const int i)
@@ -401,7 +359,13 @@ void DOMNode::SetI(const char * name, const int i)
 
 int DOMNode::GetI(const char * name) const
 {
-    return property(name).toInt();
+    if (property(name).isValid()) {
+        return property(name).toInt();
+    }
+    if (this != default_object) {
+        return default_object->GetI(name);
+    }
+    return 0;
 }
 
 void DOMNode::SetB(const char * name, const bool b)
@@ -411,19 +375,35 @@ void DOMNode::SetB(const char * name, const bool b)
 
 bool DOMNode::GetB(const char * name) const
 {
-    return property(name).toString().toLower() == "true";
+    if (property(name).isValid()) {
+        return property(name).toString().toLower() == "true";
+    }
+    if (this != default_object) {
+        return default_object->GetB(name);
+    }
+    return false;
 }
 
 void DOMNode::SetS(const char * name, const QString s)
 {
-    ScriptableVector *v=qvariant_cast<ScriptableVector *>(property(name));
-    if (v) {
+    ScriptableVector *v0 = qvariant_cast<ScriptableVector *>(property(name));
+    if (v0) {
         SetV(name, MathUtil::GetStringAsVector(s));
     }
     else {
-        setProperty(name, s);
+        if (this != default_object && default_object && default_object->property(name).isValid()) {
+            ScriptableVector *v1 = qvariant_cast<ScriptableVector *>(default_object->property(name));
+            if (v1) {
+                SetV(name, MathUtil::GetStringAsVector(s));
+            }
+            else {
+                setProperty(name, s);
+            }
+        }
+        else {
+            setProperty(name, s);
+        }
     }
-//    setProperty(name, s);
 }
 
 QString DOMNode::GetS(const char * name) const
@@ -434,9 +414,13 @@ QString DOMNode::GetS(const char * name) const
                 QString::number(v->GetY()) + " " +
                 QString::number(v->GetZ());
     }
-    else {
+    if (property(name).isValid()) {
         return property(name).toString();
     }
+    if (this != default_object) {
+        return default_object->GetS(name);
+    }
+    return QString();
 }
 
 void DOMNode::SetC(const char * name, const QColor c)
@@ -457,9 +441,13 @@ QColor DOMNode::GetC(const char * name) const
         }
         return MathUtil::GetStringAsColour(s);
     }
-    else {
+    if (property(name).isValid()) {
         return MathUtil::GetStringAsColour(property(name).toString());
     }
+    if (this != default_object) {
+        return default_object->GetC(name);
+    }
+    return QColor(255,255,255,255);
 }
 
 void DOMNode::Copy(QPointer<DOMNode> o)
@@ -748,21 +736,12 @@ bool DOMNode::GetSaveAttribute(const char * name, const bool even_if_default)
         return false;
     }
 
-    if (even_if_default || !attrib_defaults.contains(name) || GetS(name) != attrib_defaults[name]) { //attribute value test
+    if (even_if_default || !default_object->property(name).isValid() || GetS(name) != default_object->GetS(name)) { //attribute value test
         //save it out if we either:
         // accept defaults,
         // have no default attrib for comparison (custom attribute),
         // or the attribute is not default
-
-        if (!attrib_types.contains(name) || attrib_types[name].isEmpty() || attrib_types[name].contains(GetS("_type"))) { //attribute type test
-
-            //save it out if either:
-            // we have not heard of this attribute in the type map (custom type)
-            // we do not have type restrictions for this attribute
-
-            return true;
-        }
-
+        return true;
     }
     return false;
 }

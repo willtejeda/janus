@@ -16,6 +16,8 @@ MainWindow::MainWindow()
 {
     SettingsManager::LoadSettings();
 
+    DOMNode::SetDefaultAttributes();
+
     //set application-wide font
     const QString font_path = MathUtil::GetApplicationPath() + "assets/fonts/OpenSans-Regular.ttf";
     int opensans_id = QFontDatabase::addApplicationFont(font_path);

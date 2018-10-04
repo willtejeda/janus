@@ -88,6 +88,7 @@ public:
     bool GetSaveAttribute(const char * name, const bool even_if_default);
 
     static int NextUUID();
+    static void SetDefaultAttributes();
 
 public slots:
 
@@ -97,15 +98,15 @@ public slots:
 
 private:
 
+    void SetDefaults();
+
     //Connections
     QPointer <DOMNode> parent_node;
     QList <QPointer <DOMNode> > children_nodes;
     QPointer <DOMNode> left_sibling, right_sibling;
 
     static int next_uuid;
-
-    static QMap <QString, QString> attrib_defaults;
-    static QMap <QString, QString> attrib_types;
+    static QPointer <DOMNode> default_object;
 };
 
 Q_DECLARE_METATYPE(QList <DOMNode *>)
