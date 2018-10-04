@@ -1090,6 +1090,7 @@ void Room::DrawGL(MultiPlayerManager *multi_players, QPointer <Player> player, c
     }
 
     // Draw Roomobjects
+    BindShader(room_shader);
     for (QPointer <RoomObject> & obj : envobjects) {
         if (obj && obj->GetParentObject().isNull() && obj->GetType() != "link") {
 
@@ -1102,15 +1103,6 @@ void Room::DrawGL(MultiPlayerManager *multi_players, QPointer <Player> player, c
             if (using_shader) {
                 UnbindShader(room_shader);
                 BindShader(obj_shader);
-            }
-            else {
-                //59.6 - Attention Devlin - shader needs to be rebound for each object, as it calls BindCubemaps, which resets the texture indexes for rad/irrad maps
-                // to prevent those indexes from being overwritten by the last drawn object, see:
-                // https://trello.com/c/i513wMO6/998-121017-if-you-have-object-specific-rad-irrad-map-any-new-spawned-object-inherits-the-object-specific-instead-of-global-room-prob
-                //
-                //If you find a more efficient way to preserve the previous textures bound to texture channels 11 and 12 (rad and irrad), please switch this to that as this
-                //fix is probably not that efficient.
-                BindShader(room_shader);
             }
 
             obj->DrawGL(current_shader, render_left_eye, player_pos_trans);
