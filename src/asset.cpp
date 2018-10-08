@@ -139,7 +139,7 @@ void Asset::SetProperties(const QVariantMap & d)
     for (it=d.begin(); it!=d.end(); ++it) {
 //        qDebug() << " " << it.key() << it.value().toString();
         if (!it.key().isEmpty()) {
-            props->SetS(it.key().trimmed().toLower(), it.value().toString());
+            props->SetS(it.key().trimmed().toLower().toLatin1().data(), it.value().toString());
         }
     }
 }
