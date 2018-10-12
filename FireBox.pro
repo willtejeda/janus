@@ -46,9 +46,6 @@ CONFIG(release, debug|release) {
 
 QT       += core opengl gui network xml script scripttools websockets
 
-#!android {
-#    QT += webengine webenginewidgets
-#}
 android{
     QT += androidextras sensors
 }
