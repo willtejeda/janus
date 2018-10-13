@@ -1134,24 +1134,17 @@ void Room::DrawGL(MultiPlayerManager *multi_players, QPointer <Player> player, c
     }
     BindShader(user_portal_shader);
 
+    const QVector3D eye_point = player->GetV("eye_point");
     for (auto & o : envobjects) {
         if (o && o->GetType() == "link" && o->GetB("visible")) {
             //59.0 bugfix - draw back if not in child room, and we are distant, and it's not a mirror
-            o->SetB("_draw_back", !use_clip_plane && !o->GetPlayerAtSigned(player->GetV("eye_point")) && !o->GetB("mirror"));
             o->DrawGL(user_portal_shader);
-
-            QPointer <Room> r = GetConnectedRoom(o);
-            if (draw_portal_decorations) {
-                const float val = ((r && r->GetStarted() && !r->GetReady()) ? r->GetProgress() : 1.0f);
-                renderer->SetDefaultFaceCullMode(FaceCullMode::DISABLED);
-                o->DrawDecorationsGL(user_portal_shader, val);
-                renderer->SetDefaultFaceCullMode(FaceCullMode::BACK);
-            }
         }
     }
 
     UnbindShader(user_portal_shader);
 
+    renderer->SetDepthMask(DepthMask::DEPTH_WRITES_ENABLED);
     renderer->EndCurrentScope();
 }
 
@@ -1482,7 +1475,9 @@ void Room::UpdateObjects(QPointer <Player> player, MultiPlayerManager *multi_pla
             o->SetThumbAssetImage(GetAssetImage(o->GetS("thumb_id")));
 
             //update player collision sets based on portal being: not mirror, open, having a room that has been processed, active, and proximity
-            if (o->GetB("open") && o->GetB("active") && o->GetPlayerAtSigned(player->GetV("eye_point"))) {
+            const bool player_at = o->GetPlayerAtSigned(player->GetV("eye_point"));
+            o->SetB("_draw_back", !use_clip_plane && !o->GetB("mirror") && !player_at);
+            if (o->GetB("open") && o->GetB("active") && player_at) {
                 QPointer <Room> r = GetConnectedRoom(o);
                 if (r && r->GetLoaded()) {
                     player_near_portal = true;

@@ -3100,11 +3100,9 @@ void RoomObject::DrawPortalGL(QPointer <AssetShader> shader)
         return;
     }
 
-    const float w = GetScale().x() * 0.5f;
-    const float h = GetScale().y() * 0.5f;
-
-    //53.9 NOTE!    
-    UpdateMatrices();
+    const QVector3D scale = GetScale();
+    const float w = scale.x() * 0.5f;
+    const float h = scale.y() * 0.5f;
 
     MathUtil::PushModelMatrix();
     MathUtil::MultModelMatrix(model_matrix_local);
@@ -3114,7 +3112,6 @@ void RoomObject::DrawPortalGL(QPointer <AssetShader> shader)
 
     shader->SetUseTextureAll(false);    
     shader->SetUseLighting(false);
-    shader->SetUseSkelAnim(false); //53.11 - TODO: find out why is this necessary?
 
     if (selected) {
         shader->SetConstColour(QVector4D(0.5f, 1.0f, 0.5f, 1.0f));
@@ -3709,20 +3706,30 @@ bool RoomObject::Clicked(const QVector3D & p)
     return false;
 }
 
-QVector3D RoomObject::GetLocal(const QVector3D & p) const
+QVector3D RoomObject::GetLocal(const QVector3D & pos) const
 {
-    const QVector3D d = (p - (GetPos() + GetZDir() * RoomObject::portal_spacing));
-    return QVector3D(QVector3D::dotProduct(d, GetXDir()) / GetScale().x(),
-                     QVector3D::dotProduct(d, GetYDir()) / GetScale().y(),
-                     QVector3D::dotProduct(d, GetZDir()) / GetScale().z());
+    const QVector3D p = GetPos();
+    const QVector3D x = GetXDir();
+    const QVector3D y = GetYDir();
+    const QVector3D z = GetZDir();
+    const QVector3D s = GetScale();
+    const QVector3D d = (pos - (p + z * RoomObject::portal_spacing));
+    return QVector3D(QVector3D::dotProduct(d, x) / s.x(),
+                     QVector3D::dotProduct(d, y) / s.y(),
+                     QVector3D::dotProduct(d, z) / s.z());
 }
 
-QVector3D RoomObject::GetGlobal(const QVector3D & p) const
+QVector3D RoomObject::GetGlobal(const QVector3D & pos) const
 {
-    return p.x() * GetXDir() * GetScale().x() +
-            p.y() * GetYDir() * GetScale().y() +
-            p.z() * GetZDir() * GetScale().z() +
-            GetPos() + GetZDir() * RoomObject::portal_spacing;
+    const QVector3D p = GetPos();
+    const QVector3D x = GetXDir();
+    const QVector3D y = GetYDir();
+    const QVector3D z = GetZDir();
+    const QVector3D s = GetScale();
+    return pos.x() * x * s.x() +
+            pos.y() * y * s.y() +
+            pos.z() * z * s.z() +
+            p + z * RoomObject::portal_spacing;
 }
 
 int RoomObject::GetNumTris() const

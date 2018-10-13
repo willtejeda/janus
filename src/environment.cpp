@@ -306,7 +306,7 @@ void Environment::draw_child_rooms(MultiPlayerManager*  multi_players, QPointer 
         if (each_portal && each_portal->GetType() == "link") {
             if (each_portal->GetB("open") && each_portal->GetB("visible")) {
                 StencilFunc newFunc = StencilFunc(StencilTestFuncion::EQUAL, StencilReferenceValue(i+1), StencilMask(0xffffffff));
-                //qDebug() << "Environement[554] Drawing Room within Portal " << each_portal << each_portal->GetURL() << "SetStencilFunc: EQUAL " << (i+1) << " 0xffffffff";
+//                qDebug() << "Environement[554] Drawing Room within Portal " << each_portal << each_portal->GetURL() << "SetStencilFunc: EQUAL " << (i+1) << " 0xffffffff";
                 renderer->SetStencilFunc(newFunc);
     //            qDebug() << "  drawing" << each_portal;
                 DrawRoomWithinPortalStencilGL(each_portal, player, multi_players, render_left_eye);
