@@ -731,8 +731,10 @@ DOMNode * DOMNode::removeChild(DOMNode *node)
 bool DOMNode::GetSaveAttribute(const char * name, const bool even_if_default)
 {
     //attribs with leading underscore are for internal use
+    const QString t = GetS("_type");
     QString n(name);
-    if (n.left(1) == "_" || (n == "js_id" && GetS("_type") == "room")) {
+    if (n.left(1) == "_"
+            || (t == "room" && (n == "js_id"  || n == "url" || n == "title" || n == "object"))) {
         return false;
     }
 

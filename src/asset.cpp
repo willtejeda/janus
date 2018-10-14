@@ -129,6 +129,7 @@ void Asset::SetSrc(const QString & base, const QString & src_str)
     else {
         SetS("src", src_str.trimmed());
         SetS("_src_url", QUrl(base).resolved(src_str).toString());
+//        qDebug() << " resolved" << QUrl(base).resolved(src_str).toString();
         SetURL(GetS("_src_url"));
     }
 }

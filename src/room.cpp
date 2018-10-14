@@ -461,7 +461,7 @@ void Room::save_cubemap_faces_to_cache(QString p_room_url_md5_string, QVector<QS
 QString Room::GetSaveFilename() const
 {
     //if the file exists locally, return it's path, otherwise, return a workspaces timestamped filename
-    const QString out_filename = GetS("url");
+    const QString out_filename = QUrl(GetS("url")).toLocalFile();
     return (QFileInfo(out_filename).exists() ? out_filename : MathUtil::GetSaveTimestampFilename());
 }
 
@@ -2421,9 +2421,12 @@ QVariantMap Room::GetJSONCode(const bool show_defaults) const
 
 void Room::AddNewAssetScript()
 {        
-    const QString save_filename = GetSaveFilename();
-//    qDebug() << "Room::AddNewAssetScript()" << save_filename;
+    QString save_filename = GetSaveFilename();
+    if (QUrl(save_filename).isLocalFile()) {
+        save_filename = QUrl(save_filename).toLocalFile();
+    }
     QFileInfo d(save_filename);
+//    qDebug() << "Room::AddNewAssetScript()" << save_filename << d.exists();
     if (d.exists()) {
 //        qDebug() << "Room::AddNewAssetScript()" << d.absoluteDir().path() + "/" + script_filename;
         QString script_filename;
@@ -2935,19 +2938,11 @@ void Room::Create()
 //    qDebug() << "Room::Create()" << this->GetURL();
     //update portal with page title and set this portal as the room's parent
     const QString url = GetS("url");
+    const QString title = page->GetTitle();
+    const QVariantMap d_room = page->GetRoomData();
 
     SetS("title", page->GetTitle());
-
     envobjects.clear();
-
-    if (QString::compare(url, "workspaces") == 0) {
-        SetS("url", "workspaces");
-    }
-    else if (QString::compare(url, "bookmarks") == 0) {
-        SetS("url", "bookmarks");
-    }
-
-    QVariantMap d_room = page->GetRoomData();
 
     //determine if we should use a custom translator (check if translator dir contains filename that matches domain)
     QString use_translator_name;
@@ -2967,8 +2962,9 @@ void Room::Create()
     if (page->FoundError()) {        
         entrance_object->SetV("pos", QVector3D(0.8f, -0.2f, 0.0f));
     }
-    else if (page->FoundFireBoxContent()) {           
-        SetProperties(d_room);        
+    else if (page->FoundFireBoxContent()) {
+        SetProperties(d_room);
+        SetS("url", url); //60.1 - replace URL if it was overwritten
         entrance_object->SetProperties(d_room); //sets initial position/dir for entrance
     }
     else if (!use_translator_name.isEmpty()) {

@@ -780,6 +780,7 @@ void Environment::Update2(QPointer <Player> player, MultiPlayerManager *multi_pl
                         p2->SetTitle(r->GetS("title"));
                     }
                     p2->SetURL("", r->GetS("url"));
+                    qDebug() << "Environment::Update2 p2 URL" << r->GetS("url");
                     p2->SetB("_url_changed", false);
 
                     QPointer <AssetImage> thumb_a = p2->GetThumbAssetImage();

@@ -3707,7 +3707,7 @@ void Game::CreateNewWorkspace(const QString path)
 
     //create new path
     const QString abs_path = path + "/index.html";
-    const QString portal_url = QUrl::fromLocalFile(abs_path).toString();
+    const QUrl portal_url = QUrl::fromLocalFile(abs_path);
 
     QPointer <Room> r = new Room();
     r->SetS("url", abs_path);
@@ -4769,7 +4769,7 @@ void Game::EndOpInteractionTeleport(const int i)
     state = JVR_STATE_DEFAULT;
 }
 
-QPointer <RoomObject> Game::CreatePortal(const QString url, const bool send_multi)
+QPointer <RoomObject> Game::CreatePortal(const QUrl url, const bool send_multi)
 {
 //    qDebug() << "Game::CreatePortal" << url << send_multi;
     QPointer <Room> r = env->GetCurRoom();
@@ -4780,7 +4780,7 @@ QPointer <RoomObject> Game::CreatePortal(const QString url, const bool send_mult
         d.normalize();
 
         const QVector3D p = player->GetV("pos") + d * 1.5f;
-        const QString portal_jsid = multi_players->GetUserID() + "-" + url;
+        const QString portal_jsid = multi_players->GetUserID() + "-" + url.toString();
         ++global_uuid;
 
         //set up child stuff for portal
@@ -4789,7 +4789,7 @@ QPointer <RoomObject> Game::CreatePortal(const QString url, const bool send_mult
 
         new_portal = new RoomObject();
         new_portal->SetType("link");
-        new_portal->SetURL("", url);
+        new_portal->SetURL("", url.toString());
         new_portal->SetV("pos", p);
         new_portal->SetDir(-d);
         new_portal->SetC("col", child_col);
@@ -4802,7 +4802,7 @@ QPointer <RoomObject> Game::CreatePortal(const QString url, const bool send_mult
         env->AddRoom(new_portal);
 
         if (send_multi) {
-            multi_players->SetSendPortal(url, portal_jsid);
+            multi_players->SetSendPortal(url.toString(), portal_jsid);
         }
     }
     return new_portal;
