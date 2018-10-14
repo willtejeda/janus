@@ -460,22 +460,9 @@ void Room::save_cubemap_faces_to_cache(QString p_room_url_md5_string, QVector<QS
 
 QString Room::GetSaveFilename() const
 {
-//    qDebug() << "Room::GetSaveFilename" << this << save_filename;
-    //first ensure that the file is either online (not on local filesystem)
-    //or it ends in .htm or .html (and can thus be overwritten)
-    QString out_filename = GetS("url");
-    QFileInfo file_info(out_filename);
-    const QString s = file_info.suffix().toLower();
-
-    if (!file_info.exists() || s == "htm" || s == "html") {
-        //Behaviour:
-        //1.  file is local.  copy existing file to timestamped one, then overwrite.
-        //2.  file not local.  create new timestamp file.
-        const QUrl url(out_filename);
-        return (url.isLocalFile() ? url.toLocalFile() : MathUtil::GetSaveTimestampFilename());
-    }
-
-    return QString();
+    //if the file exists locally, return it's path, otherwise, return a workspaces timestamped filename
+    const QString out_filename = GetS("url");
+    return (QFileInfo(out_filename).exists() ? out_filename : MathUtil::GetSaveTimestampFilename());
 }
 
 void Room::SetAssetShader(const QPointer <AssetShader> a)
@@ -2433,8 +2420,9 @@ QVariantMap Room::GetJSONCode(const bool show_defaults) const
 }
 
 void Room::AddNewAssetScript()
-{    
+{        
     const QString save_filename = GetSaveFilename();
+//    qDebug() << "Room::AddNewAssetScript()" << save_filename;
     QFileInfo d(save_filename);
     if (d.exists()) {
 //        qDebug() << "Room::AddNewAssetScript()" << d.absoluteDir().path() + "/" + script_filename;
