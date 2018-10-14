@@ -422,18 +422,18 @@ QList<QPointer <RoomObject> > AssetScript::UpdateAsynchronousCreatedObjects(QHas
 void AssetScript::UpdateInternalDataStructures(QPointer <Player> player)
 {
     //56.0 - ensure DOM/roomobjects always get updated (including object properties pointers for portals)
-    //60.0 - INSANELY IMPORTANT - make sure do not overwrite the dom map and remove objects created by JS via CreateObject!
+    //60.0 - INSANELY IMPORTANT - make sure do not overwrite the dom map and remove objects created by JS via CreateObject!    
     QMap <QString, DOMNode* > dom_map;
     DOMNodeMapFromScriptValue(global_scope.property("__dom"), dom_map);
 
     QHash <QString, QPointer <DOMNode> >::iterator iter;
     for (QPointer <RoomObject> & o : room->GetRoomObjects()) {
         if (o) {
-//            qDebug() << node << node->GetS("js_id") << node->GetS("id");
+            //            qDebug() << node << node->GetS("js_id") << node->GetS("id");
             dom_map[o->GetS("js_id")] = o->GetProperties().data();
         }
     }
-//    qDebug() << "AssetScript::UpdateInternalDataStructures" << dom_map;
+    //    qDebug() << "AssetScript::UpdateInternalDataStructures" << dom_map;
 
     if (!global_scope.property("player").isValid()) {
         global_scope.setProperty("player", script_engine->toScriptValue(player->GetProperties().data()));

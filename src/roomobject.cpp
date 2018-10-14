@@ -879,10 +879,10 @@ void RoomObject::Update(const double dt_sec)
     }
 
     //update child objects
-    for (int i=0; i<child_objects.size(); ++i) {        
+    for (int i=0; i<child_objects.size(); ++i) {
         if (child_objects[i]) {
             child_objects[i]->model_matrix_parent = model_matrix_parent * model_matrix_local;
-            child_objects[i]->Update(dt_sec);            
+            child_objects[i]->Update(dt_sec);
         }
     }
 
@@ -942,7 +942,7 @@ void RoomObject::Update(const double dt_sec)
             SetB("_text_changed", true);
         }
     }
-    if (GetB("_text_changed")) {
+    if ((obj_type == "text" || obj_type == "paragraph") && GetB("_text_changed")) {
         SetText(GetS("text"));
         SetB("_text_changed", false);
     }
