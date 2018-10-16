@@ -146,10 +146,10 @@ void GLWidget::SetGrab(const bool b)
         releaseMouse();
         setMouseTracking(false);
         clearFocus();
-        game->GetPlayer()->SetB("walk_back", false);
-        game->GetPlayer()->SetB("walk_forward", false);
-        game->GetPlayer()->SetB("walk_left", false);
-        game->GetPlayer()->SetB("walk_right", false);
+        game->GetPlayer()->SetWalkBack(false);
+        game->GetPlayer()->SetWalkForward(false);
+        game->GetPlayer()->SetWalkLeft(false);
+        game->GetPlayer()->SetWalkRight(false);
     }
 }
 
@@ -679,10 +679,10 @@ void GLWidget::paintGL()
 
     //calibrate player for first time (if needed)
     if (hmd_manager && hmd_manager->GetEnabled() &&
-            !game->GetPlayer()->GetB("hmd_calibrated") &&
+            !game->GetPlayer()->GetHMDCalibrated() &&
             (game->GetPlayer()->GetWalking())) {
         hmd_manager->ReCentre();
-        game->GetPlayer()->SetB("hmd_calibrated", true);
+        game->GetPlayer()->SetHMDCalibrated(true);
     }
 
     //for screenshots, we do
