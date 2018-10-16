@@ -642,8 +642,8 @@ void MainWindow::Update()
             JNIUtil::SetControlsVisible(true, SettingsManager::GetShowViewJoystick());
     }
 #endif
-    if (!urlbar->hasFocus() && glwidget->GetGrab() && urlbar->text() != game->GetPlayer()->GetS("url")) {
-        urlbar->setText(game->GetPlayer()->GetS("url"));
+    if (!urlbar->hasFocus() && glwidget->GetGrab() && urlbar->text() != game->GetPlayer()->GetProperties()->GetURL()) {
+        urlbar->setText(game->GetPlayer()->GetProperties()->GetURL());
     }
 #else
     if (!urlbar->hasFocus() && urlbar->text() != game->GetPlayer()->GetProperties()->GetURL()) {
@@ -1859,7 +1859,7 @@ void MainWindow::EnterVR()
         {
             GLWidget::SetDisplayMode(MODE_GEAR);
         }
-        game->GetPlayer()->SetS("hmd_type", hmd_manager->GetHMDType());
+        game->GetPlayer()->SetHMDType(hmd_manager->GetHMDType());
 
         game->SetMouseDoPitch(false);
         game->GetMenuOperations().hmd = true;
@@ -1880,7 +1880,7 @@ void MainWindow::ExitVR()
         GLWidget::SetDisplayMode(MODE_2D);
 
         game->SetMouseDoPitch(true);
-        game->GetPlayer()->SetS("hmd_type", "2d");
+        game->GetPlayer()->SetHMDType("2d");
         game->GetMenuOperations().hmd = false;
 
         glwidget->SetupFramebuffer();
@@ -1913,7 +1913,7 @@ void MainWindow::Resume()
 
     QPointer <RoomPhysics> phys = game->GetEnvironment()->GetCurRoom()->GetPhysics();
     if (phys) {
-        phys->SetPlayerGravity(game->GetEnvironment()->GetCurRoom()->GetF("gravity"));
+        phys->SetPlayerGravity(game->GetEnvironment()->GetCurRoom()->GetProperties()->GetGravity());
     }
 
     //game->GetEnvironment()->ReloadRoom();

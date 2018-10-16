@@ -1738,7 +1738,7 @@ void Room::StopAll()
     queued_functions.clear();
 
     for (QPointer <AbstractWebSurface> & a : assetwebsurfaces) {
-//        qDebug() << "Room::StopAll()" << a << a->GetB("_save_to_markup");
+//        qDebug() << "Room::StopAll()" << a << a->GetProperties()->GetSaveToMarkup();
         if (a && a->GetProperties()->GetSaveToMarkup()) {
             a->SetURL("about:blank");
         }
@@ -1839,7 +1839,7 @@ void Room::Resume()
             QPointer <AssetSound> s = o->GetAssetSound();
             if (s && s->GetReady(o->GetMediaContext()) && o->GetMediaContext()->app_paused) {
                 if (!o->GetMediaContext()->setup){
-                    s->SetupOutput(o->GetMediaContext(), o->GetB("loop"));
+                    s->SetupOutput(o->GetMediaContext(), o->GetProperties()->GetLoop());
                 }
                 else{
                     s->Play(o->GetMediaContext());

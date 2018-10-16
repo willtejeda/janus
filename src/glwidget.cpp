@@ -210,9 +210,9 @@ void GLWidget::PinchTriggered(QPinchGesture *gesture)
     //qDebug() << "pinching" << gesture->totalScaleFactor() << gesture->state();
     if (gesture->state() == Qt::GestureFinished || gesture->state() == Qt::GestureCanceled)
     {
-        game->GetPlayer()->SetB("walk_forward", false);
-        game->GetPlayer()->SetB("walk_back", false);
-        game->GetPlayer()->SetB("running", false);
+        game->GetPlayer()->GetProperties()->SetWalkForward(false);
+        game->GetPlayer()->GetProperties()->SetWalkBack(false);
+        game->GetPlayer()->GetProperties()->SetRunning(false);
 
         QMouseEvent * e = new QMouseEvent(QEvent::MouseButtonRelease, mouse_pos, Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
         game->mouseReleaseEvent(e, 0);
@@ -228,21 +228,21 @@ void GLWidget::PinchTriggered(QPinchGesture *gesture)
         game->SetPinching(true);
         if (scale < 0.8)
         {
-            if (scale < 0.5) game->GetPlayer()->SetB("running", true);
-            game->GetPlayer()->SetB("walk_forward", false);
-            game->GetPlayer()->SetB("walk_back", true);
+            if (scale < 0.5) game->GetPlayer()->SetRunning(true);
+            game->GetPlayer()->SetWalkForward(false);
+            game->GetPlayer()->SetWalkBack(true);
         }
         else if (scale > 1.2)
         {
-            if (scale > 2) game->GetPlayer()->SetB("running", true);
-            game->GetPlayer()->SetB("walk_forward", true);
-            game->GetPlayer()->SetB("walk_back", false);
+            if (scale > 2) game->GetPlayer()->SetRunning(true);
+            game->GetPlayer()->SetWalkForward(true);
+            game->GetPlayer()->SetWalkBack(false);
         }
         else if (scale <= 1.2 && scale >= 0.8)
         {
             //game->GetPlayer()->SetRunning(false);
-            game->GetPlayer()->SetB("walk_forward", false);
-            game->GetPlayer()->SetB("walk_back", false);
+            game->GetPlayer()->SetWalkForward(false);
+            game->GetPlayer()->SetWalkBack(false);
         }
 
         if (gesture->state() == Qt::GestureStarted)

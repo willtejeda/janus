@@ -1086,8 +1086,8 @@ void Game::mouseMoveEvent(QMouseEvent * e, const float x, const float y, const i
                 return;
             }
 
-            const QPoint cursor_pos(float(websurface_selected[cursor_index]->GetI("width"))*cursor_uv[cursor_index].x(),
-                                    float(websurface_selected[cursor_index]->GetI("height"))*cursor_uv[cursor_index].y());
+            const QPoint cursor_pos(float(websurface_selected[cursor_index]->GetProperties()->GetWidth())*cursor_uv[cursor_index].x(),
+                                    float(websurface_selected[cursor_index]->GetProperties()->GetHeight())*cursor_uv[cursor_index].y());
             QMouseEvent e2(QEvent::MouseMove, cursor_pos, e->button(), e->buttons(), e->modifiers());
 
             websurface_selected[cursor_index]->mouseMoveEvent(&e2, cursor_index);
@@ -1231,8 +1231,8 @@ void Game::mousePressEvent(QMouseEvent * e, const int cursor_index, const QSize 
         websurface_focused = true;
         focus_websurface = websurface_selected[cursor_index];
 
-        last_scroll = QPointF(float(websurface_selected[cursor_index]->GetI("width"))*cursor_uv[cursor_index].x(),
-                       float(websurface_selected[cursor_index]->GetI("height"))*cursor_uv[cursor_index].y());
+        last_scroll = QPointF(float(websurface_selected[cursor_index]->GetProperties()->GetWidth())*cursor_uv[cursor_index].x(),
+                       float(websurface_selected[cursor_index]->GetProperties()->GetHeight())*cursor_uv[cursor_index].y());
         focus_websurface_cursor_uv = last_scroll;
     }
     else{
@@ -1441,8 +1441,8 @@ void Game::mouseReleaseEvent(QMouseEvent * e, const int cursor_index, const QSiz
             }
 #ifdef __ANDROID__
             else if (websurface_focused && focus_websurface) {
-                QPoint cursor_pos(float(focus_websurface->GetI("width"))*focus_websurface_cursor_uv.x(),
-                                  float(focus_websurface->GetI("height"))*focus_websurface_cursor_uv.y());
+                QPoint cursor_pos(float(focus_websurface->GetProperties()->GetWidth())*focus_websurface_cursor_uv.x(),
+                                  float(focus_websurface->GetProperties()->GetHeight())*focus_websurface_cursor_uv.y());
                 QMouseEvent e2(QEvent::MouseButtonRelease, cursor_pos, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
                 focus_websurface->mouseReleaseEvent(&e2, i);
 
@@ -2611,10 +2611,10 @@ void Game::TeleportPlayer()
             env->MovePlayer(teleport_portal, player, true);
         }
         else{
-            player->SetV("pos", teleport_portal->GetPos()+teleport_portal->GetDir());
+            player->GetProperties()->SetPos(teleport_portal->GetPos()+teleport_portal->GetDir());
             QMatrix4x4 m;
             m.rotate(180, QVector3D(0,1,0));
-            player->SetV("dir", m*(teleport_portal->GetDir() * 1.5f));
+            player->GetProperties()->SetDir(m*(teleport_portal->GetDir() * 1.5f));
             player->UpdateDir();
         }
 #else
@@ -2834,7 +2834,7 @@ void Game::DrawCursorGL()
                  (JNIUtil::GetGamepadConnected() && cursor_active == 0) ||
                  (controller_manager->GetUsingSpatiallyTrackedControllers() &&
                   (cursor_active == 0 || (cursor_active == 1 && (!cs[0].active || cs[1].GetClick().hover || cs[1].GetTeleport().hover || cs[1].GetGrab().pressed)))))
-                    && r->GetB("cursor_visible")) {
+                    && r->GetProperties()->GetCursorVisible()) {
 #else
             if ((draw_cursor || (controller_manager->GetUsingSpatiallyTrackedControllers() && controller_manager->GetStates()[cursor_active].GetClick().hover))
                     && r->GetProperties()->GetCursorVisible()) {
@@ -3844,7 +3844,7 @@ void Game::UpdateControllers()
             }
         }
 #ifdef __ANDROID__
-        else if (player->GetS("hmd_type") == "daydream") {
+        else if (player->GetHMDType() == "daydream") {
             QPointer <QObject> c = qvariant_cast<QObject *>(player->GetProperties()->property("daydream"));
             if (c) {
                 c->setProperty("left_stick_x", s[0].x);
@@ -3866,7 +3866,7 @@ void Game::UpdateControllers()
                 c->setProperty("right_menu", s[1].b[1].value);
             }
         }
-        else if (player->GetS("hmd_type") == "gear" || player->GetS("hmd_type") == "go") { // Works with Go
+        else if (player->GetHMDType() == "gear" || player->GetHMDType() == "go") { // Works with Go
             QPointer <QObject> c = qvariant_cast<QObject *>(player->GetProperties()->property("gear"));
             if (c) {
                 c->setProperty("left_trackpad_x", s[0].x);
@@ -3936,7 +3936,7 @@ void Game::UpdateControllers()
     const float axis_threshold = 0.2f; //state["threshold"].toFloat();
 #else
     const float snapturn_axis_threshold = (JNIUtil::GetGamepadConnected())?0.8f:0.2f;
-    const float axis_threshold = (player->GetS("hmd_type") == "gear" || player->GetS("hmd_type") == "go")?0.2f:0.5f; //state["threshold"].toFloat();
+    const float axis_threshold = (player->GetHMDType() == "gear" || player->GetHMDType() == "go")?0.2f:0.5f; //state["threshold"].toFloat();
 #endif
 
     //don't use vive controllers for moving
@@ -3989,17 +3989,17 @@ void Game::UpdateControllers()
 #ifdef __ANDROID__
             if (b_click.hover || b_teleport.hover || b_grab.pressed ||
                     (i == 0 && controller_manager->GetHMDManager()->GetControllerTracked(0)) ||
-                    (i == 1 && player->GetS("hmd_type") == "gear" && !controller_manager->GetHMDManager()->GetControllerTracked(0))) { // Gear: Draw regardless of if headset is pressed, when controller is not present
+                    (i == 1 && player->GetHMDType() == "gear" && !controller_manager->GetHMDManager()->GetControllerTracked(0))) { // Gear: Draw regardless of if headset is pressed, when controller is not present
                 dist = UpdateCursorRaycast(m2, i);
             }
 
             //Always show laser on Android
-            if (i == 1 && player->GetS("hmd_type") == "gear") s[i].laser_length = 0.0f;
+            if (i == 1 && player->GetHMDType() == "gear") s[i].laser_length = 0.0f;
             else s[i].laser_length = ((dist != FLT_MAX) ? dist : 100.0f);
 
             //Base the laser transparency on the angle relative to the floor
             float angle = MathUtil::RadToDeg(asin(QVector3D::dotProduct(controller_dir, QVector3D(0.0f,1.0f,0.0f))));
-            if (player->GetS("hmd_type") != "rift") {
+            if (player->GetHMDType() != "rift") {
                 angle += 15.0f;
             }
 
@@ -4058,8 +4058,8 @@ void Game::UpdateControllers()
                         websurface_focused = true;
                         focus_websurface = websurface_selected[i];
 
-                        last_scroll = QPointF(float(websurface_selected[i]->GetI("width"))*cursor_uv[i].x(),
-                                       float(websurface_selected[i]->GetI("width"))*cursor_uv[i].y());
+                        last_scroll = QPointF(float(websurface_selected[i]->GetProperties()->GetWidth())*cursor_uv[i].x(),
+                                       float(websurface_selected[i]->GetProperties()->GetHeight())*cursor_uv[i].y());
                         focus_websurface_cursor_uv = last_scroll;
                     }
                     else{
@@ -4337,7 +4337,7 @@ void Game::UpdateControllers()
             || controller_manager->GetUsingSpatiallyTrackedControllers())
 #else
     //if (controller_manager->GetUsingSpatiallyTrackedControllers())
-    //    player->SetB("running", sqrt(pow(x0,2) + pow(y0,2)) > 1.0f - axis_threshold);
+    //    player->SetRunning(sqrt(pow(x0,2) + pow(y0,2)) > 1.0f - axis_threshold);
 
     x0 += JNIUtil::GetWalkJoystickX();
     y0 += -JNIUtil::GetWalkJoystickY();
@@ -4378,15 +4378,15 @@ void Game::UpdateControllers()
     }
 #ifdef __ANDROID__
     else {
-        player->SetB("walk_left", false);
-        player->SetB("walk_right", false);
-        player->SetB("walk_forward", false);
-        player->SetB("walk_back", false);
+        player->SetWalkForward(false);
+        player->SetWalkBack(false);
+        player->SetWalkLeft(false);
+        player->SetWalkRight(false);
         player->DoSpinLeft(false);
         player->DoSpinRight(false);
-        player->SetB("fly_up", false);
-        player->SetB("fly_down", false);
-        player->SetB("jump", false);
+        player->SetFlyUp(false);
+        player->SetFlyDown(false);
+        player->SetJump(false);
     }
 #endif
 
@@ -4512,7 +4512,7 @@ void Game::UpdateControllers()
 #else
         if (SettingsManager::GetComfortMode() && (JNIUtil::GetViewJoystickX() == 0 || JNIUtil::GetViewJoystickY() == 0)) {
             if (!controller_manager->GetHMDManager() || (controller_manager->GetHMDManager() && !controller_manager->GetHMDManager()->GetEnabled())) {
-                player->SpinView(controller_x[1] * player->GetF("delta_time") * rot_speed, true);
+                player->SpinView(controller_x[1] * player->GetDeltaTime() * rot_speed, true);
             }
             else if (fabsf(controller_x[1]) > snapturn_axis_threshold && fabsf(last_controller_x[1]) < snapturn_axis_threshold) {
                 if (controller_x[1] > 0.0f) {
@@ -4560,12 +4560,12 @@ void Game::UpdateControllers()
 
     if (controller_manager->GetHMDManager() && controller_manager->GetHMDManager()->GetEnabled() && !JNIUtil::GetGamepadConnected()){
         SettingsManager::SetMicAlwaysOn(true);
-        player->SetB("flying", true);
+        player->SetFlying(true);
         if (sqrt(pow(controller_x[0],2) + pow(controller_y[0],2)) > 0.8f){
-                player->SetB("running", true);
+                player->SetRunning(true);
         }
         else{
-            player->SetB("running", false);
+            player->SetRunning(false);
         }
         return;
     }
@@ -4579,33 +4579,33 @@ void Game::UpdateControllers()
         SettingsManager::SetMicAlwaysOn(b);
 
         if (!b) {
-            player->SetB("speaking", JNIUtil::GetSpeaking());
+            player->SetSpeaking(JNIUtil::GetSpeaking());
         }
 
         //Let user fly
-        player->SetB("flying", JNIUtil::GetFlying());
+        player->SetFlying(JNIUtil::GetFlying());
 
         //Let user jump
-        if (!player->GetB("flying")) {
-            player->SetB("jump", JNIUtil::GetJumping());
+        if (!player->GetFlying()) {
+            player->SetJump(JNIUtil::GetJumping());
         }
 
         //Translate user; let user run past certain threshold
-        if (state_can_walk && !player->GetB("entering_text")) {
+        if (state_can_walk && !player->GetEnteringText()) {
             if (!pinching) {
-                player->SetB("running", JNIUtil::GetRunning());
+                player->SetRunning(JNIUtil::GetRunning());
             }
         }
         else {
-            player->SetB("walk_forward", false);
-            player->SetB("walk_back", false);
-            player->SetB("walk_left", false);
-            player->SetB("walk_right", false);
+            player->SetWalkForward(false);
+            player->SetWalkBack(false);
+            player->SetWalkLeft(false);
+            player->SetWalkRight(false);
             player->DoSpinLeft(false);
             player->DoSpinRight(false);
-            player->SetB("fly_up", false);
-            player->SetB("fly_down", false);
-            player->SetB("jump", false);
+            player->SetFlyUp(false);
+            player->SetFlyDown(false);
+            player->SetJump(false);
         }
     }
 
@@ -4638,7 +4638,7 @@ void Game::UpdateControllers()
             }
         }
         else{
-            player->SetF("phi", 90);
+            player->SetPhi(90.0f);
         }
     }
     gyroscope_timer.restart();
@@ -4897,10 +4897,10 @@ void Game::EndOpInteractionDefault(const int i)
                 const QHash <QString, QPointer <RoomObject> > & envobjects = env->GetCurRoom()->GetRoomObjects();
                 for (auto & each_portal : envobjects) {
                     if (each_portal && each_portal->GetType() == TYPE_LINK && each_portal != o) {
-                        if (each_portal->GetB("open") && each_portal->GetB("visible") && !each_portal->GetB("auto_load")) {
-                            each_portal->SetB("open", false);
+                        if (each_portal->GetProperties()->GetOpen() && each_portal->GetProperties()->GetVisible() && !each_portal->GetProperties()->GetAutoLoad()) {
+                            each_portal->GetProperties()->SetOpen(false);
                             if (env->GetCurRoom()->GetConnectedPortal(each_portal))
-                                env->GetCurRoom()->GetConnectedPortal(each_portal)->SetB("open", false);
+                                env->GetCurRoom()->GetConnectedPortal(each_portal)->GetProperties()->SetOpen(false);
                         }
                     }
                 }

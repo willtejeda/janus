@@ -106,8 +106,8 @@ void Environment::Reset()
         else {
             new_portal->SetURL("", SettingsManager::GetHomeURL());
         }
-        new_portal->SetB("visible", false);
-        new_portal->SetB("active", false);
+        new_portal->GetProperties()->SetVisible(false);
+        new_portal->GetProperties()->SetActive(false);
         rootnode->AddRoomObject(new_portal);
         curnode = AddRoom(new_portal);
         lastnode = curnode;
@@ -588,10 +588,10 @@ void Environment::MovePlayer(QPointer <RoomObject> portal, QPointer <Player> pla
 
 #ifdef __ANDROID__
     //Close portal upon crossing
-    if (!p2->GetB("auto_load")) {
-        p2->SetB("open", false); //Close portal, set to non-visible room
+    if (!p2->GetProperties()->GetAutoLoad()) {
+        p2->GetProperties()->SetOpen(false); //Close portal, set to non-visible room
         if (curnode->GetConnectedPortal(p2))
-            curnode->GetConnectedPortal(p2)->SetB("open", false);
+            curnode->GetConnectedPortal(p2)->GetProperties()->SetOpen(false);
     }
 #endif
 }
@@ -922,10 +922,10 @@ void Environment::NavigateToRoom(QPointer <Player> player, QPointer <Room> r)
     const QHash <QString, QPointer <RoomObject> > & envobjects = GetCurRoom()->GetRoomObjects();
     for (auto & each_portal : envobjects) {
         if (each_portal && each_portal->GetType() == TYPE_LINK) {
-            if (each_portal->GetB("open") && each_portal->GetB("visible") && !each_portal->GetB("auto_load")) {
-                    each_portal->SetB("open", false);
+            if (each_portal->GetProperties()->GetOpen() && each_portal->GetProperties()->GetVisible() && !each_portal->GetProperties()->GetAutoLoad()) {
+                    each_portal->GetProperties()->SetOpen(false);
                     if (curnode->GetConnectedPortal(each_portal))
-                        curnode->GetConnectedPortal(each_portal)->SetB("open", false);
+                        curnode->GetConnectedPortal(each_portal)->GetProperties()->SetOpen(false);
             }
         }
     }

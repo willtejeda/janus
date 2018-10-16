@@ -484,8 +484,7 @@ void Player::Update(const float move_speed)
         }
     }
 
-//    qDebug() << "Player::Update() impulse velocity" << scale_velx << scale_vely << impulse_vel << GetB("walk_forward") << GetB("walk_back") << GetB("walk_left") << GetB("walk_right") << GetV("vel");    
-
+//    qDebug() << "Player::Update() impulse velocity" << scale_velx << scale_vely << impulse_vel << walk_forward << walk_back << walk_left << walk_right;
     if (flying) {
         props->SetAnimID("fly");
     }
