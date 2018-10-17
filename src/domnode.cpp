@@ -79,7 +79,7 @@ DOMNode::DOMNode(QObject *parent) : QObject(parent)
     save_to_markup = true;
     primitive = false;
     locked = false;
-    interpolate = true;
+    interpolate = false; //60.1 - false by default (can push user around otherwise, e.g. pocketspace geometry)
     circular = false;
     highlighted = false;
     draw_back = false;
