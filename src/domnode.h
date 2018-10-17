@@ -190,7 +190,6 @@ class DOMNode : public QObject, protected QScriptable
     Q_PROPERTY(QString oncollision READ GetOnCollision WRITE SetOnCollision)
     Q_PROPERTY(QString userid READ GetUserID)
     Q_PROPERTY(QString url READ GetURL)
-//    Q_PROPERTY(QString hmd_type READ GetHMDType)
 //    Q_PROPERTY(bool hmd_enabled READ GetHMDEnabled)
     Q_PROPERTY(ScriptableVector * local_head_pos READ GetLocalHeadPos)
     Q_PROPERTY(ScriptableVector * head_pos READ GetGlobalHeadPos)
@@ -209,6 +208,8 @@ class DOMNode : public QObject, protected QScriptable
     Q_PROPERTY(ScriptableVector * hand1_xdir READ GetHand1XDir)
     Q_PROPERTY(ScriptableVector * hand1_ydir READ GetHand1YDir)
     Q_PROPERTY(ScriptableVector * hand1_zdir READ GetHand1ZDir)
+    Q_PROPERTY(QString hmd_type READ GetHMDType)
+    Q_PROPERTY(QString device_type READ GetDeviceType)
 //    Q_PROPERTY(bool running READ GetRunning)
 //    Q_PROPERTY(bool flying READ GetFlying)
 //    Q_PROPERTY(bool walking READ GetWalking)
@@ -792,6 +793,12 @@ public:
     void SetHand1ZDir(ScriptableVector *&p);
     ScriptableVector * GetHand1ZDir();
 
+    QString GetHMDType();
+    void SetHMDType(const QString &s);
+
+    QString GetDeviceType();
+    void SetDeviceType(const QString &s);
+
     static QString ElementTypeToString(const ElementType t);
     static QString ElementTypeToTagName(const ElementType t);
     static ElementType StringToElementType(const QString name);
@@ -989,6 +996,8 @@ protected:
     ScriptableVector * hand1_xdir;
     ScriptableVector * hand1_ydir;
     ScriptableVector * hand1_zdir;    
+    QString hmd_type;
+    QString device_type;
 
     //objects
     bool interpolate;

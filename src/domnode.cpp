@@ -164,6 +164,7 @@ DOMNode::DOMNode(QObject *parent) : QObject(parent)
     hand1_xdir = new ScriptableVector(1,0,0,this);
     hand1_ydir = new ScriptableVector(0,1,0,this);
     hand1_zdir = new ScriptableVector(0,0,1,this);
+    hmd_type = "2d";
 }
 
 DOMNode::~DOMNode()
@@ -2640,6 +2641,26 @@ void DOMNode::SetHand1ZDir(ScriptableVector *&p)
 ScriptableVector * DOMNode::GetHand1ZDir()
 {
     return hand1_zdir;
+}
+
+QString DOMNode::GetHMDType()
+{
+    return hmd_type;
+}
+
+void DOMNode::SetHMDType(const QString &s)
+{
+    hmd_type = s;
+}
+
+QString DOMNode::GetDeviceType()
+{
+    return device_type;
+}
+
+void DOMNode::SetDeviceType(const QString &s)
+{
+    device_type = s;
 }
 
 QString DOMNode::ElementTypeToString(const ElementType t)
