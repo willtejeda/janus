@@ -432,7 +432,7 @@ void Room::LinkToAssets(QPointer <RoomObject> o)
     o->SetCubemapRadiance(GetAssetImage(o->GetProperties()->GetCubemapRadianceID()));
     o->SetCubemapIrradiance(GetAssetImage(o->GetProperties()->GetCubemapIrradianceID()));
     //59.9 - bugfix, without this conditional, causes video type not to work with id="blah" set
-    if (t != "video") {
+    if (t != TYPE_VIDEO) {
         o->SetAssetVideo(GetAssetVideo(o->GetProperties()->GetVideoID()));
     }
     o->SetAssetShader(GetAssetShader(o->GetProperties()->GetShaderID()));

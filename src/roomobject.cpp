@@ -755,7 +755,7 @@ void RoomObject::SnapXDirsToMajorAxis()
 
 void RoomObject::Update(const double dt_sec)
 {
-    const QString obj_type = GetType();
+    const ElementType obj_type = GetType();
 
     if (assetimage) {
         assetimage->UpdateGL();
@@ -781,7 +781,7 @@ void RoomObject::Update(const double dt_sec)
 
     UpdateMatrices();   
 
-    if (obj_type == "particle") {
+    if (obj_type == TYPE_PARTICLE) {
         if (assetobject_emitter) {
             particle_system->SetEmitterMesh(assetobject_emitter);
         }
@@ -1241,7 +1241,7 @@ void RoomObject::UpdateMedia()
         alGenSources(1, &openal_stream_source);
     }
 
-    const QString obj_type = GetType();
+    const ElementType obj_type = GetType();
 
     const bool positional_env = SettingsManager::GetPositionalEnvEnabled();
     const bool positional_voip = SettingsManager::GetPositionalVOIPEnabled();
@@ -1975,7 +1975,7 @@ void RoomObject::DrawGL(QPointer <AssetShader> shader, const bool left_eye, cons
         return;
     }
 
-    const QString t = GetType();
+    const ElementType t = GetType();
     const QColor col = MathUtil::GetVector4AsColour(props->GetColour()->toQVector4D());
 //    qDebug() << "draw" << this << col << t;
     const QColor chromakey_col = MathUtil::GetVector4AsColour(props->GetChromaKeyColour()->toQVector4D());
@@ -2027,7 +2027,7 @@ void RoomObject::DrawGL(QPointer <AssetShader> shader, const bool left_eye, cons
     shader->SetRoomSpacePositionAndDistance(QVector4D(position.x(), position.y(), position.z(), distance));
 
     //do the draw
-    if (t == "particle") {
+    if (t == TYPE_PARTICLE) {
         bool override_texture = false;
 
         shader->SetUseTextureAll(false);        
@@ -2075,7 +2075,7 @@ void RoomObject::DrawGL(QPointer <AssetShader> shader, const bool left_eye, cons
             RendererInterface::m_pimpl->SetDepthMask(DepthMask::DEPTH_WRITES_ENABLED);
         }
     }
-    else if (t == "text") {
+    else if (t == TYPE_TEXT) {
         RendererInterface::m_pimpl->SetDefaultFaceCullMode(FaceCullMode::DISABLED);
         textgeom->SetColour(col);
         MathUtil::PushModelMatrix();
@@ -2105,7 +2105,7 @@ void RoomObject::DrawGL(QPointer <AssetShader> shader, const bool left_eye, cons
         MathUtil::PopModelMatrix();
         RendererInterface::m_pimpl->SetDefaultFaceCullMode(FaceCullMode::BACK);
     }
-    else if (t == "paragraph") {
+    else if (t == TYPE_PARAGRAPH) {
 
         if (assetimage) {
             assetimage->UpdateGL();
@@ -2152,7 +2152,7 @@ void RoomObject::DrawGL(QPointer <AssetShader> shader, const bool left_eye, cons
             MathUtil::PopModelMatrix();
         }
     }
-    else if (t == "ghost") {
+    else if (t == TYPE_GHOST) {
 
         if (ghost_assetobjs.contains(head_id) && ghost_assetobjs[head_id]) {
 
@@ -2251,7 +2251,7 @@ void RoomObject::DrawGL(QPointer <AssetShader> shader, const bool left_eye, cons
             }
         }
     }
-    else if (t == "video") {
+    else if (t == TYPE_VIDEO) {
         if (assetvideo) {
 
             MathUtil::PushModelMatrix();
@@ -2291,7 +2291,7 @@ void RoomObject::DrawGL(QPointer <AssetShader> shader, const bool left_eye, cons
             MathUtil::PopModelMatrix();
         }
     }
-    else if (t == "image") {
+    else if (t == TYPE_IMAGE) {
         if (assetimage && assetimage->GetFinished()) {
             MathUtil::PushModelMatrix();
             MathUtil::MultModelMatrix(model_matrix_local);
@@ -2312,12 +2312,12 @@ void RoomObject::DrawGL(QPointer <AssetShader> shader, const bool left_eye, cons
             MathUtil::PopModelMatrix();
         }       
     }
-    else if (t == "light") {
+    else if (t == TYPE_LIGHT) {
         if (edit_mode_icons_enabled) {
             DrawIconGL(shader, light_img);
         }
     }
-    else if (t == "sound") {
+    else if (t == TYPE_SOUND) {
         if (edit_mode_icons_enabled) {
             DrawIconGL(shader, sound_img);
         }
@@ -2507,7 +2507,7 @@ void RoomObject::DrawCollisionModelGL(QPointer <AssetShader> shader)
         return;
     }
 
-    const QString t = GetType();
+    const ElementType t = GetType();
     if (t == TYPE_OBJECT) {
         shader->SetConstColour(QVector4D(1,0.5f,0.5f,1));
         RendererInterface::m_pimpl->SetPolyMode(PolyMode::LINE);
@@ -2633,7 +2633,7 @@ void RoomObject::Pause()
 void RoomObject::Play()
 {
 //    qDebug() << "RoomObject::Play()" << this->GetID() << this->GetJSID() << this->GetPos();
-    const QString t = GetType();
+    const ElementType t = GetType();
     if (t == TYPE_SOUND || t == TYPE_LINK || t == TYPE_OBJECT) {
         if (assetsound) {
             assetsound->Play(&media_ctx);
@@ -2661,7 +2661,7 @@ void RoomObject::Play()
 
 void RoomObject::Stop()
 {    
-    const QString t = GetType();
+    const ElementType t = GetType();
     if (t == TYPE_SOUND) {
         if (assetsound) {
             assetsound->Stop(&media_ctx);
@@ -2679,7 +2679,7 @@ void RoomObject::Stop()
 
 bool RoomObject::GetPlaying() const
 {
-    const QString t = GetType();
+    const ElementType t = GetType();
     if (t == TYPE_SOUND) {
         if (assetsound) {
             return assetsound->GetPlaying((MediaContext *) &media_ctx);
@@ -4130,7 +4130,7 @@ QVector3D RoomObject::GetGlobal(const QVector3D & pos) const
 
 int RoomObject::GetNumTris() const
 {
-    const QString t = GetType();
+    const ElementType t = GetType();
     if (t == TYPE_TEXT || t == TYPE_PARAGRAPH) {
         return 2;
     }

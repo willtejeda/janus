@@ -210,9 +210,9 @@ void GLWidget::PinchTriggered(QPinchGesture *gesture)
     //qDebug() << "pinching" << gesture->totalScaleFactor() << gesture->state();
     if (gesture->state() == Qt::GestureFinished || gesture->state() == Qt::GestureCanceled)
     {
-        game->GetPlayer()->GetProperties()->SetWalkForward(false);
-        game->GetPlayer()->GetProperties()->SetWalkBack(false);
-        game->GetPlayer()->GetProperties()->SetRunning(false);
+        game->GetPlayer()->SetWalkForward(false);
+        game->GetPlayer()->SetWalkBack(false);
+        game->GetPlayer()->SetRunning(false);
 
         QMouseEvent * e = new QMouseEvent(QEvent::MouseButtonRelease, mouse_pos, Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
         game->mouseReleaseEvent(e, 0);
