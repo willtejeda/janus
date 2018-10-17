@@ -714,7 +714,7 @@ void Room::BindCubemaps(QPointer <AssetShader> shader)
         if (has_valid_cubemap
             && (!has_radiance_cubemap || !has_irradiance_cubemap)
             && current_processing_state == PROCESSING_STATE::INVALID)
-        {
+        {            
             QString room_url_md5_string = QString::number(room_url_md5);
             QString room_save_filename = GetSaveFilename();
             bool is_room_local = QFileInfo(room_save_filename).exists();
@@ -1394,7 +1394,8 @@ void Room::UpdateObjects(QPointer <Player> player, MultiPlayerManager *multi_pla
             if (a) {
                 ++nObjects;
                 progress += a->GetProgress();
-                if (!a->GetFinished()) {
+                if (!a->GetFinished() && !a->GetError()) {
+//                    qDebug() << "WAITING ON" << a->GetProperties()->GetID() << a->GetProperties()->GetTypeAsString() << a->GetFinished() << a->GetError();
                     is_room_ready = false;
                     is_room_ready_for_screenshot = false;
                 }
@@ -1409,7 +1410,7 @@ void Room::UpdateObjects(QPointer <Player> player, MultiPlayerManager *multi_pla
             if (a) {
                 ++nImages;
                 progress += a->GetProgress();
-                if (!a->GetFinished()) {
+                if (!a->GetFinished() && !a->GetError()) {
                     is_room_ready_for_screenshot = false;
                 }
 //                qDebug() << "image" << a->GetProperty("src") << a->GetFinished();
@@ -1543,11 +1544,14 @@ void Room::UpdateJS(QPointer <Player> player)
 {    
     bool all_scripts_ready = (!assetscripts.isEmpty() && GetProcessed());
     const QVector3D d = player->GetProperties()->GetDir()->toQVector3D();
+//    qDebug() << "Room::UpdateJS()" << assetscripts.size();
     for (QPointer <AssetScript> & script : assetscripts) {
         if (script) {
             script->Update();
             LogErrorOnException();
 //            qDebug() << "Room::UpdateJS evaluating" << script->GetS("src");
+
+//            qDebug() << "Room::UpdateJS" << script->GetFinished() << script->GetOnLoadInvoked();
 
             if (script->GetFinished()) {
 
@@ -1561,6 +1565,7 @@ void Room::UpdateJS(QPointer <Player> player)
                 }
                 else {
 //                    qDebug() << " calling update";
+//                    qDebug() << "setdeltatime" << (int)(player->GetDeltaTime()* 1000);
                     QList<QPointer <RoomObject> > objectsAdded = script->DoRoomUpdate(envobjects, player, QScriptValueList() << (int)(player->GetDeltaTime()* 1000));
                     LogErrorOnException();
                     AddRoomObjects(objectsAdded);

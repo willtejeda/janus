@@ -311,7 +311,7 @@ void Game::Update()
     if (deltat_time.elapsed() > 0) {
         delta_time = double(deltat_time.restart()) / 1000.0;
     }
-    player->SetDeltaTime(delta_time);
+    player->SetDeltaTime(delta_time);    
 
     //deallocation includes opengl delete calls
     if (!do_exit) {
