@@ -196,7 +196,7 @@ float WebAsset::GetProgress() const
 
 bool WebAsset::GetError() const
 {
-    return (status_code >= 400);
+    return (status_code >= 400) || (status_code == -1);
 }
 
 void WebAsset::SetStatusCode(const int s)
