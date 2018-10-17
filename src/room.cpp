@@ -601,6 +601,7 @@ void Room::BindShader(QPointer <AssetShader> shader)
     shader->SetFogColour(MathUtil::GetVector4AsColour(props->GetFogCol()->toQVector4D()));
     shader->SetUseLighting(false);
     shader->SetPlayerPosition(player_pos_trans);    
+//    qDebug() << "roombindshader" << props->GetFog() << fog_mode << props->GetFogDensity() << props->GetFogStart() << props->GetFogEnd() << MathUtil::GetVector4AsColour(props->GetFogCol()->toQVector4D());
 
     shader->UpdateFrameUniforms();
     shader->UpdateObjectUniforms();
@@ -2333,16 +2334,16 @@ void Room::SaveXML(QTextStream & ofs)
     if (entrance_object) {
 //        qDebug() << "Room::SaveFireBoxRoom() - saving" << entrance_object << entrance_object->GetPos();
         if (entrance_object->GetPos() != QVector3D(0,0,0)) {
-            ofs << " pos=" << MathUtil::GetVectorAsString(entrance_object->GetPos(), false);
+            ofs << " pos=" << MathUtil::GetVectorAsString(entrance_object->GetPos(), true);
         }
         if (entrance_object->GetXDir() != QVector3D(1,0,0)) {
-            ofs << " xdir=" << MathUtil::GetVectorAsString(entrance_object->GetXDir(), false);
+            ofs << " xdir=" << MathUtil::GetVectorAsString(entrance_object->GetXDir(), true);
         }
         if (entrance_object->GetYDir() != QVector3D(0,1,0)) {
-            ofs << " ydir=" << MathUtil::GetVectorAsString(entrance_object->GetYDir(), false);
+            ofs << " ydir=" << MathUtil::GetVectorAsString(entrance_object->GetYDir(), true);
         }
         if (entrance_object->GetZDir() != QVector3D(0,0,1)) {
-            ofs << " zdir=" << MathUtil::GetVectorAsString(entrance_object->GetZDir(), false);
+            ofs << " zdir=" << MathUtil::GetVectorAsString(entrance_object->GetZDir(), true);
         }
     }
 
@@ -2430,7 +2431,7 @@ void Room::SaveXML(QTextStream & ofs)
         ofs << " fog_end=\"" << MathUtil::GetNumber(props->GetFogEnd()) << "\"";
     }
     if (MathUtil::GetVector4AsColour(props->GetFogCol()->toQVector4D()) != QColor(0, 0, 0)) {
-        ofs << " fog_col=" << MathUtil::GetColourAsString(MathUtil::GetVector4AsColour(props->GetFogCol()->toQVector4D()));
+        ofs << " fog_col=" << MathUtil::GetColourAsString(MathUtil::GetVector4AsColour(props->GetFogCol()->toQVector4D()), true);
     }
     if (props->GetTeleportMinDist() != 0.0f) {
         ofs << " teleport_min_dist=\"" << MathUtil::GetNumber(props->GetTeleportMinDist()) << "\"";
@@ -2442,7 +2443,7 @@ void Room::SaveXML(QTextStream & ofs)
         ofs << " shader_id=\"" << props->GetShaderID() << "\"";
     }
     if (props->GetResetVolume().first != QVector3D(-FLT_MAX, -FLT_MAX, -FLT_MAX) && props->GetResetVolume().second != QVector3D(-FLT_MAX, -100.0f, -FLT_MAX)) {
-        ofs << " reset_volume=" << MathUtil::GetAABBAsString(props->GetResetVolume());
+        ofs << " reset_volume=" << MathUtil::GetAABBAsString(props->GetResetVolume(), true);
     }
 
     ofs << ">\n";

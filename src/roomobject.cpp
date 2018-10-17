@@ -3270,7 +3270,7 @@ QString RoomObject::GetXMLCode(const bool show_defaults) const
         code_str += " auto_play=" + MathUtil::GetBoolAsString(props->GetAutoPlay());
     }
     if ((t == TYPE_OBJECT || t == TYPE_GHOST) && (show_defaults || props->GetCullFace() != "back")) {
-        code_str += " cull_face=" + props->GetCullFace();
+        code_str += " cull_face=" + MathUtil::GetStringAsString(props->GetCullFace());
     }
     if (t != TYPE_OBJECT && (show_defaults || props->GetPlayOnce())) {
         code_str += " play_once=" + MathUtil::GetBoolAsString(props->GetPlayOnce());
