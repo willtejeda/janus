@@ -186,6 +186,9 @@ void DOMNode::SetProperties(const QVariantMap & d)
     if (d.contains("vertex_src")) {
         SetVertexSrc(d["vertex_src"].toString());
     }
+    if (d.contains("mtl")) {
+        SetMTL(d["mtl"].toString());
+    }
     if (d.contains("sbs3d")) {
         SetSBS3D(d["sbs3d"].toBool());
     }
@@ -348,10 +351,20 @@ void DOMNode::SetProperties(const QVariantMap & d)
     else if (d.contains("fwd")) {
         SetDir(MathUtil::GetVectorFromQVariant(d["fwd"]));
     }
-    else if (d.contains("xdir") && d.contains("ydir") && d.contains("zdir")){
-        SetXDirs(MathUtil::GetVectorFromQVariant(d["xdir"]),
-                 MathUtil::GetVectorFromQVariant(d["ydir"]),
-                 MathUtil::GetVectorFromQVariant(d["zdir"]));
+    else {
+        QVector3D x = GetXDir()->toQVector3D();
+        QVector3D y = GetYDir()->toQVector3D();
+        QVector3D z = GetZDir()->toQVector3D();
+        if (d.contains("xdir")) {
+            x = MathUtil::GetVectorFromQVariant(d["xdir"]);
+        }
+        if (d.contains("ydir")) {
+            y = MathUtil::GetVectorFromQVariant(d["ydir"]);
+        }
+        if (d.contains("zdir")) {
+            z = MathUtil::GetVectorFromQVariant(d["zdir"]);
+        }
+        SetXDirs(x,y,z);
     }
     if (d.contains("col")) {
         SetColour(MathUtil::GetVector4FromQVariant(d["col"]));

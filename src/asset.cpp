@@ -45,6 +45,9 @@ QString Asset::GetXMLCode() const
     if (props->GetVertexSrc().length() > 0) {
         s += " vertex_src=\"" + props->GetVertexSrc() + "\"";
     }
+    if (props->GetMTL().length() > 0) {
+        s += " mtl=\"" + props->GetMTL() + "\"";
+    }
     if (props->GetSBS3D()) {
         s += " sbs3d=\"true\"";
     }
