@@ -8,7 +8,7 @@
 __VERSION=60.1
 
 #JamesMcCrae: define this when doing Oculus-submitted builds (either for Rift of GearVR app categories)
-DEFINES += OCULUS_SUBMISSION_BUILD
+#DEFINES += OCULUS_SUBMISSION_BUILD
 #Daydream store build
 #DEFINES += DAYDREAM_SUBMISSION_BUILD
 
