@@ -938,7 +938,7 @@ void MathUtil::ErrorLog(const QString line)
 
     const QString s = QString("[") + QDateTime::currentDateTime().toString() + "] " + line;
     error_log_msgs.push_back(s);
-    qDebug() << "MathUtil::ErrorLog" << s;
+//    qDebug() << "MathUtil::ErrorLog" << s;
 }
 
 QString MathUtil::GetCurrentDateTimeAsString() {
