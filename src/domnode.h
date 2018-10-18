@@ -213,6 +213,7 @@ class DOMNode : public QObject, protected QScriptable
     Q_PROPERTY(ScriptableVector * hand1_zdir READ GetHand1ZDir)
     Q_PROPERTY(QString hmd_type READ GetHMDType)
     Q_PROPERTY(QString device_type READ GetDeviceType)
+    Q_PROPERTY(ScriptableVector * emitter_pos READ GetEmitterPos WRITE SetEmitterPos)
 //    Q_PROPERTY(bool running READ GetRunning)
 //    Q_PROPERTY(bool flying READ GetFlying)
 //    Q_PROPERTY(bool walking READ GetWalking)
@@ -463,6 +464,10 @@ public:
     void SetLightmapScale(ScriptableVector * & v);
     void SetLightmapScale(const QVector4D & c);
     inline ScriptableVector * GetLightmapScale() { return lightmap_scale; }
+
+    void SetEmitterPos(ScriptableVector * & v);
+    void SetEmitterPos(const QVector4D & c);
+    inline ScriptableVector * GetEmitterPos() { return emitter_pos; }
 
     void SetAnimID(const QString & s);
     inline QString GetAnimID() const { return anim_id; }
@@ -1126,6 +1131,8 @@ protected:
 
     // Draw Priority
     int m_draw_layer;
+
+    ScriptableVector * emitter_pos;
 
 public slots:
 

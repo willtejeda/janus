@@ -486,6 +486,7 @@ void Room::LinkToAssets(QPointer <RoomObject> o)
         break;
     case TYPE_SOUND:
         o->SetAssetSound(GetAssetSound(o->GetProperties()->GetID()));
+        break;
     case TYPE_OBJECT:
     {
         const QString id = o->GetProperties()->GetID();
@@ -501,10 +502,10 @@ void Room::LinkToAssets(QPointer <RoomObject> o)
         }
         o->SetAssetObject(a);
     }
+        break;
     case TYPE_VIDEO:
-    {
         o->SetAssetVideo(GetAssetVideo(o->GetProperties()->GetID()));
-    }
+        break;
     default:
         break;
     }

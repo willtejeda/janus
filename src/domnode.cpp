@@ -26,6 +26,7 @@ DOMNode::DOMNode(QObject *parent) : QObject(parent)
     rand_col = new ScriptableVector(0, 0, 0, this);
     rand_scale = new ScriptableVector(0, 0, 0, this);
     lightmap_scale = new ScriptableVector(1, 1, 0, 0, this);
+    emitter_pos = new ScriptableVector(0, 0, 0, this);
     blend0 = 0.0f;
     blend1 = 0.0f;
     blend2 = 0.0f;
@@ -1742,6 +1743,16 @@ void DOMNode::SetLightmapScale(ScriptableVector * & v)
 void DOMNode::SetLightmapScale(const QVector4D & c)
 {
     lightmap_scale->SetFromOther(c);
+}
+
+void DOMNode::SetEmitterPos(ScriptableVector * & v)
+{
+    *emitter_pos = *v;
+}
+
+void DOMNode::SetEmitterPos(const QVector4D & c)
+{
+    emitter_pos->SetFromOther(c);
 }
 
 void DOMNode::SetAnimID(const QString & s)
