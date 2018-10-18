@@ -140,7 +140,7 @@ class DOMNode : public QObject, protected QScriptable
     Q_PROPERTY(QString anim_id READ GetAnimID WRITE SetAnimID)
     Q_PROPERTY(float anim_speed READ GetAnimSpeed WRITE SetAnimSpeed)
 
-    Q_PROPERTY(float cur_time READ GetCurTime WRITE SetCurTime)
+    Q_PROPERTY(float current_time READ GetCurTime WRITE SetCurTime)
     Q_PROPERTY(float total_time READ GetTotalTime WRITE SetTotalTime)
 
     //portal related
