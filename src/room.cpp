@@ -60,7 +60,7 @@ Room::Room() :
     LoadTemplates();
     LoadSkyboxes();
 
-    props->SetUseLocalAsset("");
+    SetRoomTemplate("");
 
     physics = new RoomPhysics();
 }
@@ -288,6 +288,7 @@ void Room::SetRoomTemplate(const QString & name)
     if (room_templates.contains(name)) {
         room_template = name;
     }
+    props->SetUseLocalAsset(name);
 }
 
 void Room::save_cubemap_faces_to_cache(QString p_room_url_md5_string, QVector<QString>& p_file_names)
@@ -2862,7 +2863,7 @@ void Room::Create()
         Create_Custom_Translator(use_translator_name);
     }
     else if (page->FoundSingleImageContent()) {
-        props->SetUseLocalAsset("room_plane");
+        SetRoomTemplate("room_plane");
         props->SetVisible(false); //room template isn't visible
 
         QPointer <AssetImage> new_asset_image(new AssetImage());
@@ -2880,7 +2881,7 @@ void Room::Create()
         entrance_object->SetDir(QVector3D(0,0,1));
     }
     else if (page->FoundGeometryContent()) {
-        props->SetUseLocalAsset("room_plane");
+        SetRoomTemplate("room_plane");
         props->SetVisible(false); //room template isn't visible
 
         //QPointer <AssetObject> new_asset_obj(new AssetObject(new_room->GetURL(), new_room->GetURL()));
@@ -2910,7 +2911,7 @@ void Room::Create()
         entrance_object->SetDir(QVector3D(0,0,1));
     }
     else if (page->FoundVideoContent()) {
-        props->SetUseLocalAsset("room_plane");
+        SetRoomTemplate("room_plane");
         props->SetVisible(false); //room template isn't visible
 
         QPointer <AssetVideo> new_asset_vid = new AssetVideo();
@@ -2932,7 +2933,7 @@ void Room::Create()
         entrance_object->GetProperties()->SetDir(QVector3D(0,0,1));
     }    
     else if (page->FoundRedditCommentContent()) {
-        props->SetUseLocalAsset("room2");
+        SetRoomTemplate("room2");
         props->SetVisible(true);
 
         QVector3D pos, dir;
@@ -2942,7 +2943,7 @@ void Room::Create()
         }        
     }
     else if (page->FoundRedditContent()) {
-        props->SetUseLocalAsset("room_box_large");
+        SetRoomTemplate("room_box_large");
         props->SetVisible(false);
 
         QVector3D pos, dir;
@@ -2956,7 +2957,7 @@ void Room::Create()
         }       
     }
     else if (page->FoundImgurContent() || page->FoundFlickrContent()) {
-        props->SetUseLocalAsset("room_plane");
+        SetRoomTemplate("room_plane");
         props->SetVisible(true);
         props->SetColour(QColor(100,100,100));
 
@@ -2964,7 +2965,7 @@ void Room::Create()
         entrance_object->SetDir(QVector3D(0,0,1));
     }
     else if (page->FoundDirectoryListing()) {
-        props->SetUseLocalAsset("room_plane");
+        SetRoomTemplate("room_plane");
         props->SetVisible(true);
 
         QColor c;
@@ -3309,7 +3310,7 @@ void Room::Create_RedditComments()
 
 void Room::Create_Default_Workspace()
 {
-    props->SetUseLocalAsset("room_plane");
+    SetRoomTemplate("room_plane");
     SetStarted(true);
     SetLoaded(true);
     SetProcessing(true);
@@ -3698,7 +3699,7 @@ void Room::Create_WebSurface()
 {
     const QString translator_path = MathUtil::GetTranslatorPath();
     //49.89 - new PBR websurface room by FireFoxG
-    GetProperties()->SetUseLocalAsset("room_plane");
+    SetRoomTemplate("room_plane");
 
     const QString url = GetProperties()->GetURL();
 
