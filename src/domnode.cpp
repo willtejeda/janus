@@ -55,7 +55,6 @@ DOMNode::DOMNode(QObject *parent) : QObject(parent)
     sync = false;
     anim_speed = 1.0f; //multiplier for speed
     auto_load = false;
-    draw_glow = true;
     draw_text = true;
     open = false;
     mirror = false;
@@ -70,7 +69,6 @@ DOMNode::DOMNode(QObject *parent) : QObject(parent)
     total_time = 0.0f;
     spinaxis = new ScriptableVector(0, 1, 0, this);
     spinval = 0.0f;
-    url_changed = false;
     m_light_intensity = 1.0f;
     m_light_cone_angle = 0.0f;
     m_light_cone_exponent = 1.0f;
@@ -81,8 +79,7 @@ DOMNode::DOMNode(QObject *parent) : QObject(parent)
     locked = false;
     interpolate = false; //60.1 - false by default (can push user around otherwise, e.g. pocketspace geometry)
     circular = false;
-    highlighted = false;
-    draw_back = false;
+    highlighted = false;    
     back_alpha = 1.0f;
     auto_load_triggered = false;
     triggered = false;
@@ -586,13 +583,6 @@ void DOMNode::SetProperties(const QVariantMap & d)
     if (d.contains("url")) {
         SetURL(d["url"].toString());
     }
-
-//    if (d.contains("fwd")) {
-//        SetDir(MathUtil::GetStringAsVector(d["fwd"].toString()));
-//    }
-//    if (type == TYPE_ROOM) {
-//        SetXDirs(GetXDir()->toQVector3D(), GetYDir()->toQVector3D(), GetZDir()->toQVector3D());
-//    }
     if (d.contains("text") || d.contains("innertext")) {
         SetTextChanged(true);
     }
@@ -922,37 +912,6 @@ DOMNode * DOMNode::removeChild(DOMNode *node)
     else {
         return NULL;
     }
-}
-
-bool DOMNode::GetSaveAttribute(const char * name, const bool even_if_default) const
-{
-    //attribs with leading underscore are for internal use
-    QString n(name);
-    if (n.left(1) == "_"
-            || (type == TYPE_ROOM && (n == "js_id"  || n == "url" || n == "title" || n == "object"))) {
-        return false;
-    }
-
-//    if (even_if_default || !default_object->property(name).isValid() || GetS(name) != default_object->GetS(name)) { //attribute value test
-        //save it out if we either:
-        // accept defaults,
-        // have no default attrib for comparison (custom attribute),
-        // or the attribute is not default
-//        return true;
-//    }
-//    return false;
-
-    return true;
-}
-
-bool DOMNode::IsRoom() const
-{
-    return type == TYPE_ROOM;
-}
-
-bool DOMNode::IsObject() const
-{
-    return type != TYPE_ROOM;
 }
 
 void DOMNode::SetDirty(const bool b)
@@ -1556,16 +1515,6 @@ void DOMNode::SetTriggered(bool value)
     triggered = value;
 }
 
-bool DOMNode::GetDrawBack() const
-{
-    return draw_back;
-}
-
-void DOMNode::SetDrawBack(bool value)
-{
-    draw_back = value;
-}
-
 bool DOMNode::GetHighlighted() const
 {
     return highlighted;
@@ -1714,16 +1663,6 @@ void DOMNode::SetReadyForScreenshot(bool value)
     ready_for_screenshot = value;
 }
 
-bool DOMNode::GetTranslatorBusy() const
-{
-    return translator_busy;
-}
-
-void DOMNode::SetTranslatorBusy(bool value)
-{
-    translator_busy = value;
-}
-
 bool DOMNode::GetStartedAutoPlay() const
 {
     return started_auto_play;
@@ -1853,9 +1792,6 @@ void DOMNode::SetVisible(const bool b)
 void DOMNode::SetURL(const QString & s)
 {
     //    qDebug() << "DOMNode::SetURL" << s;
-    if (s != url) {
-        url_changed = true;
-    }
     url = s;
 }
 
@@ -1879,11 +1815,6 @@ void DOMNode::SetSrcURL(const QString & s)
     src_url = s;
 }
 
-void DOMNode::SetURLChanged(const bool b)
-{
-    url_changed = b;
-}
-
 void DOMNode::SetOriginalURL(const QString & s)
 {
     url_orig = s;
@@ -1897,11 +1828,6 @@ void DOMNode::SetTitle(const QString & s)
 void DOMNode::SetAutoLoad(const bool b)
 {
     auto_load = b;
-}
-
-void DOMNode::SetDrawGlow(const bool b)
-{
-    draw_glow = b;
 }
 
 void DOMNode::SetDrawText(const bool b)

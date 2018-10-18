@@ -140,6 +140,9 @@ class DOMNode : public QObject, protected QScriptable
     Q_PROPERTY(QString anim_id READ GetAnimID WRITE SetAnimID)
     Q_PROPERTY(float anim_speed READ GetAnimSpeed WRITE SetAnimSpeed)
 
+    Q_PROPERTY(float cur_time READ GetCurTime WRITE SetCurTime)
+    Q_PROPERTY(float total_time READ GetTotalTime WRITE SetTotalTime)
+
     //portal related
     Q_PROPERTY(QString title READ GetTitle WRITE SetTitle)
     Q_PROPERTY(bool open READ GetOpen WRITE SetOpen)
@@ -246,11 +249,6 @@ public:
     void RemoveChild (QPointer <DOMNode>);
     void RemoveChildAt (int pos);
     QPointer <DOMNode> RemoveChildByJSID(QString);
-
-    bool IsRoom() const;
-    bool IsObject() const;
-
-    bool GetSaveAttribute(const char * name, const bool even_if_default) const;
 
     void SetType(QString & t);
     void SetType(const ElementType &t);
@@ -487,9 +485,6 @@ public:
     void SetSrcURL(const QString & s);
     inline QString GetSrcURL() const { return src_url; }
 
-    void SetURLChanged(const bool b);
-    inline bool GetURLChanged() const { return url_changed; }
-
     void SetOriginalURL(const QString & s);
     inline QString GetOriginalURL() const { return url_orig; }
 
@@ -501,9 +496,6 @@ public:
 
     void SetDrawText(const bool b);
     inline bool GetDrawText() const { return draw_text; }
-
-    void SetDrawGlow(const bool b);
-    inline bool GetDrawGlow() const { return draw_glow; }
 
     void SetOpen(const bool b);
     inline bool GetOpen() const { return open; }
@@ -846,10 +838,7 @@ public:
     void SetTexCompress(bool value);
 
     bool GetTriggered() const;
-    void SetTriggered(bool value);
-
-    bool GetDrawBack() const;
-    void SetDrawBack(bool value);
+    void SetTriggered(bool value);   
 
     bool GetHighlighted() const;
     void SetHighlighted(bool value);
@@ -890,10 +879,7 @@ public:
     void SetProgress(float value);
 
     bool GetReadyForScreenshot() const;
-    void SetReadyForScreenshot(bool value);
-
-    bool GetTranslatorBusy() const;
-    void SetTranslatorBusy(bool value);
+    void SetReadyForScreenshot(bool value);   
 
     bool GetStartedAutoPlay() const;
     void SetStartedAutoPlay(bool value);
@@ -1080,9 +1066,7 @@ protected:
 
     ElementType type;
 
-    // object
-
-    bool draw_back;
+    // object   
     bool circular;
     bool highlighted;
     bool auto_load_triggered;
@@ -1110,13 +1094,11 @@ protected:
     QString anim_id;
     float anim_speed;
 
-    bool url_changed;
     QString url;
     QString url_orig;
     QString title;
     bool auto_load;
     bool draw_text;
-    bool draw_glow;
     bool open;
     bool mirror;
     bool active;

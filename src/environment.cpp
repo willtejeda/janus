@@ -781,7 +781,6 @@ void Environment::Update2(QPointer <Player> player, MultiPlayerManager *multi_pl
                     }
                     p2->SetURL("", r->GetProperties()->GetURL());
 //                    qDebug() << "Environment::Update2 p2 URL" << r->GetProperties()->GetURL();
-                    p2->GetProperties()->SetURLChanged(false);
 
                     QPointer <AssetImage> thumb_a = p2->GetThumbAssetImage();
                     if (r && thumb_a) {
@@ -813,7 +812,6 @@ void Environment::Update2(QPointer <Player> player, MultiPlayerManager *multi_pl
                         }
                         p->SetURL("", rc->GetProperties()->GetURL());
                     }
-                    p->GetProperties()->SetURLChanged(false);
 
                     //add the entranceportal to the room
                     if (r != rootnode) {
