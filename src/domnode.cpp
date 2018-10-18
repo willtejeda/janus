@@ -2720,10 +2720,7 @@ ElementType DOMNode::StringToElementType(const QString name)
     }
     else if (s == "link") {
         return TYPE_LINK;
-    }
-    else if (s == "object") {
-        return TYPE_OBJECT;
-    }
+    }    
     else if (s == "paragraph") {
         return TYPE_PARAGRAPH;
     }
@@ -2775,8 +2772,8 @@ ElementType DOMNode::StringToElementType(const QString name)
     else if (s == "assetwebsurface") {
         return TYPE_ASSETWEBSURFACE;
     }
-    else {
-        return TYPE_ERROR;
+    else { //60.1 - error tolerance, all unknown tags assumed to be Object
+        return TYPE_OBJECT;
     }
 }
 
