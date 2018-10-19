@@ -504,7 +504,9 @@ void Room::LinkToAssets(QPointer <RoomObject> o)
     }
         break;
     case TYPE_VIDEO:
-        o->SetAssetVideo(GetAssetVideo(o->GetProperties()->GetID()));
+        o->SetAssetVideo(GetAssetVideo(o->GetProperties()->GetVideoID().isEmpty() ?
+                                               o->GetProperties()->GetID() :
+                                               o->GetProperties()->GetVideoID()));
         break;
     default:
         break;

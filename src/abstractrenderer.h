@@ -389,11 +389,13 @@ public:
 
             QPair<TextureHandle*, GLuint> & texture_id = GetTextureFromHandle(p_map, p_texture_handle_ref);
 
-            auto texture_type = texture_id.first->GetTextureType();
-            GLenum texture_target = (texture_type == TextureHandle::TEXTURE_2D) ? GL_TEXTURE_2D : GL_TEXTURE_CUBE_MAP;
+            if (texture_id.first) {
+                auto texture_type = texture_id.first->GetTextureType();
+                GLenum texture_target = (texture_type == TextureHandle::TEXTURE_2D) ? GL_TEXTURE_2D : GL_TEXTURE_CUBE_MAP;
 
-            MathUtil::glFuncs->glBindTexture(texture_target, texture_id.second);
-            m_bound_texture_handles_render[p_slot_index] = p_texture_handle_ref;
+                MathUtil::glFuncs->glBindTexture(texture_target, texture_id.second);
+                m_bound_texture_handles_render[p_slot_index] = p_texture_handle_ref;
+            }
         }
     }
 
