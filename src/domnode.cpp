@@ -2732,10 +2732,7 @@ ElementType DOMNode::StringToElementType(const QString name)
     }
     else if (s == "text") {
         return TYPE_TEXT;
-    }
-    else if (s == "video") {
-        return TYPE_VIDEO;
-    }
+    }    
     else if (s == "room") {
         return TYPE_ROOM;
     }
@@ -2771,6 +2768,9 @@ ElementType DOMNode::StringToElementType(const QString name)
     }
     else if (s == "assetwebsurface") {
         return TYPE_ASSETWEBSURFACE;
+    }
+    else if (s.left(5) == "video") {
+        return TYPE_VIDEO;
     }
     else { //60.1 - error tolerance, all unknown tags assumed to be Object
         return TYPE_OBJECT;
