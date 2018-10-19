@@ -78,7 +78,7 @@ QScriptValue CreateObject(QScriptContext * context, QScriptEngine * engine)
 //        roomObject.property("objects").setProperty(newId.toString(), newDOMNodeScriptValue);
     }
 
-    qDebug() << "CreateObject" << newNode->GetJSID();
+//    qDebug() << "CreateObject" << newNode->GetJSID();
     return newDOMNodeScriptValue;
 }
 
