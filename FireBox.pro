@@ -8,9 +8,9 @@
 __VERSION=60.1
 
 #JamesMcCrae: define this when doing Oculus-submitted builds (either for Rift of GearVR app categories)
-DEFINES += OCULUS_SUBMISSION_BUILD
+#DEFINES += OCULUS_SUBMISSION_BUILD
 #Daydream store build
-#DEFINES += DAYDREAM_SUBMISSION_BUILD
+DEFINES += DAYDREAM_SUBMISSION_BUILD
 
 DEFINES += __JANUS_VERSION=\\\"$$__VERSION\\\"
 DEFINES += __JANUS_VERSION_COMPLETE=__JANUS_VERSION\\\".$$system(git --git-dir ./.git --work-tree . describe --always --tags --abbrev=7)\\\"
@@ -70,7 +70,9 @@ unix:macx{
 
 CONFIG += c++11
 CONFIG += qtnamespace
-CONFIG += -opengl desktop -no-angle
+
+!android:CONFIG += -opengl desktop -no-angle
+android:CONFIG += -opengl es2 -no-angle
 
 TARGET = janusvr
 TEMPLATE = app
