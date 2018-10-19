@@ -547,13 +547,9 @@ void Environment::MovePlayer(QPointer <RoomObject> portal, QPointer <Player> pla
     }   
 
     if (set_player_to_portal && p2) {
-        player->GetProperties()->SetPos(p2->GetProperties()->GetPos()->toQVector3D()+p2->GetProperties()->GetZDir()->toQVector3D());
-        //59.0 - orient on teleport through portal, do not do it for rift or vive
-        const QString hmd_type = player->GetHMDType();
-        if (hmd_type != "rift" && hmd_type != "vive" && hmd_type != "wmxr" && hmd_type != "daydream" && hmd_type != "cardboard" && hmd_type != "gear" && hmd_type != "go") {
-            player->GetProperties()->SetDir(p2->GetZDir());
-            player->UpdateDir();
-        }
+        player->GetProperties()->SetPos(p2->GetProperties()->GetPos()->toQVector3D()+p2->GetProperties()->GetZDir()->toQVector3D());        
+        player->GetProperties()->SetDir(p2->GetZDir());
+        player->UpdateDir();
         player->GetProperties()->SetVel(QVector3D(0,0,0));
     }    
     else {
