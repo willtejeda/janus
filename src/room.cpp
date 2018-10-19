@@ -1556,7 +1556,7 @@ void Room::UpdateJS(QPointer <Player> player)
     for (QPointer <AssetScript> & script : assetscripts) {
         if (script) {
             script->Update();
-            LogErrorOnException();
+            LogErrorOnException(script);
 //            qDebug() << "Room::UpdateJS evaluating" << script->GetS("src");
 
 //            qDebug() << "Room::UpdateJS" << script->GetFinished() << script->GetOnLoadInvoked();
@@ -1568,14 +1568,14 @@ void Room::UpdateJS(QPointer <Player> player)
 //                    qDebug() << "Room::UpdateJS scriptonload" << script << script->GetProperties()->GetSrc() << script->HasRoomFunction("onLoad") << script->GetOnLoadInvoked();
                     script->SetOnLoadInvoked(true);
                     QList<QPointer <RoomObject> > objectsAdded = script->DoRoomLoad(envobjects, player);
-                    LogErrorOnException();
+                    LogErrorOnException(script);
                     AddRoomObjects(objectsAdded);
                 }
                 else {
 //                    qDebug() << " calling update";
 //                    qDebug() << "setdeltatime" << (int)(player->GetDeltaTime()* 1000);
                     QList<QPointer <RoomObject> > objectsAdded = script->DoRoomUpdate(envobjects, player, QScriptValueList() << (int)(player->GetDeltaTime()* 1000));
-                    LogErrorOnException();
+                    LogErrorOnException(script);
                     AddRoomObjects(objectsAdded);
                 }
 
@@ -1617,17 +1617,19 @@ bool Room::HasJSFunctionContains(const QString & s, const QString & code)
     return false;
 }
 
-void Room::LogErrorOnException()
+void Room::LogErrorOnException(QPointer <AssetScript> script)
 {
     if (script_engine->hasUncaughtException()) {
-//        const int script_error_line = script_engine->uncaughtExceptionLineNumber();
+        const int script_error_line = script_engine->uncaughtExceptionLineNumber();
         const QString script_error_str = script_engine->uncaughtException().toString();
         const QStringList trace = script_engine->uncaughtExceptionBacktrace();
 
-        QString err = QString("JS exception: ") + script_error_str;
-        err += "\n Backtrace:";
-        for (int i=0; i<trace.size(); ++i) {
-            err += "\n  " + trace[i];
+        QString err = QString("JS exception (") + script->GetProperties()->GetSrc() + " line " + QString::number(script_error_line) + "): " + script_error_str;
+        if (!trace.isEmpty()) {
+            err += "\n Backtrace:";
+            for (int i=0; i<trace.size(); ++i) {
+                err += "\n  " + trace[i];
+            }
         }
 
         MathUtil::ErrorLog(err);
@@ -1648,11 +1650,11 @@ void Room::CallJSFunction(const QString & s, QPointer <Player> player, QList <QP
                     args << (n ? script_engine->toScriptValue(n) : QScriptValue());
                 }
                 objectsAdded = script->RunFunctionOnObjects(s, envobjects, player, args);
-                LogErrorOnException();
+                LogErrorOnException(script);
             }
             else {
                 objectsAdded = script->RunScriptCodeOnObjects(s, envobjects, player);
-                LogErrorOnException();
+                LogErrorOnException(script);
             }
             AddRoomObjects(objectsAdded);
         }

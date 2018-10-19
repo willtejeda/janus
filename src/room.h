@@ -292,7 +292,7 @@ private:
 
     void SetAllObjectsLocked(const bool b);
 
-    void LogErrorOnException();   
+    void LogErrorOnException(QPointer <AssetScript> script);
 
     //private room-specific properties
     QVector3D player_pos_trans;
