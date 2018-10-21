@@ -23,7 +23,6 @@ DEFINES += RIFT_ID=\\\"$$system(cat riftid.txt)\\\"
 DEFINES += GEAR_ID=\\\"$$system(cat gearid.txt)\\\"
 }
 
-
 # Default rules for deployment.
 android:include(deployment.pri)
 
