@@ -8,32 +8,6 @@
 #include "scriptablevector.h"
 #include "mathutil.h"
 
-enum ElementType {
-    TYPE_GHOST,
-    TYPE_IMAGE,
-    TYPE_LIGHT,
-    TYPE_LINK,
-    TYPE_OBJECT,
-    TYPE_PARAGRAPH,
-    TYPE_PARTICLE,
-    TYPE_SOUND,
-    TYPE_TEXT,
-    TYPE_VIDEO,
-    TYPE_ROOM,
-    TYPE_PLAYER,
-    TYPE_ASSET,
-    TYPE_ASSETGHOST,
-    TYPE_ASSETIMAGE,
-    TYPE_ASSETOBJECT,
-    TYPE_ASSETRECORDING,
-    TYPE_ASSETSCRIPT,
-    TYPE_ASSETSHADER,
-    TYPE_ASSETSOUND,
-    TYPE_ASSETVIDEO,
-    TYPE_ASSETWEBSURFACE,
-    TYPE_ERROR
-};
-
 class DOMNode : public QObject, protected QScriptable
 {
     Q_OBJECT

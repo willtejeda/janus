@@ -2430,6 +2430,7 @@ void Room::DoEdit(const QString & s)
         obj->SetParentObject(QPointer <RoomObject> ());
         obj->GetProperties()->SetSync(false);
 
+//        qDebug() << "Room::DoEdit checking for js_id" << obj->GetProperties()->GetJSID();
         QPointer <RoomObject> o2 = GetRoomObject(obj->GetProperties()->GetJSID());
         if (o2) {            
             //object already exists
@@ -2447,6 +2448,10 @@ void Room::DoEdit(const QString & s)
             o2 = new RoomObject();
             o2->Copy(obj);            
             o2->GetProperties()->SetInterpolate(true);
+            //60.1 - ensure we copy the js_id (so things like drag and drop work correctly and fix a bug with generating new objects with new js_id's)
+            if (!obj->GetProperties()->GetJSID().isEmpty()) {
+                o2->GetProperties()->SetJSID(obj->GetProperties()->GetJSID());
+            }
 
             //make new objects scale in
             o2->GetProperties()->SetScale(QVector3D(0,0,0));
