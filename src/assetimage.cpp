@@ -451,6 +451,10 @@ void AssetImage::DrawImageGL(QPointer <AssetShader> shader, const bool left_eye)
 
 bool AssetImage::UpdateGL()
 {    
+    if (!SettingsManager::GetAssetImagesEnabled()) {
+        return false;
+    }
+
     if (GetLoaded() && !GetProcessing()) {
 //        qDebug() << "AssetImage::UpdateGL() starting thread" << src_url;
         SetProcessing(true);
