@@ -2616,6 +2616,7 @@ void Room::Create_Default(const QVariantMap fireboxroom)
 {
 //    qDebug() << page->GetData()["FireBoxRoom"].toMap()["Assets"].toMap()["AssetObject"].toList();
 //    QVariantMap fireboxroom = page->GetData()["FireBoxRoom"].toMap();
+//    qDebug() << "Room::Create_Default() 1" << props->GetURL();
 
     QVariantMap assets = fireboxroom["assets"].toMap();
     QVariantMap room;
@@ -2626,7 +2627,7 @@ void Room::Create_Default(const QVariantMap fireboxroom)
     Create_Default_Assets_Helper(assets);
 
 //    qDebug() << "room" << fireboxroom["room"].toMap();
-    SetProperties(room);
+    SetProperties(room);    
 
     QPointer <RoomObject> root_object(new RoomObject());
     root_object->SetType(TYPE_ROOM);
@@ -2643,7 +2644,7 @@ void Room::Create_Default(const QVariantMap fireboxroom)
 
 void Room::Create()
 {
-//    qDebug() << "Room::Create()" << this->GetURL();
+//    qDebug() << "Room::Create()" << props->GetURL() << page->GetURL();
     //update portal with page title and set this portal as the room's parent
     const QString url = props->GetURL();
     const QString title = page->GetTitle();
@@ -2672,7 +2673,7 @@ void Room::Create()
     }
     else if (page->FoundFireBoxContent()) {
         SetProperties(d_room);
-        props->SetURL(url); //60.1 - replace URL if it was overwritten
+        props->SetURL(url); //60.1 - replace URL if it was overwritten        
         entrance_object->SetProperties(d_room); //sets initial position/dir for entrance
     }
     else if (!use_translator_name.isEmpty()) {
@@ -3635,15 +3636,16 @@ void Room::Create_Default_Helper(const QVariantMap & d, QPointer <RoomObject> p)
 {
     QVariantMap::const_iterator it;
     for (it=d.begin(); it!=d.end(); ++it) {
-        const QString t = it.key();
+        const QString t_str = it.key();
+        const ElementType t = DOMNode::StringToElementType(t_str);
 //            qDebug() << "NAME" << name;
-        if (!t.isEmpty()) {
-            QVariantList l = d[t].toList();
+        if (!t_str.isEmpty()) {
+            QVariantList l = d[t_str].toList();
             for (int i=0; i<l.size(); ++i) {
                 QVariantMap d = l[i].toMap();
 
                 QPointer <RoomObject> o = new RoomObject();
-                o->SetType(DOMNode::StringToElementType(t));
+                o->SetType(t);
                 o->SetProperties(d);
                 if (d.contains("js_id")) {
                     o->GetProperties()->SetJSID(d["js_id"].toString());
@@ -3651,7 +3653,8 @@ void Room::Create_Default_Helper(const QVariantMap & d, QPointer <RoomObject> p)
 
                 //60.0 - resolve links relative to this room's path
                 if (t == TYPE_LINK) {
-                    o->SetURL(this->GetProperties()->GetURL(), o->GetProperties()->GetURL());
+//                    qDebug() << "Room::Create_Default_Helper" << props->GetURL() << o->GetProperties()->GetURL();
+                    o->SetURL(props->GetURL(), o->GetProperties()->GetURL());
 
                     if (!page->FoundFireBoxContent()) {
                         QVector3D pos, dir;

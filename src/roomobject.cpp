@@ -3177,6 +3177,7 @@ QString RoomObject::GetXMLCode(const bool show_defaults) const
 void RoomObject::SetURL(const QString & base, const QString & s)
 {
 //    qDebug() << "RoomObject::SetURL" << this << base << s;
+    props->SetBaseURL(base);
     props->SetURL(s);
 
     //do extra stuff - if this is a link, has an attached websurface, etc.
