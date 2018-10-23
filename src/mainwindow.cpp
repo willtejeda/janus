@@ -1036,12 +1036,14 @@ void MainWindow::Initialize()
     }
 
 #ifndef __ANDROID__
-    connect(&timer2, SIGNAL(timeout()), this, SLOT(CEFTimeOut()), Qt::ConnectionType::QueuedConnection);
+//    connect(&timer2, SIGNAL(timeout()), this, SLOT(CEFTimeOut()), Qt::ConnectionType::QueuedConnection);
+    connect(&timer2, SIGNAL(timeout()), this, SLOT(CEFTimeOut()));
 #endif
-    connect(&timer, SIGNAL(timeout()), this, SLOT(TimeOut()), Qt::ConnectionType::QueuedConnection);
+    //connect(&timer, SIGNAL(timeout()), this, SLOT(TimeOut()), Qt::ConnectionType::QueuedConnection);
+    connect(&timer, SIGNAL(timeout()), this, SLOT(TimeOut()));
 
 #ifndef __ANDROID__
-    timer2.start( 0 );
+    timer2.start( 10 );
 #endif
     timer.start( 0 );    
 }
