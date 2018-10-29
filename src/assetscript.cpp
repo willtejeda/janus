@@ -416,7 +416,7 @@ QList<QPointer <RoomObject> > AssetScript::UpdateAsynchronousCreatedObjects(QHas
     return FlushNewObjects();
 }
 
-void AssetScript::UpdateInternalDataStructures(QPointer <Player> player)
+void AssetScript::UpdateInternalDataStructures(QPointer <Player> player, QMap <QString, DOMNode *> remote_players)
 {
     //56.0 - ensure DOM/roomobjects always get updated (including object properties pointers for portals)
     //60.0 - INSANELY IMPORTANT - make sure do not overwrite the dom map and remove objects created by JS via CreateObject!    
@@ -440,16 +440,20 @@ void AssetScript::UpdateInternalDataStructures(QPointer <Player> player)
     }
     global_scope.setProperty("__dom", script_engine->toScriptValue(dom_map));
     roomObject.setProperty("objects", script_engine->toScriptValue(dom_map));
+    //remote player map
+//    qDebug() << "AssetScript::UpdateInternalDataStructures" << remote_players << remote_players.size();
+    roomObject.setProperty("players", script_engine->toScriptValue(remote_players));
+    roomObject.setProperty("playerCount", remote_players.size());
 }
 
-QList<QPointer <RoomObject> > AssetScript::RunScriptCodeOnObjects(const QString & code, QHash <QString, QPointer <RoomObject> > & envobjects, QPointer <Player> player)
+QList<QPointer <RoomObject> > AssetScript::RunScriptCodeOnObjects(const QString & code, QHash <QString, QPointer <RoomObject> > & envobjects, QPointer <Player> player, QMap <QString, DOMNode *> remote_players)
 {
-    UpdateInternalDataStructures(player);
+    UpdateInternalDataStructures(player, remote_players);
     RunScriptCode(code);
     return UpdateAsynchronousCreatedObjects(envobjects);
 }
 
-QList<QPointer <RoomObject> > AssetScript::RunFunctionOnObjects(const QString & fnName, QHash <QString, QPointer <RoomObject> > & envobjects, QPointer <Player> player, const QScriptValueList & args)
+QList<QPointer <RoomObject> > AssetScript::RunFunctionOnObjects(const QString & fnName, QHash <QString, QPointer <RoomObject> > & envobjects, QPointer <Player> player, QMap<QString, DOMNode *> remote_players, const QScriptValueList & args)
 {
     if (!HasFunction(fnName)) {
         const QString err = "Couldn't run undefined function on objects:" + fnName;
@@ -457,7 +461,7 @@ QList<QPointer <RoomObject> > AssetScript::RunFunctionOnObjects(const QString & 
         return QList<QPointer <RoomObject> >();
     }
 
-    UpdateInternalDataStructures(player);
+    UpdateInternalDataStructures(player, remote_players);
     RunFunction(fnName, args);
 //    qDebug() << "AssetScript::RunFunctionOnObjects" << this << fnName;
     return UpdateAsynchronousCreatedObjects(envobjects);
@@ -545,7 +549,7 @@ QList<QPointer <RoomObject> > AssetScript::RunFunctionOnObjects(const QString & 
 //    return addedObjects;
 //}
 
-QList<QPointer <RoomObject> > AssetScript::OnKeyEvent(QString name, QKeyEvent * e, QHash <QString, QPointer <RoomObject> > & objects, QPointer <Player> player, bool * defaultPrevented)
+QList<QPointer <RoomObject> > AssetScript::OnKeyEvent(QString name, QKeyEvent * e, QHash <QString, QPointer <RoomObject> > & objects, QPointer <Player> player, QMap <QString, DOMNode *> remote_players, bool * defaultPrevented)
 {
     if (!HasRoomFunction(name)) {
         *defaultPrevented = false;
@@ -553,7 +557,7 @@ QList<QPointer <RoomObject> > AssetScript::OnKeyEvent(QString name, QKeyEvent * 
     }
 
     QScriptValue eventScriptObject = KeyEventToScriptValue(script_engine, e);
-    QList<QPointer <RoomObject> > objectsAdded = RunFunctionOnObjects("room." + name, objects, player, QScriptValueList() << eventScriptObject);
+    QList<QPointer <RoomObject> > objectsAdded = RunFunctionOnObjects("room." + name, objects, player, remote_players, QScriptValueList() << eventScriptObject);
     *defaultPrevented = eventScriptObject.property("_defaultPrevented").toBool();
     return objectsAdded;
 }
@@ -578,10 +582,10 @@ QString AssetScript::GetJSCode()
     return GetData();
 }
 
-QList <QPointer <RoomObject> > AssetScript::DoRoomLoad(QHash <QString, QPointer <RoomObject> > & envobjects, QPointer <Player> player)
+QList <QPointer <RoomObject> > AssetScript::DoRoomLoad(QHash <QString, QPointer <RoomObject> > & envobjects, QPointer <Player> player, QMap <QString, DOMNode *> remote_players)
 {
 //    qDebug() << "AssetScript::DoRoomLoad" << this;
-    UpdateInternalDataStructures(player);
+    UpdateInternalDataStructures(player, remote_players);
     if (room_load_fn.isFunction()) {
 //        qDebug() << "AssetScript::DoRoomLoad" << this << room_load_fn.toString();
         room_load_fn.call(roomObject);
@@ -589,9 +593,9 @@ QList <QPointer <RoomObject> > AssetScript::DoRoomLoad(QHash <QString, QPointer 
     return UpdateAsynchronousCreatedObjects(envobjects);
 }
 
-QList <QPointer <RoomObject> > AssetScript::DoRoomUpdate(QHash <QString, QPointer <RoomObject> > & envobjects, QPointer <Player> player, const QScriptValueList & args)
+QList <QPointer <RoomObject> > AssetScript::DoRoomUpdate(QHash <QString, QPointer <RoomObject> > & envobjects, QPointer <Player> player, QMap <QString, DOMNode *> remote_players, const QScriptValueList & args)
 {
-    UpdateInternalDataStructures(player);
+    UpdateInternalDataStructures(player, remote_players);
     if (room_update_fn.isFunction()) {
         room_update_fn.call(roomObject, args);
     }

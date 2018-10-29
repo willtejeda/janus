@@ -633,7 +633,7 @@ void Environment::UpdateAssets()
     }
 }
 
-void Environment::Update1(QPointer <Player> player)
+void Environment::Update1(QPointer <Player> player, MultiPlayerManager *multi_players)
 {        
     if (curnode) {                
         curnode->UpdatePhysics(player);             
@@ -642,7 +642,7 @@ void Environment::Update1(QPointer <Player> player)
 
         //update JS
         if (curnode->GetReady()) {
-            curnode->UpdateJS(player);
+            curnode->UpdateJS(player, multi_players);
             curnode->UpdateAutoPlay();
         }
     }   

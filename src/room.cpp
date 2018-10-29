@@ -1326,7 +1326,7 @@ void Room::UpdateObjects(QPointer <Player> player, MultiPlayerManager *multi_pla
                         QList <QPointer <DOMNode> > args;
                         args.push_back(envobjects[obj->GetProperties()->GetJSID()]->GetProperties());
                         args.push_back(envobjects[o->GetProperties()->GetJSID()]->GetProperties());
-                        CallJSFunction("room.onCollisionEnter", player, args);
+                        CallJSFunction("room.onCollisionEnter", player, multi_players, args);
                     }
                 }
                 //process onexit
@@ -1336,7 +1336,7 @@ void Room::UpdateObjects(QPointer <Player> player, MultiPlayerManager *multi_pla
                         QList <QPointer <DOMNode> > args;
                         args.push_back(envobjects[obj->GetProperties()->GetJSID()]->GetProperties());
                         args.push_back(envobjects[o->GetProperties()->GetJSID()]->GetProperties());
-                        CallJSFunction("room.onCollisionExit", player, args);
+                        CallJSFunction("room.onCollisionExit", player, multi_players, args);
                     }
                 }
 
@@ -1550,10 +1550,12 @@ void Room::UpdatePhysics(QPointer <Player> player)
     }
 }
 
-void Room::UpdateJS(QPointer <Player> player)
+void Room::UpdateJS(QPointer <Player> player, MultiPlayerManager * multi_players)
 {    
     bool all_scripts_ready = (!assetscripts.isEmpty() && GetProcessed());
     const QVector3D d = player->GetProperties()->GetDir()->toQVector3D();
+    QMap <QString, DOMNode *> remote_players = multi_players->GetPlayersInRoomDOMNodeMap(props->GetURL());
+
 //    qDebug() << "Room::UpdateJS()" << assetscripts.size();
     for (QPointer <AssetScript> & script : assetscripts) {
         if (script) {
@@ -1569,14 +1571,14 @@ void Room::UpdateJS(QPointer <Player> player)
                 if (!script->GetOnLoadInvoked()) {
 //                    qDebug() << "Room::UpdateJS scriptonload" << script << script->GetProperties()->GetSrc() << script->HasRoomFunction("onLoad") << script->GetOnLoadInvoked();
                     script->SetOnLoadInvoked(true);
-                    QList<QPointer <RoomObject> > objectsAdded = script->DoRoomLoad(envobjects, player);
+                    QList<QPointer <RoomObject> > objectsAdded = script->DoRoomLoad(envobjects, player, remote_players);
                     LogErrorOnException(script);
                     AddRoomObjects(objectsAdded);
                 }
                 else {
 //                    qDebug() << " calling update";
 //                    qDebug() << "setdeltatime" << (int)(player->GetDeltaTime()* 1000);
-                    QList<QPointer <RoomObject> > objectsAdded = script->DoRoomUpdate(envobjects, player, QScriptValueList() << (int)(player->GetDeltaTime()* 1000));
+                    QList<QPointer <RoomObject> > objectsAdded = script->DoRoomUpdate(envobjects, player, remote_players, QScriptValueList() << (int)(player->GetDeltaTime()* 1000));
                     LogErrorOnException(script);
                     AddRoomObjects(objectsAdded);
                 }
@@ -1639,9 +1641,10 @@ void Room::LogErrorOnException(QPointer <AssetScript> script)
     }
 }
 
-void Room::CallJSFunction(const QString & s, QPointer <Player> player, QList <QPointer <DOMNode> > nodes)
+void Room::CallJSFunction(const QString & s, QPointer <Player> player, MultiPlayerManager * multi_players, QList <QPointer <DOMNode> > nodes)
 {
     const QVector3D d = player->GetProperties()->GetDir()->toQVector3D();
+    QMap <QString, DOMNode *> remote_players = multi_players->GetPlayersInRoomDOMNodeMap(props->GetURL());
 
     for (QPointer <AssetScript> & script : assetscripts) {
         if (script) {            
@@ -1651,11 +1654,11 @@ void Room::CallJSFunction(const QString & s, QPointer <Player> player, QList <QP
                 for (QPointer <DOMNode> & n : nodes) {
                     args << (n ? script_engine->toScriptValue(n) : QScriptValue());
                 }
-                objectsAdded = script->RunFunctionOnObjects(s, envobjects, player, args);
+                objectsAdded = script->RunFunctionOnObjects(s, envobjects, player, remote_players, args);
                 LogErrorOnException(script);
             }
             else {
-                objectsAdded = script->RunScriptCodeOnObjects(s, envobjects, player);
+                objectsAdded = script->RunScriptCodeOnObjects(s, envobjects, player, remote_players);
                 LogErrorOnException(script);
             }
             AddRoomObjects(objectsAdded);
@@ -2311,16 +2314,16 @@ bool Room::SaveXML(const QString & filename)
     return true;
 }
 
-bool Room::RunKeyPressEvent(QKeyEvent * e, QPointer <Player> player)
+bool Room::RunKeyPressEvent(QKeyEvent * e, QPointer <Player> player, MultiPlayerManager * multi_players)
 {
     bool defaultPrevented = false;
-
     const QVector3D d = player->GetProperties()->GetDir()->toQVector3D();
+    QMap <QString, DOMNode *> remote_players = multi_players->GetPlayersInRoomDOMNodeMap(props->GetURL());
 
     for (QPointer <AssetScript> & a : assetscripts) {
         if (a) {
             bool eachDefaultPrevented = false;
-            QList<QPointer <RoomObject> > objectsAdded = a->OnKeyEvent("onKeyDown", e, envobjects, player, &eachDefaultPrevented);
+            QList<QPointer <RoomObject> > objectsAdded = a->OnKeyEvent("onKeyDown", e, envobjects, player, remote_players, &eachDefaultPrevented);
             AddRoomObjects(objectsAdded);
 
             if (eachDefaultPrevented) {
@@ -2337,15 +2340,16 @@ bool Room::RunKeyPressEvent(QKeyEvent * e, QPointer <Player> player)
     return defaultPrevented;
 }
 
-bool Room::RunKeyReleaseEvent(QKeyEvent * e, QPointer <Player> player)
-{
-    const QVector3D d = player->GetProperties()->GetDir()->toQVector3D();
+bool Room::RunKeyReleaseEvent(QKeyEvent * e, QPointer <Player> player, MultiPlayerManager * multi_players)
+{    
     bool defaultPrevented = false;
+    const QVector3D d = player->GetProperties()->GetDir()->toQVector3D();
+    QMap <QString, DOMNode *> remote_players = multi_players->GetPlayersInRoomDOMNodeMap(props->GetURL());
 
     for (QPointer <AssetScript> & a : assetscripts) {
         if (a) {
             bool eachDefaultPrevented = false;
-            QList<QPointer <RoomObject> > objectsAdded = a->OnKeyEvent("onKeyUp", e, envobjects, player, &eachDefaultPrevented);
+            QList<QPointer <RoomObject> > objectsAdded = a->OnKeyEvent("onKeyUp", e, envobjects, player, remote_players, &eachDefaultPrevented);
             AddRoomObjects(objectsAdded);
 
             if (eachDefaultPrevented) {

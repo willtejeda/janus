@@ -396,7 +396,7 @@ void Game::Update()
 
     //do environment::update1 and process portal crossings
     QPointer <Room> r0 = env->GetCurRoom();
-    env->Update1(player);
+    env->Update1(player, multi_players);
     QPointer <Room> r1 = env->GetCurRoom();
 
     //clear selection if player moved
@@ -1052,9 +1052,9 @@ void Game::mouseMoveEvent(QMouseEvent * e, const float x, const float y, const i
         }
 #endif
 
-        r->CallJSFunction("room.onMouseMove", player);
+        r->CallJSFunction("room.onMouseMove", player, multi_players);
         if (left_btn) {
-            r->CallJSFunction("room.onMouseDrag", player);
+            r->CallJSFunction("room.onMouseDrag", player, multi_players);
         }
 
 //        qDebug() << "Game::mouseMoveEvent" << selected[cursor_index] << envobjects.contains(selected[cursor_index]);
@@ -1248,7 +1248,7 @@ void Game::mousePressEvent(QMouseEvent * e, const int cursor_index, const QSize 
     switch (state) {
     case JVR_STATE_DEFAULT:
         if (e->button() == Qt::LeftButton) {
-            r->CallJSFunction("room.onMouseDown", player);
+            r->CallJSFunction("room.onMouseDown", player, multi_players);
 
             if (r->GetProperties()->GetCursorVisible()) {
                 SoundManager::Play(SOUND_CLICK1, false, player->GetCursorPos(cursor_index), 1.0f);
@@ -1412,8 +1412,8 @@ void Game::mouseReleaseEvent(QMouseEvent * e, const int cursor_index, const QSiz
     {
         if (e->button() == Qt::LeftButton) {
 
-            r->CallJSFunction("room.onMouseUp", player);
-            r->CallJSFunction("room.onClick", player);
+            r->CallJSFunction("room.onMouseUp", player, multi_players);
+            r->CallJSFunction("room.onClick", player, multi_players);
 
 #ifdef __ANDROID__
 
@@ -1751,7 +1751,7 @@ void Game::keyPressEvent(QKeyEvent * e)
                 player->SetRunning(true);
             }
 
-            bool defaultPrevented = r->RunKeyPressEvent(e, player);
+            bool defaultPrevented = r->RunKeyPressEvent(e, player, multi_players);
             if (defaultPrevented) {
                 keys[e->key()] = false;
                 break;
@@ -2566,7 +2566,7 @@ void Game::keyReleaseEvent(QKeyEvent * e)
         return;
     }
 
-    bool defaultPrevented = r->RunKeyReleaseEvent(e, player);
+    bool defaultPrevented = r->RunKeyReleaseEvent(e, player, multi_players);
     if (defaultPrevented) {
         return;
     }
@@ -4060,7 +4060,7 @@ void Game::UpdateControllers()
                     }
 #endif
 
-                    r->CallJSFunction("room.onMouseDown", player);
+                    r->CallJSFunction("room.onMouseDown", player, multi_players);
 
                     if (!room_has_fn_onmousedown) {
                         StartOpInteractionDefault(i);
@@ -4087,8 +4087,8 @@ void Game::UpdateControllers()
 #endif
 
                     //room onclick
-                    r->CallJSFunction("room.onMouseUp", player);
-                    r->CallJSFunction("room.onClick", player);
+                    r->CallJSFunction("room.onMouseUp", player, multi_players);
+                    r->CallJSFunction("room.onClick", player, multi_players);
 
                     //object onclick
                     QPointer <RoomObject> o = r->GetRoomObject(player->GetCursorObject(i));
@@ -4096,7 +4096,7 @@ void Game::UpdateControllers()
                         //55.2 - onclick is on mouse release, and should only happen once per mouse click
                         QString click_code = o->GetProperties()->GetOnClick();
                         if (click_code.length() > 0) { //special javascript onclick code to run
-                            r->CallJSFunction(click_code, player);
+                            r->CallJSFunction(click_code, player, multi_players);
                         }
                     }
 
@@ -4171,7 +4171,7 @@ void Game::UpdateControllers()
         //LMB
         if (s[1].t[0].proc_press) {
             s[1].t[0].proc_press = false;
-            r->CallJSFunction("room.onMouseDown", player);
+            r->CallJSFunction("room.onMouseDown", player, multi_players);
 
             if (!room_has_fn_onmousedown) {
                 StartOpInteractionDefault(0);
@@ -4181,8 +4181,8 @@ void Game::UpdateControllers()
             s[1].t[0].proc_release = false;
 
             //room onclick
-            r->CallJSFunction("room.onMouseUp", player);
-            r->CallJSFunction("room.onClick", player);
+            r->CallJSFunction("room.onMouseUp", player, multi_players);
+            r->CallJSFunction("room.onClick", player, multi_players);
 
             //object onclick
             QPointer <RoomObject> o = r->GetRoomObject(player->GetCursorObject(0));
@@ -4190,7 +4190,7 @@ void Game::UpdateControllers()
                 //55.2 - onclick is on mouse release, and should only happen once per mouse click
                 QString click_code = o->GetProperties()->GetOnClick();
                 if (click_code.length() > 0) { //special javascript onclick code to run
-                    r->CallJSFunction(click_code, player);
+                    r->CallJSFunction(click_code, player, multi_players);
                 }
             }
 
@@ -4875,7 +4875,7 @@ void Game::EndOpInteractionDefault(const int i)
         //55.2 - onclick is on mouse release, and should only happen once per mouse click
         QString click_code = o->GetProperties()->GetOnClick();
         if (click_code.length() > 0) { //special javascript onclick code to run
-            r->CallJSFunction(click_code, player);
+            r->CallJSFunction(click_code, player, multi_players);
         }
 
         //default stuff

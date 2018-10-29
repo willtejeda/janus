@@ -131,6 +131,7 @@ public:
     QString GetUserID() const;    
     QPointer <RoomObject> GetPlayer();
     QList <QPointer <RoomObject> > GetPlayersInRoom(const QString & url);
+    QMap <QString, DOMNode *> GetPlayersInRoomDOMNodeMap(const QString & url);
 
     QList <QPair <QString, QColor> > GetNewChatMessages();
 

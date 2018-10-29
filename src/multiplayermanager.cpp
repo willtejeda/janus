@@ -912,6 +912,21 @@ QList <QPointer <RoomObject> > MultiPlayerManager::GetPlayersInRoom(const QStrin
     return ps;
 }
 
+QMap <QString, DOMNode *> MultiPlayerManager::GetPlayersInRoomDOMNodeMap(const QString & url)
+{
+    const QString url_md5 = MathUtil::MD5Hash(url);
+    QMap <QString, DOMNode *> ps;
+    QMap <QString, QPointer <RoomObject> >::iterator it;
+    for (it=players.begin(); it!=players.end(); ++it) {
+        QPointer <RoomObject> player = it.value();
+        if (player && player->GetProperties() && QString::compare(player->GetURL(), url_md5) == 0) {
+//            qDebug() << "MultiPlayerManager::GetPlayersInRoomDOMNodeMap()" << player->GetProperties()->GetID(); //<< it.value()->GetTimeElapsed();
+            ps[player->GetProperties()->GetID()] = player->GetProperties().data();
+        }
+    }
+    return ps;
+}
+
 QPointer <RoomObject> MultiPlayerManager::GetPlayer()
 {
     return user_ghost;
