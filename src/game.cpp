@@ -2991,13 +2991,12 @@ void Game::UpdateOverlays()
         if (obj) {
             info_text_geom.Clear();
 
-
-            const QString t = obj->GetProperties()->GetTypeAsString();
-            QString type_str = t + " js_id=\"" + obj->GetProperties()->GetJSID();
-            if (t == "link") {
+            const ElementType t = obj->GetType();
+            QString type_str = DOMNode::ElementTypeToTagName(t) + " js_id=\"" + obj->GetProperties()->GetJSID();
+            if (t == TYPE_LINK) {
                 type_str += " url=\"" + obj->GetProperties()->GetURL().left(15)+ "...";
             }
-            else if (t != "text" && t != "paragraph"){
+            else if (t != TYPE_TEXT && t != TYPE_PARAGRAPH){
                 type_str += " id=\"" + obj->GetProperties()->GetID() + "\"";
             }
 
@@ -3038,7 +3037,7 @@ void Game::UpdateOverlays()
                 info_text_geom.AddText(QString(" mirror=") + MathUtil::GetBoolAsString(obj->GetProperties()->GetMirror()), QColor(0,255,0));
             }
 
-            if (obj->GetType() == TYPE_TEXT) {
+            if (t == TYPE_TEXT) {
                 info_text_geom.AddText("  ...</text>");
             }
             else {
@@ -5088,35 +5087,35 @@ QPointer <Asset> Game::CreateAssetFromURL(const QString url_str)
 {
     //infer asset type from filename extension
     //60.0 - be sure to use just the filename only, as this filters out blah.txt?v=2311283 and so on
-    const QString t = MathUtil::AssetTypeFromFilename(QUrl(url_str).fileName());
+    const ElementType t = MathUtil::AssetTypeFromFilename(QUrl(url_str).fileName());
 //    qDebug() << "Game::CreateAssetFromURL" << url_str << AssetTypeToString(t);
 
     QPointer <Asset> new_asset;
-    if (t == "assetghost") {
+    if (t == TYPE_ASSETGHOST) {
         new_asset = new AssetGhost();
     }
-    else if (t == "assetimage") {
+    else if (t == TYPE_ASSETIMAGE) {
         new_asset = new AssetImage();
     }
-    else if (t == "assetobject") {
+    else if (t == TYPE_ASSETOBJECT) {
         new_asset = new AssetObject();
     }
-    else if (t == "assetrecording") {
+    else if (t == TYPE_ASSETRECORDING) {
         new_asset = new AssetRecording();
     }
-    else if (t == "assetscript") {
+    else if (t == TYPE_ASSETSCRIPT) {
         new_asset = new AssetScript(env->GetCurRoom());
     }
-    else if (t == "assetshader") {
+    else if (t == TYPE_ASSETSHADER) {
         new_asset = new AssetShader();
     }
-    else if (t == "assetsound") {
+    else if (t == TYPE_ASSETSOUND) {
         new_asset = new AssetSound();
     }
-    else if (t == "assetvideo") {
+    else if (t == TYPE_ASSETVIDEO) {
         new_asset = new AssetVideo();
     }
-    else if (t == "assetwebsurface") {
+    else if (t == TYPE_ASSETWEBSURFACE) {
         new_asset = (AbstractWebSurface*)new AssetWebSurface();
     }
 
