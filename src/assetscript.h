@@ -69,6 +69,8 @@ public:
 
     QList <QPointer <RoomObject> > DoRoomLoad(QHash <QString, QPointer <RoomObject> > & envobjects, QPointer <Player> player, QMap <QString, DOMNode *> remote_players);
     QList <QPointer <RoomObject> > DoRoomUpdate(QHash <QString, QPointer <RoomObject> > & envobjects, QPointer <Player> player, QMap <QString, DOMNode *> remote_players, const QScriptValueList & args);
+    QList <QPointer <RoomObject> > DoRoomOnPlayerEnterEvent(QHash <QString, QPointer <RoomObject> > & envobjects, QPointer <Player> player, QMap <QString, DOMNode *> remote_players, const QScriptValueList & args);
+    QList <QPointer <RoomObject> > DoRoomOnPlayerExitEvent(QHash <QString, QPointer <RoomObject> > & envobjects, QPointer <Player> player, QMap <QString, DOMNode *> remote_players, const QScriptValueList & args);
 
 private:
 
@@ -90,6 +92,8 @@ private:
 
     QScriptValue room_load_fn;
     QScriptValue room_update_fn;
+    QScriptValue room_onplayerenterevent_fn;
+    QScriptValue room_onplayerexitevent_fn;
 };
 
 #endif // ASSETSCRIPT_H

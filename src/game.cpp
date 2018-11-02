@@ -5719,7 +5719,7 @@ void Game::UpdateMultiplayer()
                 multi_players->SetResetPlayer(false);
             }
         }
-    }
+    }   
 }
 
 void Game::UpdateAssets()

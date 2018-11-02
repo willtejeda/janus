@@ -1554,7 +1554,7 @@ void Room::UpdateJS(QPointer <Player> player, MultiPlayerManager * multi_players
 {    
     bool all_scripts_ready = (!assetscripts.isEmpty() && GetProcessed());
     const QVector3D d = player->GetProperties()->GetDir()->toQVector3D();
-    QMap <QString, DOMNode *> remote_players = multi_players->GetPlayersInRoomDOMNodeMap(props->GetURL());
+    QMap <QString, DOMNode *> remote_players = multi_players->GetPlayersInRoomDOMNodeMap(props->GetURL());  
 
 //    qDebug() << "Room::UpdateJS()" << assetscripts.size();
     for (QPointer <AssetScript> & script : assetscripts) {
@@ -1592,13 +1592,13 @@ void Room::UpdateJS(QPointer <Player> player, MultiPlayerManager * multi_players
                     }
                     queued_functions.push_back(itr.value());
                 }
-                script->GetGlobalProperty("room").property(ScriptBuiltins::janus_queued_functions).setProperty("length", 0);               
+                script->GetGlobalProperty("room").property(ScriptBuiltins::janus_queued_functions).setProperty("length", 0);                              
             }
             else {
                 all_scripts_ready = false;
             }
         }
-    }
+    } 
 
     // 59.13 - once all scripts are loaded
     if (all_scripts_ready) {
@@ -1608,6 +1608,33 @@ void Room::UpdateJS(QPointer <Player> player, MultiPlayerManager * multi_players
     //player dir may have updated
     if (player->GetProperties()->GetDir()->toQVector3D() != d) {
         player->UpdateDir();
+    }
+
+    if (scripts_ready) {
+        //callback for room.onPlayerEnterEvent
+        QList <QPointer <RoomObject> > & enter_events = multi_players->GetOnPlayerEnterEvents();
+        QList <QPointer <RoomObject> > & exit_events = multi_players->GetOnPlayerExitEvents();
+        for (QPointer <AssetScript> & script : assetscripts) {
+            if (script && script->GetFinished()) {
+                //call player enter events
+                for (QPointer <RoomObject> o : enter_events) {
+                    if (o && o->GetProperties()) {
+//                        qDebug() << "Room::UpdateJS calling JS function enter" << o << o->GetProperties()->GetID();
+                        script->DoRoomOnPlayerEnterEvent(envobjects, player, remote_players, QScriptValueList() << script_engine->toScriptValue(o->GetProperties()));
+                    }
+                }
+
+                //call player exit events
+                for (QPointer <RoomObject> o : exit_events) {
+                    if (o && o->GetProperties()) {
+//                        qDebug() << "Room::UpdateJS calling JS function exit" << o << o->GetProperties()->GetID();
+                        script->DoRoomOnPlayerExitEvent(envobjects, player, remote_players, QScriptValueList() << script_engine->toScriptValue(o->GetProperties()));
+                    }
+                }
+            }
+        }
+        enter_events.clear();
+        exit_events.clear();
     }
 }
 

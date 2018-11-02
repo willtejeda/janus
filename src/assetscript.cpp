@@ -380,11 +380,15 @@ void AssetScript::Update()
         //       otherwise there is a bug with multiple erroneous function calls
         roomObject.setProperty("onLoad", QScriptValue());
         roomObject.setProperty("update", QScriptValue());
+        roomObject.setProperty("onPlayerEnterEvent", QScriptValue());
+        roomObject.setProperty("onPlayerExitEvent", QScriptValue());
 
         RunScriptCode(QString(GetData()));
 
         room_load_fn = roomObject.property("onLoad");
         room_update_fn = roomObject.property("update");
+        room_onplayerenterevent_fn = roomObject.property("onPlayerEnterEvent");
+        room_onplayerexitevent_fn = roomObject.property("onPlayerExitEvent");
 
         QScriptSyntaxCheckResult syntax_result = script_engine->checkSyntax(last_code);
         if (syntax_result.state() != QScriptSyntaxCheckResult::Valid) {
@@ -598,6 +602,24 @@ QList <QPointer <RoomObject> > AssetScript::DoRoomUpdate(QHash <QString, QPointe
     UpdateInternalDataStructures(player, remote_players);
     if (room_update_fn.isFunction()) {
         room_update_fn.call(roomObject, args);
+    }
+    return UpdateAsynchronousCreatedObjects(envobjects);
+}
+
+QList <QPointer <RoomObject> > AssetScript::DoRoomOnPlayerEnterEvent(QHash <QString, QPointer <RoomObject> > & envobjects, QPointer <Player> player, QMap <QString, DOMNode *> remote_players, const QScriptValueList & args)
+{
+    UpdateInternalDataStructures(player, remote_players);
+    if (room_onplayerenterevent_fn.isFunction()) {
+        room_onplayerenterevent_fn.call(roomObject, args);
+    }
+    return UpdateAsynchronousCreatedObjects(envobjects);
+}
+
+QList <QPointer <RoomObject> > AssetScript::DoRoomOnPlayerExitEvent(QHash <QString, QPointer <RoomObject> > & envobjects, QPointer <Player> player, QMap <QString, DOMNode *> remote_players, const QScriptValueList & args)
+{
+    UpdateInternalDataStructures(player, remote_players);
+    if (room_onplayerexitevent_fn.isFunction()) {
+        room_onplayerexitevent_fn.call(roomObject, args);
     }
     return UpdateAsynchronousCreatedObjects(envobjects);
 }
