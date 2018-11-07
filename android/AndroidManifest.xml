@@ -1,9 +1,8 @@
 <?xml version="1.0"?>
-<manifest package="org.janusvr" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools" android:versionName="60.00" android:versionCode="49" android:installLocation="auto">
+<manifest package="org.janusvr" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools" android:versionName="61.00" android:versionCode="49" android:installLocation="auto">
     <!--Normal app -->
     <application android:hardwareAccelerated="true" android:name="org.qtproject.qt5.android.bindings.QtApplication" android:keepScreenOn="true" android:label="JanusVR" android:icon="@drawable/icon">
         <activity android:configChanges="orientation|uiMode|screenLayout|screenSize|smallestScreenSize|layoutDirection|locale|fontScale|keyboard|keyboardHidden|navigation" android:name="org.janus.JanusActivity" android:label="JanusVR" android:screenOrientation="landscape" android:launchMode="singleTop" android:resizeableActivity="false" android:theme="@style/VrActivityTheme" android:excludeFromRecents="true">
-
     <!---->
     <!--For Oculus GO Submission -->
 <!--
@@ -20,6 +19,7 @@
                 <category android:name="com.google.intent.category.CARDBOARD"/>
             </intent-filter>
             <!---->
+
             <!--For Oculus GO Submission -->
 <!--
             <intent-filter>
@@ -28,7 +28,6 @@
             </intent-filter>
 -->
             <!---->
-
             <intent-filter>
                 <action android:name="org.janusvr.launchfrombrowser"/>
                 <category android:name="android.intent.category.DEFAULT"/>

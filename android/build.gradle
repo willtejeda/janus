@@ -69,11 +69,12 @@ android {
             abiFilters "armeabi", "armeabi-v7a", "x86"
         }
         versionCode 49
-        versionName "60.00"
+        versionName "61.00"
     }
 
-    /*
+
     //Used to sign Gear/Go build
+    /*
     signingConfigs {
         release {
             keyAlias keystoreProperties['keyAlias']
