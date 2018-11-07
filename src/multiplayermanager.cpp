@@ -506,9 +506,11 @@ void MultiPlayerManager::Update(QPointer <Player> player, const QString & url, c
         players[user_ghost->GetProperties()->GetID()]->SetURL(cur_url_id);
     }
 
+    //update player onPlayerEnter onPlayerExit events
+    QList <QPointer <RoomObject> > current_in_room = GetPlayersInRoom(cur_url);
+
     //update players (and remove those who timed out)
     QList <QString> players_to_remove;
-    QList <QPointer <RoomObject> > current_in_room = GetPlayersInRoom(cur_url);
     QMap<QString, QPointer <RoomObject> >::iterator playerIndex;
     for (playerIndex = players.begin(); playerIndex != players.end(); ++playerIndex) {
 
@@ -516,8 +518,8 @@ void MultiPlayerManager::Update(QPointer <Player> player, const QString & url, c
 
         if (p) {
             //release 60.0 - 30+ second timeout delay... if too short, a long avatar load may trigger the timeout, avatar is deleted, then load started, then deleted, on and on...
-            if (p->GetTimeElapsed() > RoomObject::GetLogoffRate() + 60.0f) {
-    //            qDebug() << "MultiplayerManager::Update()  removing";
+            if (p->GetTimeElapsed() > RoomObject::GetLogoffRate() + 30.0f) {
+//                qDebug() << "MultiplayerManager::Update()  removing";
                 players_to_remove.push_back(playerIndex.key());
             }
             else {
@@ -525,7 +527,7 @@ void MultiPlayerManager::Update(QPointer <Player> player, const QString & url, c
                 const bool player_in_room = (QString::compare(p->GetURL(), cur_url_id) == 0);
                 const bool player_in_adjacent_room = adjacent_urls.contains(p->GetURL());
 
-    //            qDebug() << "MultiplayerManager::Update() setting player" << playerIndex.key() << player->GetS("id") << p->GetURL() << "cur_url" << cur_url << "cur_url_id" << cur_url_id << QString::number(MathUtil::hash(cur_url), 16) <<  "in room" << player_in_room << player_in_adjacent_room;
+//                qDebug() << "MultiplayerManager::Update() setting player" << playerIndex.key() << player->GetProperties()->GetID() << p->GetURL() << "cur_url" << cur_url << "cur_url_id" << cur_url_id << QString::number(MathUtil::hash(cur_url), 16) <<  "in room" << player_in_room << player_in_adjacent_room;
                 p->SetPlayerInRoom(player_in_room);
                 p->SetPlayerInAdjacentRoom(player_in_adjacent_room);
 
@@ -536,33 +538,42 @@ void MultiPlayerManager::Update(QPointer <Player> player, const QString & url, c
                 p->Update(delta_time);
                 if (current_in_room.contains(p) && !players_in_room.contains(playerIndex.key())){
     //                Analytics::PostEvent("user", "joined", player->GetID());
+//                    qDebug() << "MultiPlayerManager::Update() pushing back userenter" << p << p->GetProperties()->GetID();
+                    on_player_enter_events.push_back(p);
                     players_in_room[playerIndex.key()] = p;
                 }
             }
         }
     }
 
-    for (int i=0; i<players_to_remove.size(); ++i) {
-        players.remove(players_to_remove[i]);
-        players_in_room.remove(players_to_remove[i]);
+    for (QString & s : players_to_remove) {
+        players.remove(s);
+        if (players_in_room.contains(s)) {
+            on_player_exit_events.push_back(players_in_room[s]);
+            players_in_room.remove(s);
+        }
+
     }
 
     //update players_in_room hash
     players_to_remove.clear();
-    for (playerIndex = players_in_room.begin(); playerIndex != players_in_room.end();++playerIndex) {
-        QPointer <RoomObject> player = playerIndex.value();
-        if (!current_in_room.contains(player)){
+    for (playerIndex = players_in_room.begin(); playerIndex != players_in_room.end(); ++playerIndex) {
+        QPointer <RoomObject> p = playerIndex.value();
+        if (!current_in_room.contains(p)){
 //            Analytics::PostEvent("user","left",player->GetID());
+//            qDebug() << "MultiPlayerManager::Update() pushing back userleft" << p << p->GetProperties()->GetID();
             players_to_remove.push_back(playerIndex.key());
         }
     }
-    for (int i = 0; i < players_to_remove.length(); i++){
-        players_in_room.remove(players_to_remove[i]);
-    }
+    for (QString & s : players_to_remove) {
+        if (players_in_room.contains(s)) {
+            on_player_exit_events.push_back(players_in_room[s]);
+            players_in_room.remove(s);
+        }
+    }   
 
     //do ghost recordings for self, regardless of multiplayermanager being enabled or not
     if (recording) {
-
         AssetRecordingPacket packet;
         packet.SetTimeToEpoch();
 
@@ -907,6 +918,21 @@ QList <QPointer <RoomObject> > MultiPlayerManager::GetPlayersInRoom(const QStrin
         if (player && QString::compare(player->GetURL(), url_md5) == 0) {
 //            qDebug() << "MultiPlayerManager::GetPlayersInRoom()" << it.value()->GetID() << it.value()->GetTimeElapsed();
             ps.push_back(player);
+        }
+    }
+    return ps;
+}
+
+QMap <QString, DOMNode *> MultiPlayerManager::GetPlayersInRoomDOMNodeMap(const QString & url)
+{
+    const QString url_md5 = MathUtil::MD5Hash(url);
+    QMap <QString, DOMNode *> ps;
+    QMap <QString, QPointer <RoomObject> >::iterator it;
+    for (it=players.begin(); it!=players.end(); ++it) {
+        QPointer <RoomObject> player = it.value();
+        if (player && player->GetProperties() && QString::compare(player->GetURL(), url_md5) == 0) {
+//            qDebug() << "MultiPlayerManager::GetPlayersInRoomDOMNodeMap()" << player->GetProperties()->GetID(); //<< it.value()->GetTimeElapsed();
+            ps[player->GetProperties()->GetID()] = player->GetProperties().data();
         }
     }
     return ps;
@@ -1983,4 +2009,14 @@ void MultiPlayerManager::RemoveSubscribeURL(const QString & url)
 
         }
     }
+}
+
+QList <QPointer <RoomObject> > & MultiPlayerManager::GetOnPlayerEnterEvents()
+{
+    return on_player_enter_events;
+}
+
+QList <QPointer <RoomObject> > & MultiPlayerManager::GetOnPlayerExitEvents()
+{
+    return on_player_exit_events;
 }

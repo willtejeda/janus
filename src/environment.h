@@ -41,7 +41,7 @@ public:
 
     void UpdateAssets();
 
-    void Update1(QPointer <Player> player);
+    void Update1(QPointer <Player> player, MultiPlayerManager * multi_players);
     void Update2(QPointer <Player> player, MultiPlayerManager * multi_players);
 
     void NavigateToRoom(QPointer <Player>, QPointer <Room> r);
