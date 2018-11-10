@@ -2070,31 +2070,32 @@ bool Room::DeleteSelected(const QString & selected, const bool do_sync, const bo
             MathUtil::room_delete_code += o->GetXMLCode();
         }
 
-        if (!(o->GetType() == TYPE_LINK && o->GetProperties()->GetOpen()))
-        {
-            //remove this object from physics sim
-            if (physics) {
-                physics->RemoveRigidBody(o);
-            }
-
-            //remove this object from it's parent's child list
-            if (o->GetParentObject()) {
-                o->GetParentObject()->GetChildObjects().removeAll(o);
-            }
-
-            o->SetSelected(false);
-            o->Stop();
-            if (play_delete_sound) {
-                o->PlayDeleteObject();
-            }
-
-            if (envobjects.contains(selected) && envobjects[selected] && envobjects[selected]->GetParentObject()) {
-                envobjects[selected]->GetParentObject()->GetProperties()->removeChild(envobjects[selected]->GetProperties());
-            }
-
-            envobjects.remove(selected);
-            did_delete = true;
+        if (o->GetType() == TYPE_LINK && o->GetProperties()->GetOpen()) {
+            o->GetProperties()->SetOpen(false);
         }
+
+        //remove this object from physics sim
+        if (physics) {
+            physics->RemoveRigidBody(o);
+        }
+
+        //remove this object from it's parent's child list
+        if (o->GetParentObject()) {
+            o->GetParentObject()->GetChildObjects().removeAll(o);
+        }
+
+        o->SetSelected(false);
+        o->Stop();
+        if (play_delete_sound) {
+            o->PlayDeleteObject();
+        }
+
+        if (envobjects.contains(selected) && envobjects[selected] && envobjects[selected]->GetParentObject()) {
+            envobjects[selected]->GetParentObject()->GetProperties()->removeChild(envobjects[selected]->GetProperties());
+        }
+
+        envobjects.remove(selected);
+        did_delete = true;
     }
 
     return did_delete;
