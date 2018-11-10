@@ -388,16 +388,18 @@ void Room::SetCubemap(const QVector <QString> & skybox_image_ids, CUBEMAP_TYPE p
                 imgs[imageIndex]->GetProperties()->SetTexClamp(true);
             }
         }
-        else { //error
-            QPointer <AssetImage> new_asset_image(new AssetImage());
-//            new_asset_image->CreateFromText(QString::number(imageIndex), 32, false, QColor(255,255,255), QColor(0,0,0), 1.0f, 32, 32, true);
-            new_asset_image->CreateFromText(QString("<p align=\"center\">no skybox image</p>"), 24, true, QColor(255,128,192), QColor(25,25,128), 1.0f, 256, 256, true);
-            new_asset_image->GetProperties()->SetID("skybox_error_image"+QString::number(imageIndex));
-            new_asset_image->GetProperties()->SetSaveToMarkup(false);
-            new_asset_image->GetProperties()->SetTexClamp(true);
-            AddAssetImage(new_asset_image);
-
-            imgs[imageIndex] = dynamic_cast<AssetImage *>(new_asset_image.data());
+        else if (skybox_image_ids[imageIndex].isEmpty()) { //error
+            const QString error_id = "_skybox_error_image"+QString::number(imageIndex);
+            if (!assetimages.contains(error_id)) {
+//                qDebug() << "error?" << skybox_image_ids[imageIndex] << assetimages.contains(skybox_image_ids[imageIndex]) << assetimages[skybox_image_ids[imageIndex]];
+                QPointer <AssetImage> new_asset_image(new AssetImage());
+                new_asset_image->CreateFromText(QString("<p align=\"center\">no skybox image</p>"), 24, true, QColor(255,128,192), QColor(25,25,128), 1.0f, 256, 256, true);
+                new_asset_image->GetProperties()->SetID(error_id);
+                new_asset_image->GetProperties()->SetSaveToMarkup(false);
+                new_asset_image->GetProperties()->SetTexClamp(true);
+                AddAssetImage(new_asset_image);
+            }
+            imgs[imageIndex] = dynamic_cast<AssetImage *>(assetimages[error_id].data());
         }
     }
 
@@ -1414,15 +1416,14 @@ void Room::UpdateObjects(QPointer <Player> player, MultiPlayerManager *multi_pla
             if (a) {
                 ++nObjects;
                 progress += a->GetProgress();
+//                qDebug() << "o" << a << a->GetProgress();
                 if (!a->GetFinished() && !a->GetError()) {
-//                    qDebug() << "WAITING ON" << a->GetProperties()->GetID() << a->GetProperties()->GetTypeAsString() << a->GetFinished() << a->GetError();
                     is_room_ready = false;
                     is_room_ready_for_screenshot = false;
                 }
                 if (!a->GetTexturesFinished()) {
                     is_room_ready_for_screenshot = false;
                 }
-//                qDebug() << "object" << a->GetProperty("src") << a->GetFinished() << a->GetTexturesFinished();
             }
         }        
 
@@ -1430,10 +1431,10 @@ void Room::UpdateObjects(QPointer <Player> player, MultiPlayerManager *multi_pla
             if (a) {
                 ++nImages;
                 progress += a->GetProgress();
+//                qDebug() << "i" << a << a->GetProgress() << a->GetProperties()->GetID() << a->GetProperties()->GetSrc() << a->GetFinished();
                 if (!a->GetFinished() && !a->GetError()) {
                     is_room_ready_for_screenshot = false;
-                }
-//                qDebug() << "image" << a->GetProperty("src") << a->GetFinished();
+                }                
             }
         }
 
@@ -1443,10 +1444,9 @@ void Room::UpdateObjects(QPointer <Player> player, MultiPlayerManager *multi_pla
         else{
             progress = 0.0f;
         }
-
         props->SetProgress(progress);
 
-        //qDebug() << "progress" << progress;
+//        qDebug() << "progress" << progress << is_room_ready << is_room_ready_for_screenshot << nObjects << nImages;
         if (is_room_ready) {
             props->SetReady(true);
         }
