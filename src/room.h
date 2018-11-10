@@ -166,6 +166,8 @@ public:
     bool SaveXML(const QString & filename);
     void SaveXML(QTextStream & ofs);
 
+    bool SaveJSON(const QString & filename);
+
     void OnCollisionEnter(QPointer <RoomObject> envobject, QPointer <RoomObject> other_envobject, QPointer <Player> player);
     void OnCollisionExit(QPointer <RoomObject> envobject, QPointer <RoomObject> other_envobject, QPointer <Player> player);
 
@@ -263,6 +265,8 @@ public slots:
     void Create_Custom_Translator_Loaded();
 
 private:   
+
+    QVariantMap GetJSONCode(const bool show_defaults) const;
 
     void LinkToAssets(QPointer <RoomObject> o);    
 

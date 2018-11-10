@@ -2172,8 +2172,6 @@ void Room::SaveXML(QTextStream & ofs)
     ofs << "<Room";
 
     //write out all room attributes
-    QVariantMap rd;
-
     if (QString::compare(props->GetServer(), SettingsManager::GetServer()) != 0) {
         ofs << " server=\"" << props->GetServer() << "\"";
     }
@@ -2349,6 +2347,283 @@ bool Room::SaveXML(const QString & filename)
 
     qDebug() << "Room::SaveXML() - File" << filename << "saved.";
     return true;
+}
+
+bool Room::SaveJSON(const QString & filename)
+{
+    QFile file(filename);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        qDebug() << "Room::SaveJSON(): File " << filename << " can't be saved";
+        return false;
+    }
+
+    QTextStream ofs(&file);
+
+    ofs.setRealNumberNotation(QTextStream::FixedNotation);
+    ofs << QJsonDocument::fromVariant(GetJSONCode(false)).toJson();
+
+    file.close();
+
+    qDebug() << "Room::SaveJSON() - File" << filename << "saved.";
+    return true;
+}
+
+QVariantMap Room::GetJSONCode(const bool show_defaults) const
+{
+    QVariantMap root;
+
+    QVariantMap fireboxroom;
+    QVariantMap assetsmap;
+    QVariantList assetobjectlist;
+    QVariantList assetimagelist;
+    QVariantList assetghostlist;
+    QVariantList assetrecordinglist;
+    QVariantList assetshaderlist;
+    QVariantList assetscriptlist;
+    QVariantList assetsoundlist;
+    QVariantList assetvideolist;
+    QVariantList assetwebsurfacelist;
+
+    QVariantMap room;
+    QMap <QString, QVariantList> elementlistmap;
+
+    for (const QPointer <AssetObject> & a : assetobjects) {
+        if (a && !a->GetProperties()->GetPrimitive() && a->GetProperties()->GetSaveToMarkup()) {
+            assetobjectlist.push_back(a->GetJSONCode());
+        }
+    }
+
+    for (const QPointer <AssetImage> & a : assetimages) {
+        if (a && a->GetProperties()->GetSaveToMarkup()) {
+            assetimagelist.push_back(a->GetJSONCode());
+        }
+    }
+
+    for (const QPointer <AssetGhost> & a : assetghosts) {
+        if (a && a->GetProperties()->GetSaveToMarkup()) {
+            assetghostlist.push_back(a->GetJSONCode());
+        }
+    }
+
+    for (const QPointer <AssetRecording> & a : assetrecordings) {
+        if (a && a->GetProperties()->GetSaveToMarkup()) {
+            assetrecordinglist.push_back(a->GetJSONCode());
+        }
+    }
+
+    for (const QPointer <AssetShader> & a : assetshaders) {
+        if (a && a->GetProperties()->GetSaveToMarkup()) {
+            assetshaderlist.push_back(a->GetJSONCode());
+        }
+    }
+
+    for (const QPointer <AssetScript> & a : assetscripts) {
+        if (a && a->GetProperties()->GetSaveToMarkup()) {
+            assetscriptlist.push_back(a->GetJSONCode());
+        }
+    }
+
+    for (const QPointer <AssetSound> & a : assetsounds) {
+        if (a && a->GetProperties()->GetSaveToMarkup()) {
+            assetsoundlist.push_back(a->GetJSONCode());
+        }
+    }
+
+    for (const QPointer <AssetVideo> & a : assetvideos) {
+        if (a && a->GetProperties()->GetSaveToMarkup()) {
+            assetvideolist.push_back(a->GetJSONCode());
+        }
+    }
+
+    for (const QPointer <AbstractWebSurface> & a : assetwebsurfaces) {
+        if (a && a->GetProperties()->GetSaveToMarkup()) {
+            assetwebsurfacelist.push_back(a->GetJSONCode());
+        }
+    }
+
+    if (!assetobjectlist.empty()) {
+        assetsmap.insert("assetobject", assetobjectlist);
+    }
+    if (!assetimagelist.empty()) {
+        assetsmap.insert("assetimage", assetimagelist);
+    }
+    if (!assetghostlist.empty()) {
+        assetsmap.insert("assetghost", assetghostlist);
+    }
+    if (!assetrecordinglist.empty()) {
+        assetsmap.insert("assetrecording", assetrecordinglist);
+    }
+    if (!assetshaderlist.empty()) {
+        assetsmap.insert("assetshader", assetshaderlist);
+    }
+    if (!assetscriptlist.empty()) {
+        assetsmap.insert("assetscript", assetscriptlist);
+    }
+    if (!assetsoundlist.empty()) {
+        assetsmap.insert("assetsound", assetsoundlist);
+    }
+    if (!assetvideolist.empty()) {
+        assetsmap.insert("assetvideo", assetvideolist);
+    }
+    if (!assetwebsurfacelist.empty()) {
+        assetsmap.insert("assetwebsurface", assetwebsurfacelist);
+    }
+
+    //populate room tag attributes
+    if (QString::compare(props->GetServer(), SettingsManager::GetServer()) != 0) {
+        room["server"] = props->GetServer();
+    }
+    if (props->GetServerPort() != SettingsManager::GetPort()) {
+        room["port"] = QString::number(props->GetServerPort());
+    }
+    if (props->GetLocked()) {
+        room["locked"] = true;
+    }
+    if (room_template.length() > 0) {
+        room["use_local_asset"] = room_template;
+    }
+    if (!props->GetVisible()) {
+        room["visible"] = false;
+    }
+    if (!props->GetCursorVisible()) {
+        room["cursor_visible"] = false;
+    }
+
+    if (entrance_object) {
+//        qDebug() << "Room::SaveFireBoxRoom() - saving" << entrance_object << entrance_object->GetPos();
+        if (entrance_object->GetPos() != QVector3D(0,0,0)) {
+            room["pos"] = MathUtil::GetVectorAsString(entrance_object->GetPos(), false);
+        }
+        if (entrance_object->GetXDir() != QVector3D(1,0,0)) {
+            room["xdir"] = MathUtil::GetVectorAsString(entrance_object->GetXDir(), false);
+        }
+        if (entrance_object->GetYDir() != QVector3D(0,1,0)) {
+            room["ydir"] = MathUtil::GetVectorAsString(entrance_object->GetYDir(), false);
+        }
+        if (entrance_object->GetZDir() != QVector3D(0,0,1)) {
+            room["zdir"] = MathUtil::GetVectorAsString(entrance_object->GetZDir(), false);
+        }
+    }
+
+    if (cubemap) {
+        if (cubemap->GetAssetImages().size() == 6) {
+            QVector <QPointer <AssetImage> > & skybox_imgs = cubemap->GetAssetImages();
+            //faces 0 right 1 left 2 up 3 down 4 front 5 back
+            if (skybox_imgs[0] && skybox_imgs[0]->GetProperties()->GetSaveToMarkup()) {
+                room["skybox_right_id"] = skybox_imgs[0]->GetProperties()->GetID();
+            }
+            if (skybox_imgs[1] && skybox_imgs[1]->GetProperties()->GetSaveToMarkup()) {
+                room["skybox_left_id"] = skybox_imgs[1]->GetProperties()->GetID();
+            }
+            if (skybox_imgs[2] && skybox_imgs[2]->GetProperties()->GetSaveToMarkup()) {
+                room["skybox_up_id"] = skybox_imgs[2]->GetProperties()->GetID();
+            }
+            if (skybox_imgs[3] && skybox_imgs[3]->GetProperties()->GetSaveToMarkup()) {
+                room["skybox_down_id"] = skybox_imgs[3]->GetProperties()->GetID();
+            }
+            if (skybox_imgs[4] && skybox_imgs[4]->GetProperties()->GetSaveToMarkup()) {
+                room["skybox_front_id"] = skybox_imgs[4]->GetProperties()->GetID();
+            }
+            if (skybox_imgs[5] && skybox_imgs[5]->GetProperties()->GetSaveToMarkup()) {
+                room["skybox_back_id"] = skybox_imgs[5]->GetProperties()->GetID();
+            }
+        }
+        else if (cubemap->GetAssetImages().size() == 1) {
+            if (cubemap->GetAssetImages().first()) {
+                room["cubemap_id"] = cubemap->GetAssetImages().first()->GetProperties()->GetID();
+            }
+        }
+    }
+    if (cubemap_radiance &&
+            !cubemap_radiance->GetAssetImages().empty() &&
+            cubemap_radiance->GetAssetImages().first()) {
+        room["cubemap_radiance_id"] = cubemap_radiance->GetAssetImages().first()->GetProperties()->GetID();
+    }
+    if (cubemap_irradiance &&
+            !cubemap_irradiance->GetAssetImages().empty() &&
+            cubemap_irradiance->GetAssetImages().first()) {
+        room["cubemap_irradiance_id"] = cubemap_irradiance->GetAssetImages().first()->GetProperties()->GetID();
+    }
+    if (props->GetNearDist() != 0.01f) {
+        room["near_dist"] = MathUtil::GetNumber(props->GetNearDist());
+    }
+    if (props->GetFarDist() != 1000.0f) {
+        room["far_dist"] = MathUtil::GetNumber(props->GetFarDist());
+    }
+    if (props->GetGrabDist() != 0.5f) {
+        room["grab_dist"] = MathUtil::GetNumber(props->GetGrabDist());
+    }
+    if (props->GetGravity() != -9.8f) {
+        room["gravity"] = MathUtil::GetNumber(props->GetGravity());
+    }
+    if (props->GetJumpVelocity() != 5.0f) {
+        room["jump_velocity"] = MathUtil::GetNumber(props->GetJumpVelocity());
+    }
+    if (props->GetWalkSpeed() != 1.8f) {
+        room["walk_speed"] = MathUtil::GetNumber(props->GetWalkSpeed());
+    }
+    if (props->GetRunSpeed() != 5.4f) {
+        room["run_speed"] = MathUtil::GetNumber(props->GetRunSpeed());
+    }
+
+    //fog stuff
+    if (!props->GetPartyMode()) {
+        room["party_mode"] = false;
+    }
+    if (props->GetFog()) {
+        room["fog"] = true;
+    }
+    if (props->GetFogMode() == 0) {
+        room["fog_mode"] = "linear";
+    }
+    else if (props->GetFogMode() == 2) {
+        room["fog_mode"] = "exp2";
+    }
+    if (props->GetFogDensity() != 1.0f) {
+        room["fog_density"] = MathUtil::GetNumber(props->GetFogDensity());
+    }
+    if (props->GetFogStart() != 0.0f) {
+        room["fog_start"] = MathUtil::GetNumber(props->GetFogStart());
+    }
+    if (props->GetFogEnd() != 1.0f) {
+        room["fog_end"] = MathUtil::GetNumber(props->GetFogEnd());
+    }
+    if (MathUtil::GetVector4AsColour(props->GetFogCol()->toQVector4D()) != QColor(0, 0, 0)) {
+        room["fog_col"] = MathUtil::GetColourAsString(MathUtil::GetVector4AsColour(props->GetFogCol()->toQVector4D()), false);
+    }
+    if (props->GetTeleportMinDist() != 0.0f) {
+        room["teleport_min_dist"] = MathUtil::GetNumber(props->GetTeleportMinDist());
+    }
+    if (props->GetTeleportMaxDist() != 100.0f) {
+        room["teleport_max_dist"] = MathUtil::GetNumber(props->GetTeleportMaxDist());
+    }
+    if (props->GetShaderID().length() > 0) {
+        room["shader_id"] = props->GetShaderID();
+    }
+    if (props->GetResetVolume().first != QVector3D(-FLT_MAX, -FLT_MAX, -FLT_MAX) && props->GetResetVolume().second != QVector3D(-FLT_MAX, -100.0f, -FLT_MAX)) {
+        room["reset_volume"] = MathUtil::GetAABBAsString(props->GetResetVolume(), false);
+    }
+
+    //write the environment objects out, easy
+    for (const QPointer <RoomObject> & obj : envobjects) {
+        if (obj && (obj->GetType() != TYPE_LINK || (obj->GetType() == TYPE_LINK && obj != GetEntranceObject() && obj->GetSaveToMarkup()))) {
+            elementlistmap[obj->GetProperties()->GetTypeAsString()].push_back(obj->GetJSONCode(show_defaults));
+        }
+    }
+
+    //add all qvariantlists to room
+    QMap <QString, QVariantList>::const_iterator ele_cit;
+    for (ele_cit=elementlistmap.begin(); ele_cit!=elementlistmap.end(); ++ele_cit) {
+        room.insert(ele_cit.key(), ele_cit.value());
+    }
+
+    //assemble fireboxroom
+    fireboxroom.insert("assets", assetsmap);
+    fireboxroom.insert("room", room);
+
+    root.insert("FireBoxRoom", fireboxroom);
+
+    return root;
 }
 
 bool Room::RunKeyPressEvent(QKeyEvent * e, QPointer <Player> player, MultiPlayerManager * multi_players)
