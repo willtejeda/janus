@@ -216,8 +216,8 @@ void Environment::draw_current_room(MultiPlayerManager*  multi_players, QPointer
     // This draws it near the farclip but avoids the corners being depth failed
     // drawing it far from the user is to keep stereo disparity to near-zero so it's perceived
     // as being infinitely far away.
-    m.scale(curnode->GetProperties()->GetFarDist() * 0.3f);
-    curnode->BindShader(Room::GetSkyboxShader());
+    m.scale(curnode->GetProperties()->GetFarDist() * 0.3f);    
+    curnode->BindShader(Room::GetSkyboxShader(), true); //61.0 - "true" flag disables fog for skybox
     curnode->DrawSkyboxGL(Room::GetSkyboxShader(), m);
 
     renderer->EndCurrentScope();
@@ -466,7 +466,7 @@ void Environment::DrawRoomWithinPortalStencilGL(QPointer <RoomObject> portal, QP
     m.scale(room->GetProperties()->GetFarDist() * 0.05f); // Prevents portals appearing black when looking through them
 #endif
     renderer->BeginScope(RENDERER::RENDER_SCOPE::CHILD_ROOM_SKYBOX);
-    room->BindShader(Room::GetSkyboxShader());
+    room->BindShader(Room::GetSkyboxShader(), true);
     room->DrawSkyboxGL(Room::GetSkyboxShader(), m * currentRoomToOtherRoomRotation);
     renderer->EndCurrentScope();
 

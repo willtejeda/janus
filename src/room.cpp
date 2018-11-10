@@ -382,12 +382,22 @@ void Room::SetCubemap(const QVector <QString> & skybox_image_ids, CUBEMAP_TYPE p
     QVector <QPointer <AssetImage> > imgs = QVector<QPointer <AssetImage> >(imageCount);
 
     for (int imageIndex = 0; imageIndex < imageCount; ++imageIndex) {
-        if (assetimages.contains(skybox_image_ids[imageIndex]) &&
-                assetimages[skybox_image_ids[imageIndex]]) {
+        if (!skybox_image_ids[imageIndex].isEmpty() && assetimages.contains(skybox_image_ids[imageIndex]) && assetimages[skybox_image_ids[imageIndex]]) {
             imgs[imageIndex] = dynamic_cast<AssetImage *>(assetimages[skybox_image_ids[imageIndex]].data());
             if (imgs[imageIndex]) {
                 imgs[imageIndex]->GetProperties()->SetTexClamp(true);
             }
+        }
+        else { //error
+            QPointer <AssetImage> new_asset_image(new AssetImage());
+//            new_asset_image->CreateFromText(QString::number(imageIndex), 32, false, QColor(255,255,255), QColor(0,0,0), 1.0f, 32, 32, true);
+            new_asset_image->CreateFromText(QString("<p align=\"center\">no skybox image</p>"), 24, true, QColor(255,128,192), QColor(25,25,128), 1.0f, 256, 256, true);
+            new_asset_image->GetProperties()->SetID("skybox_error_image"+QString::number(imageIndex));
+            new_asset_image->GetProperties()->SetSaveToMarkup(false);
+            new_asset_image->GetProperties()->SetTexClamp(true);
+            AddAssetImage(new_asset_image);
+
+            imgs[imageIndex] = dynamic_cast<AssetImage *>(new_asset_image.data());
         }
     }
 
@@ -584,7 +594,7 @@ void Room::SetUseClipPlane(const bool b, const QVector4D p)
     plane_eqn = p;
 }
 
-void Room::BindShader(QPointer <AssetShader> shader)
+void Room::BindShader(QPointer <AssetShader> shader, const bool disable_fog)
 {
     if (shader.isNull()) {
         return;
@@ -592,7 +602,7 @@ void Room::BindShader(QPointer <AssetShader> shader)
 
     shader->SetUseClipPlane(use_clip_plane);
     shader->SetClipPlane(plane_eqn);    
-    shader->SetFogEnabled(props->GetFog());
+    shader->SetFogEnabled(disable_fog ? false : props->GetFog());
     int fog_mode = 0;
     const QString s = props->GetFogMode().toLower();
     if (s == "linear") {
