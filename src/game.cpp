@@ -4799,7 +4799,6 @@ QPointer <RoomObject> Game::CreatePortal(const QUrl url, const bool send_multi)
         new_portal->GetProperties()->SetScale(QVector3D(1.8f, 2.5f, 1.0f));
         new_portal->GetProperties()->SetCircular(true);
         new_portal->GetProperties()->SetJSID(portal_jsid);
-        new_portal->SetSaveToMarkup(false);
         new_portal->GetProperties()->SetOpen(true);
         r->AddRoomObject(new_portal);
         env->AddRoom(new_portal);
