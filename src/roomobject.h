@@ -134,6 +134,8 @@ public:
     void ReadXMLCode(const QString & str);
     QString GetXMLCode(const bool show_defaults = false) const;
 
+    QVariantMap GetJSONCode(const bool show_defaults) const;
+
     void Update(const double dt_sec);
     void UpdateMedia();
 

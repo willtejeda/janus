@@ -2703,7 +2703,15 @@ void Game::SaveRoom(const QString out_filename)
     }
 
     QPointer <Room> r = env->GetCurRoom();
-    const bool success = r->SaveXML(out_filename);
+
+    bool success;
+    if (out_filename.right(4).toLower() == "json") {
+        success = r->SaveJSON(out_filename);
+    }
+    else {
+        success = r->SaveXML(out_filename);
+    }
+
     if (success) {
         SoundManager::Play(SOUND_SAVED, false, player->GetProperties()->GetPos()->toQVector3D(), 1.0f);
     }
@@ -4791,7 +4799,6 @@ QPointer <RoomObject> Game::CreatePortal(const QUrl url, const bool send_multi)
         new_portal->GetProperties()->SetScale(QVector3D(1.8f, 2.5f, 1.0f));
         new_portal->GetProperties()->SetCircular(true);
         new_portal->GetProperties()->SetJSID(portal_jsid);
-        new_portal->SetSaveToMarkup(false);
         new_portal->GetProperties()->SetOpen(true);
         r->AddRoomObject(new_portal);
         env->AddRoom(new_portal);

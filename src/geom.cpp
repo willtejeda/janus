@@ -1028,13 +1028,13 @@ void Geom::DrawGL(QPointer <AssetShader> shader, const QColor col, const bool ov
         //58.0 - Change diffuse only when lighting is enabled (or some surfaces, menu/websurface, appear dark),
         //later change to restore since it causes inconsistent behaviour
         //changes again, this time to not use it if there's a texture override (this should work ok)
-        if (textures[0].img.isNull()&& !override_texture)
+        if (textures[0].img.isNull() && !override_texture)
         {
             shader->SetDiffuse(QVector4D(mat.kd.redF(), mat.kd.greenF(), mat.kd.blueF(), mat.kd.alphaF()));
         }
         else
         {
-            shader->SetDiffuse(QVector4D(1,1,1,1));
+            shader->SetDiffuse(QVector4D(1, 1, 1, mat.kd.alphaF())); //61.0 - support transparency (d value in OBJ .mtl)
         }
 
         if (textures[1].img.isNull())

@@ -1035,12 +1035,13 @@ void MainWindow::Initialize()
 #endif
     }
 
+    //use Qt::ConnectionType::QueuedConnection for timeouts, makes VOIP smooth, etc.
 #ifndef __ANDROID__
-//    connect(&timer2, SIGNAL(timeout()), this, SLOT(CEFTimeOut()), Qt::ConnectionType::QueuedConnection);
-    connect(&timer2, SIGNAL(timeout()), this, SLOT(CEFTimeOut()));
+    connect(&timer2, SIGNAL(timeout()), this, SLOT(CEFTimeOut()), Qt::ConnectionType::QueuedConnection);
+//    connect(&timer2, SIGNAL(timeout()), this, SLOT(CEFTimeOut()));
 #endif
-    //connect(&timer, SIGNAL(timeout()), this, SLOT(TimeOut()), Qt::ConnectionType::QueuedConnection);
-    connect(&timer, SIGNAL(timeout()), this, SLOT(TimeOut()));
+    connect(&timer, SIGNAL(timeout()), this, SLOT(TimeOut()), Qt::ConnectionType::QueuedConnection);
+//    connect(&timer, SIGNAL(timeout()), this, SLOT(TimeOut()));
 
 #ifndef __ANDROID__
     timer2.start( 10 );

@@ -130,7 +130,7 @@ public:
     void SetPlayerPosTrans(const QVector3D p);
     void SetUseClipPlane(const bool b, const QVector4D p = QVector4D(0,0,0,0));
 
-    void BindShader(QPointer <AssetShader> shader);
+    void BindShader(QPointer <AssetShader> shader, const bool disable_fog = false);
     void UnbindShader(QPointer <AssetShader> shader);
 
     void DrawCollisionModelGL(QPointer <AssetShader> shader);
@@ -165,6 +165,8 @@ public:
 
     bool SaveXML(const QString & filename);
     void SaveXML(QTextStream & ofs);
+
+    bool SaveJSON(const QString & filename);
 
     void OnCollisionEnter(QPointer <RoomObject> envobject, QPointer <RoomObject> other_envobject, QPointer <Player> player);
     void OnCollisionExit(QPointer <RoomObject> envobject, QPointer <RoomObject> other_envobject, QPointer <Player> player);
@@ -263,6 +265,8 @@ public slots:
     void Create_Custom_Translator_Loaded();
 
 private:   
+
+    QVariantMap GetJSONCode(const bool show_defaults) const;
 
     void LinkToAssets(QPointer <RoomObject> o);    
 
