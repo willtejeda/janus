@@ -365,19 +365,13 @@ void MultiPlayerManager::Update(QPointer <Player> player, const QString & url, c
         }
     }
 
-//    qDebug() << "MultiPlayerManager::Update" << enabled << url << name;
-    //58.0 bugfix - reset the set_enterroom_url_id when in the pocketspace, so future enterroom events send (as well as party mode)
+//    qDebug() << "MultiPlayerManager::Update" << enabled << url << name;    
     if (enabled) {
 
         UpdateConnections();
 
         for (int connectionIndex=0; connectionIndex<connection_list.size(); ++connectionIndex) {
             ServerConnection & s = connection_list[connectionIndex];
-
-//            qDebug() << "MultiPlayerManager::Update" << connectionIndex << s.tcpserver << s.logging_in << s.logged_in;
-            if (QUrl(cur_url).isLocalFile() && cur_url.right(22) == "assets/3dui/index.html") {
-                s.sent_enterroom_url_id = cur_url_id;
-            }
 
             const int readline_len = 1000000;
             char readline[readline_len+1];

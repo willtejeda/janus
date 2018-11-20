@@ -176,7 +176,7 @@ public:
 
     unsigned int GetRoomNumTris() const;    
 
-    void SetPlayerLastTransform(const QMatrix4x4 & m); //remmebers player's last position here when going to/from pocketspace
+    void SetPlayerLastTransform(const QMatrix4x4 & m); //remmebers player's last position
     QMatrix4x4 GetPlayerLastTransform() const;   
 
     void StartURLRequest();    

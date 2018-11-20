@@ -657,7 +657,7 @@ void MainWindow::Update()
         topbarwidget->setVisible(vis);
     }
 
-    //59.3 - disable pocketspace toggle button if there is no other current viewed room to toggle to
+    //59.3 - disable home toggle button if there is no other current viewed room to toggle to
     if (game->GetEnvironment()->GetLastRoom().isNull() && button_home->isVisible()) {
         button_home->setVisible(false);
     }
@@ -1046,7 +1046,7 @@ void MainWindow::Initialize()
 #ifndef __ANDROID__
     timer2.start( 10 );
 #endif
-    timer.start( 0 );    
+    timer.start( 0 );
 }
 
 void MainWindow::UpdateHands()
@@ -1136,7 +1136,7 @@ void MainWindow::SetupWidgets()
     button_home->setIconSize(QSize(btn_size,btn_size));
     button_home->setMaximumWidth(btn_size);
     button_home->setMaximumHeight(btn_size);
-    button_home->setToolTip("Go to/from pocketspace");
+    button_home->setToolTip("Go to/from home URL");
     connect(button_home, SIGNAL(clicked(bool)), this, SLOT(ActionHome()));
 
     urlbar = new QLineEdit();
@@ -1592,7 +1592,7 @@ void MainWindow::ActionReload()
 
 void MainWindow::ActionHome()
 {
-    game->StartEscapeToPocketspace();
+    game->StartEscapeToHome();
 }
 
 void MainWindow::ActionBookmark()
