@@ -34,6 +34,7 @@ DOMNode::DOMNode(QObject *parent) : QObject(parent)
     loop = false;
     pitch = 1.0f;
     gain = 1.0f;
+    doppler_factor = 1.0f;
     outer_gain = 0.0f;
     inner_angle = 360.0f;
     outer_angle = 360.0f;    
@@ -533,6 +534,9 @@ void DOMNode::SetProperties(const QVariantMap & d)
     }
     if (d.contains("gain")) {
         SetGain(d["gain"].toFloat());
+    }
+    if (d.contains("doppler_factor")) {
+        SetDopplerFactor(d["doppler_factor"].toFloat());
     }
     if (d.contains("outer_gain")) {
         SetOuterGain(d["outer_gain"].toFloat());
@@ -1272,6 +1276,11 @@ void DOMNode::SetLoop(const bool b)
 void DOMNode::SetGain(const float f)
 {
     gain = f;
+}
+
+void DOMNode::SetDopplerFactor(const float f)
+{
+    doppler_factor = f;
 }
 
 void DOMNode::SetOuterGain(const float f)

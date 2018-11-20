@@ -104,6 +104,7 @@ class DOMNode : public QObject, protected QScriptable
 
     Q_PROPERTY(bool loop READ GetLoop WRITE SetLoop)
     Q_PROPERTY(float gain READ GetGain WRITE SetGain)
+    Q_PROPERTY(float doppler_factor READ GetDopplerFactor WRITE SetDopplerFactor)
     Q_PROPERTY(float outer_gain READ GetOuterGain WRITE SetOuterGain)
     Q_PROPERTY(float inner_angle READ GetInnerAngle WRITE SetInnerAngle)
     Q_PROPERTY(float outer_angle READ GetOuterAngle WRITE SetOuterAngle)
@@ -341,6 +342,8 @@ public:
     inline bool GetLoop() const { return loop; }
     void SetGain(const float f);
     inline float GetGain() const { return gain; }
+    void SetDopplerFactor(const float f);
+    inline float GetDopplerFactor() const { return doppler_factor; }
     void SetOuterGain(const float f);
     inline float GetOuterGain() const { return outer_gain; }
     void SetInnerAngle(const float f);
@@ -1036,6 +1039,7 @@ protected:
     bool loop;
     float pitch;
     float gain;
+    float doppler_factor;
     float outer_gain;
     float inner_angle;
     float outer_angle;
