@@ -12,7 +12,7 @@
 #include "multiplayermanager.h"
 #include "cookiejar.h"
 #include "rendererinterface.h"
-#include "renderergl33_loadingthread.h"
+#include "renderergl33.h"
 #include "assetimage.h"
 #include "scriptbuiltins.h"
 
