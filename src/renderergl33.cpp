@@ -14,9 +14,6 @@ RendererGL33::RendererGL33() :
       m_screenshot_pbo(0),
       m_frame_vector_sorted(false)
 {
-#ifdef __ANDROID__
-    paused = false;
-#endif
     qDebug() << "RendererGL33::RendererGL33()";
 }
 
@@ -915,15 +912,3 @@ void RendererGL33::RenderEqui()
     // Restore the cameras
     m_scoped_cameras_cache[m_rendering_index] = camera_cache;
 }
-
-#ifdef __ANDROID__
-void RendererGL33RenderThread::Pause()
-{
-    paused = true;
-}
-
-void RendererGL33RenderThread::Resume()
-{
-    paused = false;
-}
-#endif

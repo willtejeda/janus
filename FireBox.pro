@@ -252,9 +252,7 @@ android:SOURCES -= "src/gamepad.c" \
     "src/propertieswindow.cpp" \
     "src/assetwindow.cpp" \
     "src/codeeditorwindow.cpp" \
-    "src/navigationwindow.cpp" \
-    "src/renderergl44_loadingthread.cpp" \
-    "src/renderergl44_renderthread.cpp"
+    "src/navigationwindow.cpp"
 android:HEADERS -= "src/gamepad.h" \
     "src/vivemanager.h" \    
     "src/cefwebview.h" \
@@ -263,9 +261,7 @@ android:HEADERS -= "src/gamepad.h" \
     "src/propertieswindow.h" \
     "src/assetwindow.h" \
     "src/codeeditorwindow.h" \
-    "src/navigationwindow.h" \
-    "src/renderergl44_loadingthread.h" \
-    "src/renderergl44_renderthread.h"
+    "src/navigationwindow.h"
 android:SOURCES += "src/androidwebview.cpp" \
     "src/slidingtabwidget.cpp" \
     "src/jniutil.cpp" \
