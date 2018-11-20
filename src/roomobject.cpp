@@ -27,7 +27,8 @@ RoomObject::RoomObject() :
     props(new DOMNode()),
     save_to_markup(true),
     grabbed(false),
-    draw_back(false)
+    draw_back(false),
+    interface_object(false)
 {
     ++objects_allocated;
 
@@ -329,6 +330,16 @@ ElementType RoomObject::GetType() const
     return props->GetType();
 }
 
+void RoomObject::SetInterfaceObject(const bool b)
+{
+    interface_object = b;
+}
+
+bool RoomObject::GetInterfaceObject() const
+{
+    return interface_object;
+}
+
 void RoomObject::SetProperties(QPointer<DOMNode> props)
 {
     this->props = props;
@@ -527,7 +538,7 @@ bool RoomObject::GetRaycastIntersection(const QMatrix4x4 transform, QList <QVect
         }
 
         //manip handle sphere test 57.1 - note, it should not get in way of normal interaction
-        if (edit_mode_enabled && edit_mode_icons_enabled && int_verts.empty() && props->GetJSID().left(6) != "__menu") {
+        if (edit_mode_enabled && edit_mode_icons_enabled && int_verts.empty() && !interface_object) {
             Sphere3D s;
             s.cent = GetPos();
             s.rad = SpinAnimation::GetIconScale() * 0.5f;
@@ -1831,7 +1842,7 @@ void RoomObject::DrawLoadingGL(QPointer <AssetShader> shader)
             SpinAnimation::DrawGL(shader, value, true);
         }
         else { //59.0 - don't draw the cube icon, it interferes with stuff
-            if (edit_mode_enabled && edit_mode_icons_enabled && props->GetJSID().left(6) != "__menu") {
+            if (edit_mode_enabled && edit_mode_icons_enabled && !interface_object) {
                 DrawIconGL(shader, object_img);
             }
         }
@@ -1851,7 +1862,7 @@ void RoomObject::DrawLoadingGL(QPointer <AssetShader> shader)
         }
     }
     else if (t == TYPE_PARTICLE) {
-        if (edit_mode_enabled && edit_mode_icons_enabled && props->GetJSID().left(6) != "__menu") {
+        if (edit_mode_enabled && edit_mode_icons_enabled && !interface_object) {
             DrawIconGL(shader, particle_img);
         }
     }

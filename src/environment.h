@@ -12,7 +12,7 @@
 #include "multiplayermanager.h"
 #include "cookiejar.h"
 #include "rendererinterface.h"
-#include "renderergl33_loadingthread.h"
+#include "renderergl33.h"
 #include "assetimage.h"
 #include "scriptbuiltins.h"
 
@@ -66,14 +66,12 @@ signals:
 
 private:   
 
-    void UpdateQueuedFunctions(QPointer <Room> r);
-
-    void SetupPocketspace();
+    void UpdateQueuedFunctions(QPointer <Room> r);   
     void DrawRoomWithinPortalStencilGL(QPointer <RoomObject> portal, QPointer <Player> player, MultiPlayerManager*  multi_players, const bool render_left_eye);
 
-    QPointer <Room> rootnode; //the pocketspace and children
+    QPointer <Room> rootnode; //navigation root/launch url
     QPointer <Room> curnode; //pointer node player is at
-    QPointer <Room> lastnode; //last non-pocketspace/root node player was at
+    QPointer <Room> lastnode; //last node player was at
 
     QVector3D player_lasteyepoint;
 
