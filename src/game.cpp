@@ -185,7 +185,7 @@ void Game::AddPrivateWebsurface()
     const QString u = SettingsManager::GetWebsurfaceURL();
 
     p.asset = (AbstractWebSurface*)new AssetWebSurface();
-    p.asset->GetProperties()->SetID("__menu_web_id");
+    p.asset->GetProperties()->SetID("__web_id");
     p.asset->GetProperties()->SetWidth(1366);
     p.asset->GetProperties()->SetHeight(768);
     p.asset->GetProperties()->SetSaveToMarkup(false);
@@ -197,10 +197,11 @@ void Game::AddPrivateWebsurface()
 
     p.obj = new RoomObject();
     p.obj->SetType(TYPE_OBJECT);
+    p.obj->SetInterfaceObject(true);
     p.obj->GetProperties()->SetID("plane");
-    p.obj->GetProperties()->SetJSID("__menu_plane" + QString::number(index));
+    p.obj->GetProperties()->SetJSID("__plane" + QString::number(index));
     p.obj->GetProperties()->SetLighting(false);
-    p.obj->GetProperties()->SetWebsurfaceID("__menu_web_id" + QString::number(index));
+    p.obj->GetProperties()->SetWebsurfaceID("__web_id" + QString::number(index));
     p.obj->GetProperties()->SetCullFace("none");
     p.obj->GetProperties()->SetVisible("false");
     p.obj->SetAssetObject(p.plane_obj);
@@ -460,7 +461,7 @@ float Game::UpdateCursorRaycast(const QMatrix4x4 transform, const int cursor_ind
         }
 
         //56.0 - even invisible walls should keep player in
-        if (o->GetProperties()->GetJSID().left(6) == "__menu" && !o->GetProperties()->GetVisible()) {
+        if (o->GetInterfaceObject() && !o->GetProperties()->GetVisible()) {
             continue;
         }
 

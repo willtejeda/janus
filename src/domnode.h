@@ -309,7 +309,7 @@ public:
     inline int GetUUID() const { return uuid; }
 
     void SetJSID(const QString & id);
-    inline QString GetJSID() const { return js_id; }
+    inline QString GetJSID() const { return js_id; }   
 
     void SetID(const QString & id);
     inline QString GetID() const { return id; }
@@ -988,6 +988,7 @@ protected:
 
     int uuid; // unique identifier for each object
     QString js_id;
+    bool interface_object;
     QString id;
     QString m_cubemap_radiance_id;
     QString m_cubemap_irradiance_id;
