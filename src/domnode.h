@@ -165,8 +165,7 @@ class DOMNode : public QObject, protected QScriptable
     Q_PROPERTY(ScriptableVector * cursor1_ydir READ GetCursor1YDir WRITE SetCursor1YDir)
     Q_PROPERTY(ScriptableVector * cursor1_zdir READ GetCursor1ZDir WRITE SetCursor1ZDir)
     Q_PROPERTY(QString oncollision READ GetOnCollision WRITE SetOnCollision)
-    Q_PROPERTY(QString userid READ GetUserID)
-    Q_PROPERTY(QString url READ GetURL)
+    Q_PROPERTY(QString userid READ GetUserID)    
 //    Q_PROPERTY(bool hmd_enabled READ GetHMDEnabled)
     Q_PROPERTY(ScriptableVector * local_head_pos READ GetLocalHeadPos)
     Q_PROPERTY(ScriptableVector * head_pos READ GetGlobalHeadPos)
@@ -451,6 +450,9 @@ public:
 
     void SetURL(const QString & s);
     inline QString GetURL() const { return url; }
+
+    void SetURLChanged(const bool b);
+    inline bool GetURLChanged() const { return url_changed; }
 
     void SetBaseURL(const QString & s);
     inline QString GetBaseURL() const { return base_url; }
@@ -1075,6 +1077,7 @@ protected:
     float anim_speed;
 
     QString url;
+    bool url_changed;
     QString url_orig;
     QString title;
     bool auto_load;

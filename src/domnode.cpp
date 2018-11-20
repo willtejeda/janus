@@ -92,6 +92,7 @@ DOMNode::DOMNode(QObject *parent) : QObject(parent)
     teleport_override = false;
     reloaded = false;
     cur_mount = 0;
+    url_changed = false;
 
     //assets
     tex_alpha = "undefined";
@@ -1802,8 +1803,17 @@ void DOMNode::SetVisible(const bool b)
 
 void DOMNode::SetURL(const QString & s)
 {
-    //    qDebug() << "DOMNode::SetURL" << s;
+//    qDebug() << "DOMNode::SetURL" << s;
+    if (!url_changed && url != s) {
+        url_changed = true;
+    }
     url = s;
+
+}
+
+void DOMNode::SetURLChanged(const bool b)
+{
+    url_changed = b;
 }
 
 void DOMNode::SetBaseURL(const QString & s)

@@ -520,6 +520,13 @@ void Room::LinkToAssets(QPointer <RoomObject> o)
                                                o->GetProperties()->GetID() :
                                                o->GetProperties()->GetVideoID()));
         break;
+    case TYPE_LINK:
+        //62.0 - update portal URL if it changed
+        if (o->GetProperties()->GetURLChanged()) {
+            o->SetURL(props->GetURL(), o->GetProperties()->GetURL());
+            o->GetProperties()->SetURLChanged(false);
+        }
+        break;
     default:
         break;
     }
