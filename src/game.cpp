@@ -49,9 +49,13 @@ Game::Game() :
     bookmarks->LoadWorkspaces();
 
     controller_manager = new ControllerManager();
-    virtualkeyboard = new VirtualKeyboard();
+    virtualkeyboard = new VirtualKeyboard();    
     env = new Environment();
     multi_players = new MultiPlayerManager();
+
+    virtualmenu = new VirtualMenu();
+    virtualmenu->SetBookmarkManager(bookmarks);
+    virtualmenu->SetMultiPlayerManager(multi_players);
 
     global_uuid = 0;
     state = JVR_STATE_DEFAULT;
@@ -330,6 +334,9 @@ void Game::Update()
     //Update private websurfaces
     UpdatePrivateWebsurfaces();
 
+    //update virtual menu
+    UpdateVirtualMenu();
+
     //update virtual keyboard
     UpdateVirtualKeyboard();
 
@@ -401,11 +408,13 @@ void Game::Update()
     env->Update1(player, multi_players);
     QPointer <Room> r1 = env->GetCurRoom();
 
-    //clear selection if player moved
+    //clear selection if player moved and hide menu
     if (r0 != r1) {
         ClearSelection(0);
         ClearSelection(1);
         SetPrivateWebsurfacesVisible(false);
+
+        virtualmenu->SetVisible(false);
     }
 
     if (r1) {
@@ -425,6 +434,7 @@ float Game::UpdateCursorRaycast(const QMatrix4x4 transform, const int cursor_ind
         QPointer <RoomObject> envobject;
         QPointer <RoomObject> kbobject;
         QPointer <RoomObject> webobject;
+        QPointer <RoomObject> menuobject;
         QVector3D v;
         QVector3D n;
         QVector2D uv;
@@ -492,7 +502,7 @@ float Game::UpdateCursorRaycast(const QMatrix4x4 transform, const int cursor_ind
         for (int j=0; j<private_websurfaces.size(); ++j) {
             QList <QVector3D> vs;
             QList <QVector3D> ns;
-            QList <QVector2D> uvs;
+            QList <QVector2D> uvs;            
             if (private_websurfaces[j].obj->GetRaycastIntersection(transform, vs, ns, uvs)) {
                 for (int i=0; i<vs.size(); ++i) {
                     IntersectionElement intersection_element;
@@ -501,6 +511,29 @@ float Game::UpdateCursorRaycast(const QMatrix4x4 transform, const int cursor_ind
                     intersection_element.n = ns[i];
                     intersection_element.uv = uvs[i];
                     intersection_list.push_back(intersection_element);
+                }
+            }
+        }
+    }
+
+    //virtual menu
+    if (virtualmenu->GetVisible()) {
+        QHash <QString, QPointer <RoomObject> > & os = virtualmenu->GetEnvObjects();
+        for (QPointer <RoomObject> & o : os) {
+            if (o) {
+                QList <QVector3D> vs;
+                QList <QVector3D> ns;
+                QList <QVector2D> uvs;
+                if (o->GetRaycastIntersection(transform, vs, ns, uvs)) {
+                    for (int i=0; i<vs.size(); ++i) {
+                        IntersectionElement intersection_element;
+                        intersection_element.menuobject = o;
+                        intersection_element.v = vs[i];
+                        intersection_element.n = ns[i];
+                        intersection_element.uv = uvs[i];
+                        intersection_list.push_back(intersection_element);
+//                        qDebug() << "menu hit" << virtualmenu->GetVisible() << o->GetProperties()->GetJSID();
+                    }
                 }
             }
         }
@@ -596,6 +629,9 @@ float Game::UpdateCursorRaycast(const QMatrix4x4 transform, const int cursor_ind
         }
         else if (intersection_list[min_index].kbobject) {
             player->SetCursorObject(intersection_list[min_index].kbobject->GetProperties()->GetJSID(), cursor_index);
+        }
+        else if (intersection_list[min_index].menuobject) {
+            player->SetCursorObject(intersection_list[min_index].menuobject->GetProperties()->GetJSID(), cursor_index);
         }
         else if (intersection_list[min_index].webobject) {
             player->SetCursorObject(intersection_list[min_index].webobject->GetProperties()->GetJSID(), cursor_index);
@@ -902,7 +938,8 @@ void Game::DrawGL(const float ipd, const QMatrix4x4 head_xform, const bool set_m
     QPointer <Room> r = env->GetCurRoom();
     RendererInterface::m_pimpl->BeginScope(RENDERER::RENDER_SCOPE::VIRTUAL_KEYBOARD);
     r->BindShader(Room::GetTransparencyShader());
-    DrawVirtualKeyboard();
+    DrawVirtualMenu();
+    DrawVirtualKeyboard();    
     r->UnbindShader(Room::GetTransparencyShader());
     RendererInterface::m_pimpl->EndCurrentScope();
 
@@ -1760,6 +1797,10 @@ void Game::keyPressEvent(QKeyEvent * e)
             }
 
             switch (e->key()) {
+
+            case Qt::Key_Tab:
+                virtualmenu->MenuButtonPressed();
+                break;
 
             case Qt::Key_W:
             case Qt::Key_Up:
@@ -3431,6 +3472,11 @@ QPointer <Environment> Game::GetEnvironment()
     return env;
 }
 
+QPointer <VirtualMenu> Game::GetVirtualMenu()
+{
+    return virtualmenu;
+}
+
 QPointer <MultiPlayerManager> Game::GetMultiPlayerManager()
 {
     return multi_players;
@@ -4136,8 +4182,9 @@ void Game::UpdateControllers()
                             StartResetPlayer();
                         }
                     }
-                    else{
-                        StartEscapeToHome();
+                    else {
+                        virtualmenu->MenuButtonPressed();
+//                        StartEscapeToHome();
                     }
                 }
 
@@ -4254,7 +4301,7 @@ void Game::UpdateControllers()
         //home button
         if (s[0].b[0].proc_release) {
             s[0].b[0].proc_release = false;
-            StartEscapeToHome();
+            virtualmenu->MenuButtonPressed();
         }
 
         //reset hmd
@@ -4645,6 +4692,49 @@ void Game::UpdateControllers()
 #endif
 }
 
+void Game::UpdateVirtualMenu()
+{
+    if (virtualmenu->GetVisible()) {
+        virtualmenu->Update();
+
+        if (virtualmenu->GetDoEscapeToHome()) {
+            StartEscapeToHome();
+        }
+        if (virtualmenu->GetDoExit()) {
+            SetDoExit(true);
+        }
+        if (virtualmenu->GetDoCreatePortal()) {
+            CreatePortal(virtualmenu->GetDoCreatePortalURL(), true);
+            virtualmenu->SetVisible(false);
+        }
+    }
+    else {
+        QVector3D z = -player->GetProperties()->GetDir()->toQVector3D();
+        z.setY(0.0f);
+        z.normalize();
+        const QVector3D y(0,1,0);
+        const QVector3D x = QVector3D::crossProduct(y, z).normalized();
+
+        QVector3D p = player->GetProperties()->GetEyePoint();
+        p.setY(player->GetProperties()->GetPos()->toQVector3D().y());
+
+        QMatrix4x4 m;
+        m.translate(p - z * 2.0f);
+        m.setColumn(0, x);
+        m.setColumn(1, y);
+        m.setColumn(2, z);
+
+        virtualmenu->SetModelMatrix(m);
+    }
+}
+
+void Game::DrawVirtualMenu()
+{
+    if (virtualmenu->GetVisible()) {
+        virtualmenu->DrawGL(Room::GetTransparencyShader());
+    }
+}
+
 void Game::UpdateVirtualKeyboard()
 {
     // Draw keyboard if HMD is in use, websurface selected, and text cursor is within a text-editable region
@@ -4778,7 +4868,7 @@ QPointer <RoomObject> Game::CreatePortal(const QUrl url, const bool send_multi)
 //    qDebug() << "Game::CreatePortal" << url << send_multi;
     QPointer <Room> r = env->GetCurRoom();
     QPointer <RoomObject> new_portal;
-    if (!url.isEmpty()) {
+    if (r && !url.isEmpty()) {
         QVector3D d = player->GetProperties()->GetDir()->toQVector3D();
         d.setY(0.0f);
         d.normalize();
@@ -4816,9 +4906,13 @@ void Game::StartOpInteractionDefault(const int i)
     QPointer <Room> r = env->GetCurRoom();
     QPointer <RoomObject> o = r->GetRoomObject(player->GetCursorObject(i));
 
-    //            qDebug() << "player->getcursorobject" << player->GetCursorObject(cursor_index) << websurface_selected[cursor_index] << menu.GetWebpage();
+    //            qDebug() << "player->getcursorobject" << player->GetCursorObject(cursor_index) << websurface_selected[cursor_index] << menu.GetWebpage();    
+    if (virtualmenu->GetVisible()) {
+        virtualmenu->mousePressEvent(player->GetCursorObject(i));
+    }
+
     bool keyboard_clicked = false;
-    if (virtualkeyboard->GetKeySelected(player->GetCursorObject(i)) != 0) {
+    if (virtualkeyboard->GetVisible() && virtualkeyboard->GetKeySelected(player->GetCursorObject(i)) != 0) {
         virtualkeyboard->mousePressEvent(i);
         keyboard_clicked = true;
     }
@@ -4875,6 +4969,10 @@ void Game::EndOpInteractionDefault(const int i)
     QPointer <Room> r = env->GetCurRoom();
     const QString curs = player->GetCursorObject(i);
     QPointer <RoomObject> o = r->GetRoomObject(curs);
+
+    if (virtualmenu->GetVisible()) {
+        virtualmenu->mouseReleaseEvent(player->GetCursorObject(i));
+    }
 
     if (virtualkeyboard->GetKeySelected(curs) != 0) {
         virtualkeyboard->mouseReleaseEvent(i);
