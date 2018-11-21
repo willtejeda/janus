@@ -498,8 +498,8 @@ void VirtualMenu::ConstructSubmenuMain()
 void VirtualMenu::ConstructSubmenuURL()
 {
     QMatrix4x4 m = modelmatrix;
-    m.translate(0,1.75f,0);
-    m.scale(4,1,1);
+    m.translate(0,1.65f,0);
+    m.scale(3.2f,0.8f,1);
     VirtualMenuButton * b = AddNewButton(VirtualMenuIndex_URL, "__enteredurl", entered_url, m);
     b->label->GetProperties()->SetJSID("__enteredurl_label");
 
@@ -511,8 +511,8 @@ void VirtualMenu::ConstructSubmenuURL()
 
     for (int i=0; i<rows.size(); ++i) {
         QMatrix4x4 m = modelmatrix;
-        m.translate(-1.75f, 1.5f - i*0.25f,0);
-        m.scale(0.25f, 1, 1);
+        m.translate(-1.5f, 1.5f - i*0.17f,0);
+        m.scale(0.2f, 0.8f, 1);
 
         if (i == 1) {
             m.translate(1.5f,0,0);
