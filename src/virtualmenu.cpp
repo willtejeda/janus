@@ -115,6 +115,13 @@ bool VirtualMenu::GetTakingScreenshot() const
 
 void VirtualMenu::Update()
 {
+    //hide menu if we moved
+    const QString cur_url = multi_players->GetCurURL();
+    if (cur_url != last_url) {
+        visible = false;
+    }
+    last_url = cur_url;
+
     for (QPointer <AssetImage> & a : assetimgs) {
         if (a) {
             a->UpdateGL();
@@ -405,7 +412,8 @@ void VirtualMenu::ConstructSubmenuMain()
 void VirtualMenu::ConstructSubmenuBookmarks()
 {
     if (bookmarkmanager && multi_players) {
-        const bool bookmarked = bookmarkmanager->GetBookmarked(multi_players->GetCurURL());
+        const QString cur_url = multi_players->GetCurURL();
+        const bool bookmarked = bookmarkmanager->GetBookmarked(cur_url);
 
         QMatrix4x4 m = modelmatrix;
         m.translate(0,2.55f,0);

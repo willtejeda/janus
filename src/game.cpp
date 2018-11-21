@@ -412,9 +412,7 @@ void Game::Update()
     if (r0 != r1) {
         ClearSelection(0);
         ClearSelection(1);
-        SetPrivateWebsurfacesVisible(false);
-
-        virtualmenu->SetVisible(false);
+        SetPrivateWebsurfacesVisible(false);       
     }
 
     if (r1) {
@@ -4694,9 +4692,9 @@ void Game::UpdateControllers()
 
 void Game::UpdateVirtualMenu()
 {
-    if (virtualmenu->GetVisible()) {
-        virtualmenu->Update();
+    virtualmenu->Update();
 
+    if (virtualmenu->GetVisible()) {
         if (virtualmenu->GetDoEscapeToHome()) {
             StartEscapeToHome();
         }

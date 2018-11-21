@@ -246,6 +246,8 @@ private:
 
     QTimer partymode_request_timer;
     WebAsset partymode_data_request;
+
+    QString last_url;
 };
 
 #endif // VIRTUALMENU_H
