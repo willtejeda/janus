@@ -2877,8 +2877,9 @@ void Game::DrawCursorGL()
                   (cursor_active == 0 || (cursor_active == 1 && (!cs[0].active || cs[1].GetClick().hover || cs[1].GetTeleport().hover || cs[1].GetGrab().pressed)))))
                     && r->GetProperties()->GetCursorVisible()) {
 #else
-            if ((draw_cursor || (controller_manager->GetUsingSpatiallyTrackedControllers() && controller_manager->GetStates()[cursor_active].GetClick().hover))
-                    && r->GetProperties()->GetCursorVisible()) {
+            if (virtualmenu->GetVisible() ||
+                    ((draw_cursor || (controller_manager->GetUsingSpatiallyTrackedControllers() && controller_manager->GetStates()[cursor_active].GetClick().hover))
+                    && r->GetProperties()->GetCursorVisible())) {
 #endif
                 MathUtil::PushModelMatrix();
                 MathUtil::LoadModelIdentity();
@@ -2887,7 +2888,8 @@ void Game::DrawCursorGL()
 
                 //56.0 - hacky bugfix - if we do not draw something in the "cursor" scope, the 2DUI websurface does not update properly
     //            qDebug() << p << x << y << z << s << alpha;
-                if (websurface_selected[cursor_active] ||
+                if (virtualmenu->GetVisible() ||
+                        websurface_selected[cursor_active] ||
                         (video_selected[cursor_active] && cursor_obj && !video_selected[cursor_active]->GetPlaying(cursor_obj->GetMediaContext()))) {
                     if (RoomObject::cursor_arrow_obj) {
                         RoomObject::cursor_arrow_obj->DrawGL(shader, QColor(255,255,255,255));
