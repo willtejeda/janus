@@ -206,7 +206,14 @@ void VirtualMenu::mouseReleaseEvent(const QString selected)
 {
         switch (menu_index) {
         case VirtualMenuIndex_MAIN:
-            if (selected == "__back") {
+            if (selected == "__url") {
+                entered_url = "http://";
+                if (envobjects_text[VirtualMenuIndex_URL]["__enteredurl_label"]) {
+                    envobjects_text[VirtualMenuIndex_URL]["__enteredurl_label"]->SetText(entered_url);
+                }
+                menu_index = VirtualMenuIndex_URL;
+            }
+            else if (selected == "__back") {
                 do_back = true;
             }
             else if (selected == "__forward") {
@@ -231,6 +238,27 @@ void VirtualMenu::mouseReleaseEvent(const QString selected)
                 do_exit = true;
             }
             break;
+        case VirtualMenuIndex_URL:
+            if (selected == "__backspace") {
+                entered_url = entered_url.left(entered_url.length()-1);
+                if (envobjects_text[VirtualMenuIndex_URL]["__enteredurl_label"]) {
+                    envobjects_text[VirtualMenuIndex_URL]["__enteredurl_label"]->SetText(entered_url);
+                }
+            }
+            else if (selected == "__enter") {
+                menu_index = VirtualMenuIndex_MAIN;
+                do_create_portal = true;
+                create_portal_url = entered_url;
+            }
+            else if (selected == "__enteredurl") {
+
+            }
+            else {
+                entered_url += selected.right(1);
+                if (envobjects_text[VirtualMenuIndex_URL]["__enteredurl_label"]) {
+                    envobjects_text[VirtualMenuIndex_URL]["__enteredurl_label"]->SetText(entered_url);
+                }
+            }
         case VirtualMenuIndex_BOOKMARKS:
             if (selected == "__bookmarkadd") {
                 do_bookmark_add = true;
@@ -428,6 +456,7 @@ void VirtualMenu::ConstructSubmenus()
 
     //construct submenus
     ConstructSubmenuMain();
+    ConstructSubmenuURL();
     ConstructSubmenuBookmarks();
     ConstructSubmenuAvatar();
     ConstructSubmenuSocial();
@@ -464,6 +493,56 @@ void VirtualMenu::ConstructSubmenuMain()
 
     AddNewButton(VirtualMenuIndex_MAIN, "__exit", "Exit", m);
     m.translate(0,-0.25f,0);
+}
+
+void VirtualMenu::ConstructSubmenuURL()
+{
+    QMatrix4x4 m = modelmatrix;
+    m.translate(0,1.75f,0);
+    m.scale(4,1,1);
+    VirtualMenuButton * b = AddNewButton(VirtualMenuIndex_URL, "__enteredurl", entered_url, m);
+    b->label->GetProperties()->SetJSID("__enteredurl_label");
+
+    QList <QString> rows;
+    rows.push_back("~1234567890-_+");
+    rows.push_back("qwertyuiop");
+    rows.push_back("asdfghjkl:");
+    rows.push_back("zxcvbnm,./");
+
+    for (int i=0; i<rows.size(); ++i) {
+        QMatrix4x4 m = modelmatrix;
+        m.translate(-1.75f, 1.5f - i*0.25f,0);
+        m.scale(0.25f, 1, 1);
+
+        if (i == 1) {
+            m.translate(1.5f,0,0);
+        }
+        else if (i == 2) {
+            m.translate(2.0f,0,0);
+        }
+        else if (i == 3) {
+            m.translate(2.5f,0,0);
+        }
+
+        for (int j=0; j<rows[i].length(); ++j) {
+            AddNewButton(VirtualMenuIndex_URL, "__" + rows[i].mid(j,1), rows[i].mid(j,1), m);
+            m.translate(1.05f,0,0);
+        }
+
+        if (i == 0) {
+            m.translate(-0.5f,0,0);
+            m.scale(2,1,1);
+            m.translate(0.5f,0,0);
+            AddNewButton(VirtualMenuIndex_URL, "__backspace", "Backspace", m);
+        }
+        else if (i == 2) {
+            m.translate(-0.5f,0,0);
+            m.scale(2,1,1);
+            m.translate(0.5f,0,0);
+            VirtualMenuButton * b = AddNewButton(VirtualMenuIndex_URL, "__enter", "Enter", m);
+            b->button->GetProperties()->SetColour(QVector4D(0.5f,1.0f,0.5f,1.0f));
+        }
+    }
 }
 
 void VirtualMenu::ConstructSubmenuBookmarks()

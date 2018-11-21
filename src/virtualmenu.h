@@ -9,6 +9,7 @@
 enum VirtualMenuIndex
 {
     VirtualMenuIndex_MAIN,
+    VirtualMenuIndex_URL,
     VirtualMenuIndex_BOOKMARKS,
     VirtualMenuIndex_AVATAR,
     VirtualMenuIndex_SOCIAL,
@@ -29,6 +30,7 @@ struct VirtualMenuButton
         label = new RoomObject();
         label->SetType(TYPE_TEXT);
         label->SetInterfaceObject(true);
+        label->GetProperties()->SetJSID(js_id+"_label");
         label->SetFixedSize(true, 0.05f);
         label->SetText(text);
 
@@ -215,6 +217,7 @@ private:
 
     void Clear();
     void ConstructSubmenuMain();
+    void ConstructSubmenuURL();
     void ConstructSubmenuBookmarks();
     void ConstructSubmenuAvatar();
     void ConstructSubmenuSocial();
@@ -254,6 +257,7 @@ private:
     WebAsset partymode_data_request;
 
     QString last_url;
+    QString entered_url;
 };
 
 #endif // VIRTUALMENU_H
