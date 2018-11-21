@@ -3,13 +3,16 @@
 VirtualMenu::VirtualMenu() :
     menu_index(VirtualMenuIndex_MAIN),
     visible(false),
+    taking_screenshot(false),
     cur_bookmark(0),
     num_bookmarks(0),
     cur_user(0),
     num_users(0),
     do_escape_to_home(false),
     do_exit(false),
-    do_create_portal(false)
+    do_create_portal(false),
+    do_bookmark_add(false),
+    do_bookmark_remove(false)
 {
     assetobjs["cube"] = QPointer<AssetObject>(new AssetObject());
     assetobjs["cube"]->SetSrc(MathUtil::GetApplicationURL(), QString("assets/primitives/cube.obj"));
@@ -100,8 +103,25 @@ bool VirtualMenu::GetVisible() const
     return visible;
 }
 
+void VirtualMenu::SetTakingScreenshot(const bool b)
+{
+    taking_screenshot = b;
+}
+
+bool VirtualMenu::GetTakingScreenshot() const
+{
+    return taking_screenshot;
+}
+
 void VirtualMenu::Update()
 {
+    //hide menu if we moved
+    const QString cur_url = multi_players->GetCurURL();
+    if (cur_url != last_url) {
+        visible = false;
+    }
+    last_url = cur_url;
+
     for (QPointer <AssetImage> & a : assetimgs) {
         if (a) {
             a->UpdateGL();
@@ -200,7 +220,13 @@ void VirtualMenu::mouseReleaseEvent(const QString selected)
             }
             break;
         case VirtualMenuIndex_BOOKMARKS:
-            if (selected == "__bookmarkup") {
+            if (selected == "__bookmarkadd") {
+                do_bookmark_add = true;
+            }
+            else if (selected == "__bookmarkremove") {
+                do_bookmark_remove = true;
+            }
+            else if (selected == "__bookmarkup") {
                 if (cur_bookmark+16 < num_bookmarks) {
                     cur_bookmark += 16;
                     ConstructSubmenus();
@@ -305,6 +331,28 @@ QString VirtualMenu::GetDoCreatePortalThumb()
     return create_portal_thumb;
 }
 
+bool VirtualMenu::GetDoBookmarkAdd()
+{
+    if (do_bookmark_add) {
+        do_bookmark_add = false;
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+bool VirtualMenu::GetDoBookmarkRemove()
+{
+    if (do_bookmark_remove) {
+        do_bookmark_remove = false;
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
 void VirtualMenu::MenuButtonPressed()
 {
     if (!visible) {
@@ -363,11 +411,23 @@ void VirtualMenu::ConstructSubmenuMain()
 
 void VirtualMenu::ConstructSubmenuBookmarks()
 {
-    if (bookmarkmanager) {
+    if (bookmarkmanager && multi_players) {
+        const QString cur_url = multi_players->GetCurURL();
+        const bool bookmarked = bookmarkmanager->GetBookmarked(cur_url);
+
+        QMatrix4x4 m = modelmatrix;
+        m.translate(0,2.55f,0);
+        if (bookmarked) {
+            AddNewButton(VirtualMenuIndex_BOOKMARKS, "__bookmarkremove", "Remove current URL", m);
+        }
+        else {
+            AddNewButton(VirtualMenuIndex_BOOKMARKS, "__bookmarkadd", "Add current URL", m);
+        }
+
         QVariantList list = bookmarkmanager->GetBookmarks() + bookmarkmanager->GetWorkspaces();
         num_bookmarks = list.length();
 
-        qDebug() << "VirtualMenu::ConstructSubmenuBookmarks()" << cur_bookmark << num_bookmarks;
+//        qDebug() << "VirtualMenu::ConstructSubmenuBookmarks()" << cur_bookmark << num_bookmarks;
         if (cur_bookmark > 0) {
             QMatrix4x4 m_down = modelmatrix;
             m_down.translate(-1.35f, 1.25f, 0.0f);
@@ -441,9 +501,11 @@ void VirtualMenu::ConstructSubmenuSocial()
 void VirtualMenu::UpdatePartyModeList()
 {
 //    qDebug() << "VirtualMenu::UpdatePartyModeList()";
-    //if not visible and we're not following
-    if (!visible || menu_index != VirtualMenuIndex_SOCIAL) {
-        return;
+    //if not visible
+    if (!MathUtil::GetPartyModeData().isEmpty()) {
+        if (!visible || menu_index != VirtualMenuIndex_SOCIAL) {
+            return;
+        }
     }
 
     if (!partymode_data_request.GetStarted() || partymode_data_request.GetProcessed()) {
