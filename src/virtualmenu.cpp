@@ -367,7 +367,7 @@ void VirtualMenu::ConstructSubmenuBookmarks()
         QVariantList list = bookmarkmanager->GetBookmarks() + bookmarkmanager->GetWorkspaces();
         num_bookmarks = list.length();
 
-        qDebug() << "VirtualMenu::ConstructSubmenuBookmarks()" << cur_bookmark << num_bookmarks;
+//        qDebug() << "VirtualMenu::ConstructSubmenuBookmarks()" << cur_bookmark << num_bookmarks;
         if (cur_bookmark > 0) {
             QMatrix4x4 m_down = modelmatrix;
             m_down.translate(-1.35f, 1.25f, 0.0f);
@@ -441,9 +441,11 @@ void VirtualMenu::ConstructSubmenuSocial()
 void VirtualMenu::UpdatePartyModeList()
 {
 //    qDebug() << "VirtualMenu::UpdatePartyModeList()";
-    //if not visible and we're not following
-    if (!visible || menu_index != VirtualMenuIndex_SOCIAL) {
-        return;
+    //if not visible
+    if (!MathUtil::GetPartyModeData().isEmpty()) {
+        if (!visible || menu_index != VirtualMenuIndex_SOCIAL) {
+            return;
+        }
     }
 
     if (!partymode_data_request.GetStarted() || partymode_data_request.GetProcessed()) {
