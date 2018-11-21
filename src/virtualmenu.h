@@ -13,6 +13,7 @@ enum VirtualMenuIndex
     VirtualMenuIndex_BOOKMARKS,
     VirtualMenuIndex_AVATAR,
     VirtualMenuIndex_SOCIAL,
+    VirtualMenuIndex_KEYBOARD
 };
 
 struct VirtualMenuButton
@@ -25,7 +26,6 @@ struct VirtualMenuButton
         button->GetProperties()->SetJSID(js_id);
         button->GetProperties()->SetID("cube");
         button->GetProperties()->SetCollisionID("cube");
-//        button->GetProperties()->SetColour(QVector4D(0,0,0,0.25f));
 
         label = new RoomObject();
         label->SetType(TYPE_TEXT);
@@ -179,6 +179,12 @@ public:
     void SetTakingScreenshot(const bool b);
     bool GetTakingScreenshot() const;
 
+    void SetMenuIndex(VirtualMenuIndex index);
+    VirtualMenuIndex GetMenuIndex() const;
+
+    void SetWebSurface(QPointer <AbstractWebSurface> w);
+    QPointer <AbstractWebSurface> GetWebSurface() const;
+
     void Update();
     void DrawGL(QPointer <AssetShader> shader);
 
@@ -207,7 +213,7 @@ public:
 
     void MenuButtonPressed();
 
-    void ConstructSubmenus();
+    void ConstructSubmenus();   
 
 public slots:
 
@@ -221,6 +227,7 @@ private:
     void ConstructSubmenuBookmarks();
     void ConstructSubmenuAvatar();
     void ConstructSubmenuSocial();
+    void ConstructSubmenuKeyboard();
 
     QHash <QString, QPointer <AssetImage> > assetimgs;
     QHash <QString, QPointer <AssetObject> > assetobjs;
@@ -258,6 +265,8 @@ private:
 
     QString last_url;
     QString entered_url;
+
+    QPointer <AbstractWebSurface> websurface; //for virtual keyboard and text entry for websurfaces
 };
 
 #endif // VIRTUALMENU_H

@@ -116,6 +116,16 @@ bool VirtualMenu::GetTakingScreenshot() const
     return taking_screenshot;
 }
 
+void VirtualMenu::SetMenuIndex(VirtualMenuIndex index)
+{
+    menu_index = index;
+}
+
+VirtualMenuIndex VirtualMenu::GetMenuIndex() const
+{
+    return menu_index;
+}
+
 void VirtualMenu::Update()
 {
     //hide menu if we moved
@@ -426,17 +436,29 @@ bool VirtualMenu::GetDoBookmarkRemove()
     }
 }
 
+void VirtualMenu::SetWebSurface(QPointer <AbstractWebSurface> w)
+{
+    websurface = w;
+}
+
+QPointer <AbstractWebSurface> VirtualMenu::GetWebSurface() const
+{
+    return websurface;
+}
+
 void VirtualMenu::MenuButtonPressed()
 {
     if (!visible) {
         visible = true;
+        menu_index = VirtualMenuIndex_MAIN;
         ConstructSubmenus();
     }
     else {
         switch (menu_index) {
         case VirtualMenuIndex_MAIN:
+        case VirtualMenuIndex_KEYBOARD:
             visible = false;
-            break;
+            break;            
         default:
             menu_index = VirtualMenuIndex_MAIN;
             break;
@@ -460,6 +482,7 @@ void VirtualMenu::ConstructSubmenus()
     ConstructSubmenuBookmarks();
     ConstructSubmenuAvatar();
     ConstructSubmenuSocial();
+    ConstructSubmenuKeyboard();
 }
 
 void VirtualMenu::ConstructSubmenuMain()
@@ -632,6 +655,59 @@ void VirtualMenu::ConstructSubmenuSocial()
         const QString thumb_id = "https://thumbnails.janusvr.com/" + MathUtil::MD5Hash(url) + "/thumb.jpg";
         AddNewImageUserButton(VirtualMenuIndex_SOCIAL, "__user"+QString::number(i), userid, url, thumb_id, m);
     }
+}
+
+void VirtualMenu::ConstructSubmenuKeyboard()
+{
+    QList <QString> rows;
+    rows.push_back("`!@#$%^&*()_+");
+    rows.push_back("~1234567890-=");
+    rows.push_back("qwertyuiop[]\\");
+    rows.push_back("asdfghjkl:'\"");
+    rows.push_back("zxcvbnm,./?");
+
+    for (int i=0; i<rows.size(); ++i) {
+        QMatrix4x4 m = modelmatrix;
+        m.translate(0,1.2f,1);
+        m.rotate(-30.0f, 1, 0, 0);
+        m.translate(-0.75f, -i*0.1f, 0);
+        m.scale(0.1f, 0.4f, 1);
+
+        if (i == 2) {
+            m.translate(0.75f,0,0);
+        }
+        else if (i == 3) {
+            m.translate(1.0f,0,0);
+        }
+        else if (i == 4) {
+            m.translate(1.25f,0,0);
+        }
+
+        for (int j=0; j<rows[i].length(); ++j) {
+            AddNewButton(VirtualMenuIndex_KEYBOARD, "__" + rows[i].mid(j,1), rows[i].mid(j,1), m);
+            m.translate(1.05f,0,0);
+        }
+
+        if (i == 1) {
+            m.translate(-0.5f,0,0);
+            m.scale(2,1,1);
+            m.translate(0.5f,0,0);
+            AddNewButton(VirtualMenuIndex_KEYBOARD, "__backspace", "<--", m);
+        }
+        else if (i == 3) {
+            m.translate(-0.5f,0,0);
+            m.scale(2,1,1);
+            m.translate(0.5f,0,0);
+            VirtualMenuButton * b = AddNewButton(VirtualMenuIndex_KEYBOARD, "__enter", "Ent", m);
+            b->button->GetProperties()->SetColour(QVector4D(0.5f,1.0f,0.5f,1.0f));
+        }
+    }
+    QMatrix4x4 m = modelmatrix;
+    m.translate(0,1.2f,1);
+    m.rotate(-30.0f, 1, 0, 0);
+    m.translate(-0.1f, -0.5f, 0);
+    m.scale(0.6f, 0.4f, 1);
+    AddNewButton(VirtualMenuIndex_KEYBOARD, "__space", " ", m);
 }
 
 void VirtualMenu::UpdatePartyModeList()
