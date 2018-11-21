@@ -4143,16 +4143,6 @@ void Game::UpdateControllers()
                     r->CallJSFunction("room.onMouseUp", player, multi_players);
                     r->CallJSFunction("room.onClick", player, multi_players);
 
-                    //object onclick
-                    QPointer <RoomObject> o = r->GetRoomObject(player->GetCursorObject(i));
-                    if (o) {
-                        //55.2 - onclick is on mouse release, and should only happen once per mouse click
-                        QString click_code = o->GetProperties()->GetOnClick();                        
-                        if (click_code.length() > 0) { //special javascript onclick code to run                            
-                            r->CallJSFunction(click_code, player, multi_players);
-                        }
-                    }
-
                     if (!room_has_fn_onmouseup && !room_has_fn_onclick) {
 #ifdef __ANDROID__
                         //Only click if we haven't teleported
@@ -4225,18 +4215,8 @@ void Game::UpdateControllers()
             r->CallJSFunction("room.onMouseUp", player, multi_players);
             r->CallJSFunction("room.onClick", player, multi_players);
 
-            //object onclick
-            QPointer <RoomObject> o = r->GetRoomObject(player->GetCursorObject(0));
-            if (o) {
-                //55.2 - onclick is on mouse release, and should only happen once per mouse click
-                QString click_code = o->GetProperties()->GetOnClick();
-                if (click_code.length() > 0) { //special javascript onclick code to run
-                    r->CallJSFunction(click_code, player, multi_players);
-                }
-            }
-
             if (!room_has_fn_onmouseup && !room_has_fn_onclick) {
-                    EndOpInteractionDefault(0);
+                EndOpInteractionDefault(0);
             }
         }
 
@@ -4682,6 +4662,15 @@ void Game::UpdateVirtualMenu()
     virtualmenu->Update();
 
     if (virtualmenu->GetVisible()) {
+        if (virtualmenu->GetDoBack()) {
+            StartResetPlayer();
+        }
+        if (virtualmenu->GetDoForward()) {
+            StartResetPlayerForward();
+        }
+        if (virtualmenu->GetDoReload()) {
+            env->ReloadRoom();
+        }
         if (virtualmenu->GetDoEscapeToHome()) {
             StartEscapeToHome();
         }
