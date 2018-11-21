@@ -3,13 +3,16 @@
 VirtualMenu::VirtualMenu() :
     menu_index(VirtualMenuIndex_MAIN),
     visible(false),
+    taking_screenshot(false),
     cur_bookmark(0),
     num_bookmarks(0),
     cur_user(0),
     num_users(0),
     do_escape_to_home(false),
     do_exit(false),
-    do_create_portal(false)
+    do_create_portal(false),
+    do_bookmark_add(false),
+    do_bookmark_remove(false)
 {
     assetobjs["cube"] = QPointer<AssetObject>(new AssetObject());
     assetobjs["cube"]->SetSrc(MathUtil::GetApplicationURL(), QString("assets/primitives/cube.obj"));
@@ -98,6 +101,16 @@ void VirtualMenu::SetVisible(const bool b)
 bool VirtualMenu::GetVisible() const
 {
     return visible;
+}
+
+void VirtualMenu::SetTakingScreenshot(const bool b)
+{
+    taking_screenshot = b;
+}
+
+bool VirtualMenu::GetTakingScreenshot() const
+{
+    return taking_screenshot;
 }
 
 void VirtualMenu::Update()
@@ -200,7 +213,13 @@ void VirtualMenu::mouseReleaseEvent(const QString selected)
             }
             break;
         case VirtualMenuIndex_BOOKMARKS:
-            if (selected == "__bookmarkup") {
+            if (selected == "__bookmarkadd") {
+                do_bookmark_add = true;
+            }
+            else if (selected == "__bookmarkremove") {
+                do_bookmark_remove = true;
+            }
+            else if (selected == "__bookmarkup") {
                 if (cur_bookmark+16 < num_bookmarks) {
                     cur_bookmark += 16;
                     ConstructSubmenus();
@@ -305,6 +324,28 @@ QString VirtualMenu::GetDoCreatePortalThumb()
     return create_portal_thumb;
 }
 
+bool VirtualMenu::GetDoBookmarkAdd()
+{
+    if (do_bookmark_add) {
+        do_bookmark_add = false;
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+bool VirtualMenu::GetDoBookmarkRemove()
+{
+    if (do_bookmark_remove) {
+        do_bookmark_remove = false;
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
 void VirtualMenu::MenuButtonPressed()
 {
     if (!visible) {
@@ -363,7 +404,18 @@ void VirtualMenu::ConstructSubmenuMain()
 
 void VirtualMenu::ConstructSubmenuBookmarks()
 {
-    if (bookmarkmanager) {
+    if (bookmarkmanager && multi_players) {
+        const bool bookmarked = bookmarkmanager->GetBookmarked(multi_players->GetCurURL());
+
+        QMatrix4x4 m = modelmatrix;
+        m.translate(0,2.55f,0);
+        if (bookmarked) {
+            AddNewButton(VirtualMenuIndex_BOOKMARKS, "__bookmarkremove", "Remove current URL", m);
+        }
+        else {
+            AddNewButton(VirtualMenuIndex_BOOKMARKS, "__bookmarkadd", "Add current URL", m);
+        }
+
         QVariantList list = bookmarkmanager->GetBookmarks() + bookmarkmanager->GetWorkspaces();
         num_bookmarks = list.length();
 

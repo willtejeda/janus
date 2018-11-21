@@ -174,6 +174,9 @@ public:
     void SetVisible(const bool b);
     bool GetVisible() const;
 
+    void SetTakingScreenshot(const bool b);
+    bool GetTakingScreenshot() const;
+
     void Update();
     void DrawGL(QPointer <AssetShader> shader);
 
@@ -194,8 +197,12 @@ public:
     bool GetDoCreatePortal();
     QString GetDoCreatePortalURL();
     QString GetDoCreatePortalThumb();
+    bool GetDoBookmarkAdd();
+    bool GetDoBookmarkRemove();
 
     void MenuButtonPressed();
+
+    void ConstructSubmenus();
 
 public slots:
 
@@ -204,7 +211,6 @@ public slots:
 private:
 
     void Clear();
-    void ConstructSubmenus();
     void ConstructSubmenuMain();
     void ConstructSubmenuBookmarks();
     void ConstructSubmenuAvatar();
@@ -217,6 +223,7 @@ private:
 
     VirtualMenuIndex menu_index;
     bool visible;
+    bool taking_screenshot;
     QMatrix4x4 modelmatrix; //transform to position menu in the environment
 
     QPointer <BookmarkManager> bookmarkmanager;
@@ -233,6 +240,9 @@ private:
     bool do_create_portal;
     QString create_portal_url;
     QString create_portal_thumb;
+
+    bool do_bookmark_add;
+    bool do_bookmark_remove;
 
     QTimer partymode_request_timer;
     WebAsset partymode_data_request;

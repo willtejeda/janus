@@ -4730,7 +4730,7 @@ void Game::UpdateVirtualMenu()
 
 void Game::DrawVirtualMenu()
 {
-    if (virtualmenu->GetVisible()) {
+    if (virtualmenu->GetVisible() && !virtualmenu->GetTakingScreenshot()) {
         virtualmenu->DrawGL(Room::GetTransparencyShader());
     }
 }
