@@ -8,6 +8,9 @@ VirtualMenu::VirtualMenu() :
     num_bookmarks(0),
     cur_user(0),
     num_users(0),
+    do_back(false),
+    do_forward(false),
+    do_reload(false),
     do_escape_to_home(false),
     do_exit(false),
     do_create_portal(false),
@@ -203,7 +206,16 @@ void VirtualMenu::mouseReleaseEvent(const QString selected)
 {
         switch (menu_index) {
         case VirtualMenuIndex_MAIN:
-            if (selected == "__home") {
+            if (selected == "__back") {
+                do_back = true;
+            }
+            else if (selected == "__forward") {
+                do_forward = true;
+            }
+            else if (selected == "__reload") {
+                do_reload = true;
+            }
+            else if (selected == "__home") {
                 do_escape_to_home = true;
             }
             else if (selected == "__bookmarks") {
@@ -286,6 +298,39 @@ void VirtualMenu::SetModelMatrix(const QMatrix4x4 m)
 QMatrix4x4 VirtualMenu::GetModelMatrix() const
 {
     return modelmatrix;
+}
+
+bool VirtualMenu::GetDoBack()
+{
+    if (do_back) {
+        do_back = false;
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+bool VirtualMenu::GetDoForward()
+{
+    if (do_forward) {
+        do_forward = false;
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+bool VirtualMenu::GetDoReload()
+{
+    if (do_reload) {
+        do_reload = false;
+        return true;
+    }
+    else {
+        return false;
+    }
 }
 
 bool VirtualMenu::GetDoEscapeToHome()
@@ -391,7 +436,19 @@ void VirtualMenu::ConstructSubmenus()
 void VirtualMenu::ConstructSubmenuMain()
 {
     QMatrix4x4 m = modelmatrix;
-    m.translate(0,2.0f,0);
+    m.translate(0,2.25f,0);
+
+    AddNewButton(VirtualMenuIndex_MAIN, "__url", multi_players->GetCurURL(), m);
+    m.translate(0,-0.25f,0);
+
+    AddNewButton(VirtualMenuIndex_MAIN, "__back", "Back", m);
+    m.translate(0,-0.25f,0);
+
+    AddNewButton(VirtualMenuIndex_MAIN, "__forward", "Forward", m);
+    m.translate(0,-0.25f,0);
+
+    AddNewButton(VirtualMenuIndex_MAIN, "__reload", "Reload", m);
+    m.translate(0,-0.25f,0);
 
     AddNewButton(VirtualMenuIndex_MAIN, "__home", "Home", m);
     m.translate(0,-0.25f,0);
