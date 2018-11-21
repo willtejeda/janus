@@ -4170,20 +4170,7 @@ void Game::UpdateControllers()
                 }
                 if (b_home.proc_release) {
                     b_home.proc_release = false;
-                    if (controller_manager->GetHMDManager() && (controller_manager->GetHMDManager()->GetHMDType() == "go" || controller_manager->GetHMDManager()->GetHMDType() == "gear")){
-                        if (env->GetCurRoom() == env->GetRootRoom()){
-#if defined(__ANDROID__) && defined(OCULUS_SUBMISSION_BUILD)
-                            ((GearManager*)(controller_manager->GetHMDManager().data()))->ShowQuitMenu();
-#endif
-                        }
-                        else {
-                            StartResetPlayer();
-                        }
-                    }
-                    else {
-                        virtualmenu->MenuButtonPressed();
-//                        StartEscapeToHome();
-                    }
+                    virtualmenu->MenuButtonPressed();
                 }
 
                 //let player grab stuff close by
@@ -4699,7 +4686,14 @@ void Game::UpdateVirtualMenu()
             StartEscapeToHome();
         }
         if (virtualmenu->GetDoExit()) {
-            SetDoExit(true);
+            if (controller_manager->GetHMDManager() && (controller_manager->GetHMDManager()->GetHMDType() == "go" || controller_manager->GetHMDManager()->GetHMDType() == "gear")){
+#if defined(__ANDROID__) && defined(OCULUS_SUBMISSION_BUILD)
+                ((GearManager*)(controller_manager->GetHMDManager().data()))->ShowQuitMenu();
+#endif
+            }
+            else {
+                SetDoExit(true);
+            }
         }
         if (virtualmenu->GetDoCreatePortal()) {
             CreatePortal(virtualmenu->GetDoCreatePortalURL(), true);
