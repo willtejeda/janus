@@ -55,6 +55,45 @@ struct VirtualMenuButton
     QPointer <RoomObject> label;
 };
 
+struct VirtualMenuIconButton
+{
+    VirtualMenuIconButton(const QString js_id, const QString imageurl, const QMatrix4x4 m)
+    {
+        button = new RoomObject();
+        button->SetType(TYPE_OBJECT);
+        button->SetInterfaceObject(true);
+        button->GetProperties()->SetJSID(js_id);
+        button->GetProperties()->SetID("cube");
+        button->GetProperties()->SetCollisionID("cube");
+//        button->GetProperties()->SetColour(QVector4D(0,0,0,0.25f));
+
+        overlay = new RoomObject();
+        overlay->SetType(TYPE_OBJECT);
+        overlay->SetInterfaceObject(true);
+        overlay->GetProperties()->SetID("plane");
+        overlay->GetProperties()->SetLighting(false);
+
+        SetModelMatrix(m);
+    }
+
+    void SetModelMatrix(const QMatrix4x4 m)
+    {
+        //place button
+        QMatrix4x4 m2 = m;
+        m2.scale(1, 1, 0.05f);
+        button->SetAttributeModelMatrix(m2);
+
+        //place text "in front"
+        QMatrix4x4 m3 = m;
+        m3.scale(1.0f, 1.0f, 0.05f);
+        m3.translate(0.0f, 0.0f,1.1f);
+        overlay->SetAttributeModelMatrix(m3);
+    }
+
+    QPointer <RoomObject> button;
+    QPointer <RoomObject> overlay;
+};
+
 struct VirtualMenuImageButton
 {
     VirtualMenuImageButton(const QString js_id, const QString url, const QString thumb_id, const QMatrix4x4 m)
@@ -198,6 +237,7 @@ public:
 
     VirtualMenuButton * AddNewButton(const VirtualMenuIndex index, const QString js_id, const QString label, const QMatrix4x4 m);
     VirtualMenuImageButton * AddNewImageButton(const VirtualMenuIndex index, const QString js_id, const QString url, const QString thumb_id, const QMatrix4x4 m);
+    VirtualMenuIconButton * AddNewIconButton(const VirtualMenuIndex index, const QString js_id, const QString imageurl, const QMatrix4x4 m);
     VirtualMenuImageUserButton * AddNewImageUserButton(const VirtualMenuIndex index, const QString js_id, const QString user, const QString url, const QString thumb_id, const QMatrix4x4 m);
 
     bool GetDoBack();

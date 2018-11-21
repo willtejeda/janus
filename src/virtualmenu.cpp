@@ -24,6 +24,13 @@ VirtualMenu::VirtualMenu() :
     assetobjs["cube"]->GetProperties()->SetSaveToMarkup(false);
     assetobjs["cube"]->Load();
 
+    assetobjs["plane"] = QPointer<AssetObject>(new AssetObject());
+    assetobjs["plane"]->SetSrc(MathUtil::GetApplicationURL(), QString("assets/primitives/plane.obj"));
+    assetobjs["plane"]->GetProperties()->SetID("cube");
+    assetobjs["plane"]->GetProperties()->SetPrimitive(true);
+    assetobjs["plane"]->GetProperties()->SetSaveToMarkup(false);
+    assetobjs["plane"]->Load();
+
     connect(&partymode_request_timer, SIGNAL(timeout()), this, SLOT(UpdatePartyModeList()));
     partymode_request_timer.start(5000);
 }
@@ -72,6 +79,26 @@ VirtualMenuImageButton * VirtualMenu::AddNewImageButton(const VirtualMenuIndex i
 
     envobjects[index][b->button->GetProperties()->GetJSID()] = b->button;
     envobjects_text[index][b->label->GetProperties()->GetJSID()] = b->label;
+
+    return b;
+}
+
+VirtualMenuIconButton * VirtualMenu::AddNewIconButton(const VirtualMenuIndex index, const QString js_id, const QString imageurl, const QMatrix4x4 m)
+{
+    if (!assetimgs.contains(imageurl)) {
+        assetimgs[imageurl] = QPointer<AssetImage>(new AssetImage());
+        assetimgs[imageurl]->SetSrc(MathUtil::GetApplicationURL(), imageurl);
+        assetimgs[imageurl]->Load();
+    }
+
+    VirtualMenuIconButton * b = new VirtualMenuIconButton(js_id, imageurl, m);
+    b->button->SetAssetObject(assetobjs["cube"]);
+    b->button->SetCollisionAssetObject(assetobjs["cube"]);
+    b->overlay->SetAssetObject(assetobjs["plane"]);
+    b->overlay->SetAssetImage(assetimgs[imageurl]);
+
+    envobjects[index][b->button->GetProperties()->GetJSID()] = b->button;
+    envobjects_text[index][b->overlay->GetProperties()->GetJSID()] = b->overlay;
 
     return b;
 }
@@ -216,7 +243,13 @@ void VirtualMenu::mouseReleaseEvent(const QString selected)
 {
         switch (menu_index) {
         case VirtualMenuIndex_MAIN:
-            if (selected == "__url") {
+            if (selected == "__bookmarkadd") {
+                do_bookmark_add = true;
+            }
+            else if (selected == "__bookmarkremove") {
+                do_bookmark_remove = true;
+            }
+            else if (selected == "__url") {
                 entered_url = "http://";
                 if (envobjects_text[VirtualMenuIndex_URL]["__enteredurl_label"]) {
                     envobjects_text[VirtualMenuIndex_URL]["__enteredurl_label"]->SetText(entered_url);
@@ -270,13 +303,7 @@ void VirtualMenu::mouseReleaseEvent(const QString selected)
                 }
             }
         case VirtualMenuIndex_BOOKMARKS:
-            if (selected == "__bookmarkadd") {
-                do_bookmark_add = true;
-            }
-            else if (selected == "__bookmarkremove") {
-                do_bookmark_remove = true;
-            }
-            else if (selected == "__bookmarkup") {
+            if (selected == "__bookmarkup") {
                 if (cur_bookmark+16 < num_bookmarks) {
                     cur_bookmark += 16;
                     ConstructSubmenus();
@@ -490,19 +517,34 @@ void VirtualMenu::ConstructSubmenuMain()
     QMatrix4x4 m = modelmatrix;
     m.translate(0,2.25f,0);
 
-    AddNewButton(VirtualMenuIndex_MAIN, "__url", multi_players->GetCurURL(), m);
+    QMatrix4x4 m3 = m;
+    m3.scale(4,1,1);
+    AddNewButton(VirtualMenuIndex_MAIN, "__url", multi_players->GetCurURL(), m3);
+
     m.translate(0,-0.25f,0);
 
-    AddNewButton(VirtualMenuIndex_MAIN, "__back", "Back", m);
-    m.translate(0,-0.25f,0);
+    QMatrix4x4 m2 = m;
+    m2.scale(0.2f, 0.2f, 1.0f);
+    m2.translate(-2.0f, 0,0);
+    AddNewIconButton(VirtualMenuIndex_MAIN, "__back", "assets/icons/back.png", m2);
+    m2.translate(1.0f,0,0);
 
-    AddNewButton(VirtualMenuIndex_MAIN, "__forward", "Forward", m);
-    m.translate(0,-0.25f,0);
+    AddNewIconButton(VirtualMenuIndex_MAIN, "__forward", "assets/icons/forward.png", m2);
+    m2.translate(1.0f,0,0);
 
-    AddNewButton(VirtualMenuIndex_MAIN, "__reload", "Reload", m);
-    m.translate(0,-0.25f,0);
+    AddNewIconButton(VirtualMenuIndex_MAIN, "__reload", "assets/icons/reload.png", m2);
+    m2.translate(1.0f,0,0);
 
-    AddNewButton(VirtualMenuIndex_MAIN, "__home", "Home", m);
+    AddNewIconButton(VirtualMenuIndex_MAIN, "__home", "assets/icons/home.png", m2);
+    m2.translate(1.0f,0,0);
+
+    bool bookmarked = false;
+    if (bookmarkmanager && multi_players) {
+        const QString cur_url = multi_players->GetCurURL();
+        bookmarked = bookmarkmanager->GetBookmarked(cur_url);
+    }
+    AddNewIconButton(VirtualMenuIndex_MAIN, bookmarked? "__bookmarkremove" : "__bookmarkadd", bookmarked? "assets/icons/bookmarked.png" : "assets/icons/bookmark.png", m2);
+
     m.translate(0,-0.25f,0);
 
     AddNewButton(VirtualMenuIndex_MAIN, "__bookmarks", "Bookmarks", m);
@@ -570,19 +612,7 @@ void VirtualMenu::ConstructSubmenuURL()
 
 void VirtualMenu::ConstructSubmenuBookmarks()
 {
-    if (bookmarkmanager && multi_players) {
-        const QString cur_url = multi_players->GetCurURL();
-        const bool bookmarked = bookmarkmanager->GetBookmarked(cur_url);
-
-        QMatrix4x4 m = modelmatrix;
-        m.translate(0,2.55f,0);
-        if (bookmarked) {
-            AddNewButton(VirtualMenuIndex_BOOKMARKS, "__bookmarkremove", "Remove current URL", m);
-        }
-        else {
-            AddNewButton(VirtualMenuIndex_BOOKMARKS, "__bookmarkadd", "Add current URL", m);
-        }
-
+    if (bookmarkmanager && multi_players) {        
         QVariantList list = bookmarkmanager->GetBookmarks() + bookmarkmanager->GetWorkspaces();
         num_bookmarks = list.length();
 
