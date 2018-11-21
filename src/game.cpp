@@ -4147,8 +4147,8 @@ void Game::UpdateControllers()
                     QPointer <RoomObject> o = r->GetRoomObject(player->GetCursorObject(i));
                     if (o) {
                         //55.2 - onclick is on mouse release, and should only happen once per mouse click
-                        QString click_code = o->GetProperties()->GetOnClick();
-                        if (click_code.length() > 0) { //special javascript onclick code to run
+                        QString click_code = o->GetProperties()->GetOnClick();                        
+                        if (click_code.length() > 0) { //special javascript onclick code to run                            
                             r->CallJSFunction(click_code, player, multi_players);
                         }
                     }
@@ -4978,6 +4978,7 @@ void Game::EndOpInteractionDefault(const int i)
     else if (o) {
         //55.2 - onclick is on mouse release, and should only happen once per mouse click
         QString click_code = o->GetProperties()->GetOnClick();
+        qDebug() << "onclick code" << click_code;
         if (click_code.length() > 0) { //special javascript onclick code to run
             r->CallJSFunction(click_code, player, multi_players);
         }
