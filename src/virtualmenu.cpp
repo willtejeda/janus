@@ -187,8 +187,8 @@ void VirtualMenu::Update()
         const QByteArray & ba = partymode_data_request.GetData();
         MathUtil::GetPartyModeData() = QJsonDocument::fromJson(ba).toVariant().toMap()["data"].toList();
         partymode_data_request.SetProcessed(true);
-
-        ConstructSubmenus();
+        ConstructSubmenus();        
+//        qDebug() << MathUtil::GetPartyModeData();
     }
 
     if (search_data_request.GetLoaded() && !search_data_request.GetProcessed()) {
