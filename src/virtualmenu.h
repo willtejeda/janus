@@ -12,6 +12,8 @@ enum VirtualMenuIndex
     VirtualMenuIndex_URL,
     VirtualMenuIndex_BOOKMARKS,
     VirtualMenuIndex_AVATAR,
+    VirtualMenuIndex_SEARCH,
+    VirtualMenuIndex_SEARCHRESULT,
     VirtualMenuIndex_SOCIAL,
     VirtualMenuIndex_KEYBOARD
 };
@@ -266,6 +268,7 @@ private:
     void ConstructSubmenuURL();
     void ConstructSubmenuBookmarks();
     void ConstructSubmenuAvatar();
+    void ConstructSubmenuSearch();
     void ConstructSubmenuSocial();
     void ConstructSubmenuKeyboard();
 

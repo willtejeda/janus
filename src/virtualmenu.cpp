@@ -508,6 +508,7 @@ void VirtualMenu::ConstructSubmenus()
     ConstructSubmenuURL();
     ConstructSubmenuBookmarks();
     ConstructSubmenuAvatar();
+    ConstructSubmenuSearch();
     ConstructSubmenuSocial();
     ConstructSubmenuKeyboard();
 }
@@ -551,6 +552,9 @@ void VirtualMenu::ConstructSubmenuMain()
     m.translate(0,-0.25f,0);
 
     AddNewButton(VirtualMenuIndex_MAIN, "__avatar", "Avatar", m);
+    m.translate(0,-0.25f,0);
+
+    AddNewButton(VirtualMenuIndex_MAIN, "__search", "Search", m);
     m.translate(0,-0.25f,0);
 
     AddNewButton(VirtualMenuIndex_MAIN, "__social", "Social", m);
@@ -754,4 +758,57 @@ void VirtualMenu::UpdatePartyModeList()
         partymode_data_request.Load(QUrl("http://api.janusvr.com/partymodeAPI"));
     }
 
+}
+
+void VirtualMenu::ConstructSubmenuSearch()
+{
+    QList <QString> rows;
+    rows.push_back("`!@#$%^&*()_+");
+    rows.push_back("~1234567890-=");
+    rows.push_back("qwertyuiop[]\\");
+    rows.push_back("asdfghjkl:'\"");
+    rows.push_back("zxcvbnm,./?");
+
+    for (int i=0; i<rows.size(); ++i) {
+        QMatrix4x4 m = modelmatrix;
+        m.translate(0,1.2f,1);
+        m.rotate(-30.0f, 1, 0, 0);
+        m.translate(-0.75f, -i*0.1f, 0);
+        m.scale(0.1f, 0.4f, 1);
+
+        if (i == 2) {
+            m.translate(0.75f,0,0);
+        }
+        else if (i == 3) {
+            m.translate(1.0f,0,0);
+        }
+        else if (i == 4) {
+            m.translate(1.25f,0,0);
+        }
+
+        for (int j=0; j<rows[i].length(); ++j) {
+            AddNewButton(VirtualMenuIndex_KEYBOARD, "__" + rows[i].mid(j,1), rows[i].mid(j,1), m);
+            m.translate(1.05f,0,0);
+        }
+
+        if (i == 1) {
+            m.translate(-0.5f,0,0);
+            m.scale(2,1,1);
+            m.translate(0.5f,0,0);
+            AddNewButton(VirtualMenuIndex_KEYBOARD, "__backspace", "<--", m);
+        }
+        else if (i == 3) {
+            m.translate(-0.5f,0,0);
+            m.scale(2,1,1);
+            m.translate(0.5f,0,0);
+            VirtualMenuButton * b = AddNewButton(VirtualMenuIndex_KEYBOARD, "__enter", "Ent", m);
+            b->button->GetProperties()->SetColour(QVector4D(0.5f,1.0f,0.5f,1.0f));
+        }
+    }
+    QMatrix4x4 m = modelmatrix;
+    m.translate(0,1.2f,1);
+    m.rotate(-30.0f, 1, 0, 0);
+    m.translate(-0.1f, -0.5f, 0);
+    m.scale(0.6f, 0.4f, 1);
+    AddNewButton(VirtualMenuIndex_KEYBOARD, "__space", " ", m);
 }
