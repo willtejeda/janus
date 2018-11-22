@@ -3275,10 +3275,10 @@ void Room::Create_Youtube()
     new_ws->SetHeight(700);
     AddAssetWebSurface(new_ws);   
 
-    QPointer <RoomObject> o(new RoomObject);    
-    o->GetProperties()->SetPos(QVector3D(0,0.2f,0.0f)); //56.0- fix falling through floor
-    o->SetDir(QVector3D(0,0,1));
-    SetEntranceObject(o);
+    if (entrance_object) {
+        entrance_object->GetProperties()->SetPos(QVector3D(0,0.2f,0.0f)); //56.0- fix falling through floor
+        entrance_object->SetDir(QVector3D(0,0,1));
+    }
 
     QPointer <RoomObject> new_obj = RoomObject::CreateObject("", "main", QColor(255,255,255), true);
     new_obj->GetProperties()->SetPos(QVector3D(0,0,0));
