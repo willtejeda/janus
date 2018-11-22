@@ -309,6 +309,12 @@ private:
     QString last_url;
     QString entered_url;
 
+    bool do_search;
+    QString entered_search;
+    QTime entered_search_time;
+    WebAsset search_data_request;
+    QVariantList search_data;
+
     QPointer <AbstractWebSurface> websurface; //for virtual keyboard and text entry for websurfaces
 };
 

@@ -15,7 +15,8 @@ VirtualMenu::VirtualMenu() :
     do_exit(false),
     do_create_portal(false),
     do_bookmark_add(false),
-    do_bookmark_remove(false)
+    do_bookmark_remove(false),
+    do_search(false)
 {
     assetobjs["cube"] = QPointer<AssetObject>(new AssetObject());
     assetobjs["cube"]->SetSrc(MathUtil::GetApplicationURL(), QString("assets/primitives/cube.obj"));
@@ -175,11 +176,26 @@ void VirtualMenu::Update()
         }
     }
 
+    if (menu_index == VirtualMenuIndex_SEARCH && do_search && !entered_search.isEmpty() && entered_search_time.elapsed() > 250) {
+        do_search = false;
+        if (!search_data_request.GetStarted() || search_data_request.GetProcessed()) {
+            search_data_request.Load(QUrl("https://vesta.janusvr.com/api/search?query=" + entered_search));
+        }
+    }
+
     if (partymode_data_request.GetLoaded() && !partymode_data_request.GetProcessed()) {
         const QByteArray & ba = partymode_data_request.GetData();
         MathUtil::GetPartyModeData() = QJsonDocument::fromJson(ba).toVariant().toMap()["data"].toList();
         partymode_data_request.SetProcessed(true);
 
+        ConstructSubmenus();
+    }
+
+    if (search_data_request.GetLoaded() && !search_data_request.GetProcessed()) {
+        const QByteArray & ba = search_data_request.GetData();
+        search_data = QJsonDocument::fromJson(ba).toVariant().toMap()["data"].toList();
+        search_data_request.SetProcessed(true);
+//        qDebug() << "VirtualMenu::Update()" << search_data;
         ConstructSubmenus();
     }
 }
@@ -274,6 +290,9 @@ void VirtualMenu::mouseReleaseEvent(const QString selected)
             else if (selected == "__avatar") {
                 menu_index = VirtualMenuIndex_AVATAR;
             }
+            else if (selected == "__search") {
+                menu_index = VirtualMenuIndex_SEARCH;
+            }
             else if (selected == "__social") {
                 menu_index = VirtualMenuIndex_SOCIAL;
             }
@@ -302,6 +321,42 @@ void VirtualMenu::mouseReleaseEvent(const QString selected)
                     envobjects_text[VirtualMenuIndex_URL]["__enteredurl_label"]->SetText(entered_url);
                 }
             }
+            break;
+        case VirtualMenuIndex_SEARCH:
+            if (selected == "__backspace") {
+                do_search = true;
+                entered_search_time.restart();
+                entered_search = entered_search.left(entered_search.length()-1);
+                if (envobjects_text[VirtualMenuIndex_SEARCH]["__enteredsearch_label"]) {
+                    envobjects_text[VirtualMenuIndex_SEARCH]["__enteredsearch_label"]->SetText(entered_search);
+                }
+            }
+            else if (selected == "__space") {
+                do_search = true;
+                entered_search_time.restart();
+                entered_search += " ";
+                if (envobjects_text[VirtualMenuIndex_SEARCH]["__enteredsearch_label"]) {
+                    envobjects_text[VirtualMenuIndex_SEARCH]["__enteredsearch_label"]->SetText(entered_search);
+                }
+            }
+            else if (selected == "__enteredsearch") {
+            }
+            else if (selected.left(10) == "__bookmark") {
+                if (envobjects[VirtualMenuIndex_SEARCH][selected]) {
+                    menu_index = VirtualMenuIndex_MAIN;
+                    do_create_portal = true;
+                    create_portal_url = envobjects[VirtualMenuIndex_SEARCH][selected]->GetURL();
+                }
+            }
+            else {
+                do_search = true;
+                entered_search_time.restart();
+                entered_search += selected.right(1);
+                if (envobjects_text[VirtualMenuIndex_SEARCH]["__enteredsearch_label"]) {
+                    envobjects_text[VirtualMenuIndex_SEARCH]["__enteredsearch_label"]->SetText(entered_search);
+                }
+            }
+            break;
         case VirtualMenuIndex_BOOKMARKS:
             if (selected == "__bookmarkup") {
                 if (cur_bookmark+16 < num_bookmarks) {
@@ -602,7 +657,7 @@ void VirtualMenu::ConstructSubmenuURL()
             m.translate(-0.5f,0,0);
             m.scale(2,1,1);
             m.translate(0.5f,0,0);
-            AddNewButton(VirtualMenuIndex_URL, "__backspace", "Backspace", m);
+            AddNewButton(VirtualMenuIndex_URL, "__backspace", "<--", m);
         }
         else if (i == 2) {
             m.translate(-0.5f,0,0);
@@ -757,11 +812,17 @@ void VirtualMenu::UpdatePartyModeList()
     if (!partymode_data_request.GetStarted() || partymode_data_request.GetProcessed()) {
         partymode_data_request.Load(QUrl("http://api.janusvr.com/partymodeAPI"));
     }
-
 }
 
 void VirtualMenu::ConstructSubmenuSearch()
 {
+    QMatrix4x4 m = modelmatrix;
+    m.translate(0,1.3f,0.8f);
+    m.scale(1.5f,0.8f,1);
+    m.rotate(-30.0f, 1, 0, 0);
+    VirtualMenuButton * b = AddNewButton(VirtualMenuIndex_SEARCH, "__enteredsearch", entered_search, m);
+    b->label->GetProperties()->SetJSID("__enteredsearch_label");
+
     QList <QString> rows;
     rows.push_back("`!@#$%^&*()_+");
     rows.push_back("~1234567890-=");
@@ -787,7 +848,7 @@ void VirtualMenu::ConstructSubmenuSearch()
         }
 
         for (int j=0; j<rows[i].length(); ++j) {
-            AddNewButton(VirtualMenuIndex_KEYBOARD, "__" + rows[i].mid(j,1), rows[i].mid(j,1), m);
+            AddNewButton(VirtualMenuIndex_SEARCH, "__" + rows[i].mid(j,1), rows[i].mid(j,1), m);
             m.translate(1.05f,0,0);
         }
 
@@ -795,20 +856,29 @@ void VirtualMenu::ConstructSubmenuSearch()
             m.translate(-0.5f,0,0);
             m.scale(2,1,1);
             m.translate(0.5f,0,0);
-            AddNewButton(VirtualMenuIndex_KEYBOARD, "__backspace", "<--", m);
-        }
-        else if (i == 3) {
-            m.translate(-0.5f,0,0);
-            m.scale(2,1,1);
-            m.translate(0.5f,0,0);
-            VirtualMenuButton * b = AddNewButton(VirtualMenuIndex_KEYBOARD, "__enter", "Ent", m);
-            b->button->GetProperties()->SetColour(QVector4D(0.5f,1.0f,0.5f,1.0f));
+            AddNewButton(VirtualMenuIndex_SEARCH, "__backspace", "<--", m);
         }
     }
-    QMatrix4x4 m = modelmatrix;
+
+    m = modelmatrix;
     m.translate(0,1.2f,1);
     m.rotate(-30.0f, 1, 0, 0);
     m.translate(-0.1f, -0.5f, 0);
     m.scale(0.6f, 0.4f, 1);
-    AddNewButton(VirtualMenuIndex_KEYBOARD, "__space", " ", m);
+    AddNewButton(VirtualMenuIndex_SEARCH, "__space", " ", m);
+
+    if (!entered_search.isEmpty()) {
+        for (int i=0; i<search_data.size(); ++i) {
+            int x = i % 4;
+            int y = (i/4);
+            QMatrix4x4 m = modelmatrix;
+            m.translate(x*0.55f-0.85f, 1.6f+y*0.55f, 0);
+            m.scale(0.5f, 0.5f, 1.0f);
+
+            QMap <QString, QVariant> o = search_data[i].toMap();
+            const QString url = o["roomUrl"].toString();
+            const QString thumbnail = o["thumbnail"].toString();
+            VirtualMenuImageButton * v = AddNewImageButton(VirtualMenuIndex_SEARCH, "__bookmark" + QString::number(i), url, thumbnail, m);
+        }
+    }
 }
