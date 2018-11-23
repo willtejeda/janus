@@ -3074,6 +3074,7 @@ void Room::Create()
         new_vid->SetDir(QVector3D(0,0,-1));
         new_vid->GetProperties()->SetScale(QVector3D(10,10,10));
         new_vid->GetProperties()->SetLighting(false);
+        new_vid->GetProperties()->SetAutoPlay(true);
         AddRoomObject(new_vid);
 
         entrance_object->GetProperties()->SetPos(QVector3D(0,0,0));
