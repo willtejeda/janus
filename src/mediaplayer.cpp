@@ -356,17 +356,10 @@ void MediaPlayer::UpdateTexture(MediaContext * ctx)
 #ifdef __ANDROID__
                 RendererInterface::m_pimpl->UpdateTextureHandleData(ctx->m_texture_handles[0].get(), 0 ,0, 0,
                                         ctx->img[0]->width(), ctx->img[0]->height(), GL_RGBA, GL_UNSIGNED_BYTE, (void *)ctx->img[0]->constBits(), ctx->img[0]->width() * ctx->img[0]->height() * 4);
+#elif __linux__
+                RendererInterface::m_pimpl->UpdateTextureHandleData(ctx->m_texture_handles[0].get(), 0 ,0, 0,
+                                        ctx->img[0]->width(), ctx->img[0]->height(), GL_RGBA, GL_UNSIGNED_BYTE, (void *)ctx->img[0]->constBits(), ctx->img[0]->width() * ctx->img[0]->height() * 4);
 #else
-//                qDebug() << "ctx->img" << ctx->img[0]->format();
-//                qDebug() << "QColor(0,255,0,128)" << QColor(0,255,0,128);
-//                *(ctx->img[0]) = ctx->img[0]->convertToFormat(QImage::Format_ARGB32);
-                for (int i=0; i<ctx->img[0]->width(); ++i) {
-                    for (int j=0; j<ctx->img[0]->height()/2; ++j) {
-                        ctx->img[0]->setPixelColor(i,j,QColor(0,255,0,(i+j)%256));
-//                        qDebug() << i << j << ctx->img[0]->pixelColor(i,j);
-                    }
-                }
-//                ctx->img[0]->save(MathUtil::GetScreenshotPath() + "out-" + MathUtil::GetCurrentDateTimeAsString() + ".png", "png", 90);
                 RendererInterface::m_pimpl->UpdateTextureHandleData(ctx->m_texture_handles[0].get(), 0 ,0, 0,
                                         ctx->img[0]->width(), ctx->img[0]->height(), GL_BGRA, GL_UNSIGNED_BYTE, (void *)ctx->img[0]->constBits(), ctx->img[0]->width() * ctx->img[0]->height() * 4);
 #endif
@@ -397,7 +390,10 @@ void MediaPlayer::UpdateLeftRightTextures(MediaContext * ctx)
 #ifdef __ANDROID__
                     RendererInterface::m_pimpl->UpdateTextureHandleData(ctx->m_texture_handles[i].get(),0 ,0, 0,
                             ctx->img[i]->width(), ctx->img[i]->height(), GL_RGBA, GL_UNSIGNED_BYTE, (void *)ctx->img[i]->constBits(), ctx->img[i]->width() * ctx->img[i]->height() * 4);
-#else                    
+#elif __linux__
+                RendererInterface::m_pimpl->UpdateTextureHandleData(ctx->m_texture_handles[0].get(), 0 ,0, 0,
+                                        ctx->img[0]->width(), ctx->img[0]->height(), GL_RGBA, GL_UNSIGNED_BYTE, (void *)ctx->img[0]->constBits(), ctx->img[0]->width() * ctx->img[0]->height() * 4);
+#else
                     RendererInterface::m_pimpl->UpdateTextureHandleData(ctx->m_texture_handles[i].get(),0 ,0, 0,
                             ctx->img[i]->width(), ctx->img[i]->height(), GL_BGRA, GL_UNSIGNED_BYTE, (void *)ctx->img[i]->constBits(), ctx->img[i]->width() * ctx->img[i]->height() * 4);
 #endif

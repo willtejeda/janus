@@ -570,8 +570,6 @@ void RendererGL33::InitializeGLContext(QOpenGLContext * p_gl_context)
     m_main_fbo = 0;
     MathUtil::glFuncs->glGenFramebuffers(1, &m_main_fbo);
 
-    AbstractRenderer::InitializeState();
-
 #ifdef WIN32
     SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
 #endif
