@@ -810,7 +810,7 @@ void VirtualMenu::UpdatePartyModeList()
     }
 
     if (!partymode_data_request.GetStarted() || partymode_data_request.GetProcessed()) {
-        partymode_data_request.Load(QUrl("http://api.janusvr.com/partymodeAPI"));
+        partymode_data_request.Load(QUrl("https://vesta.janusvr.com/api/party_mode"));
     }
 }
 

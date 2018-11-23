@@ -4380,7 +4380,7 @@ std::shared_ptr<TextureHandle> AbstractRenderer::CreateTextureQImage(const QImag
 
     GLenum internal_format = GL_RGBA8;
     GLenum external_format = GL_RGB;
-    GLenum external_pixel_size = GL_UNSIGNED_BYTE;
+    GLenum external_pixel_size = GL_UNSIGNED_BYTE;    
     switch(img.format())
     {
     case QImage::Format_RGB888:
@@ -4448,15 +4448,15 @@ std::shared_ptr<TextureHandle> AbstractRenderer::CreateTextureQImage(const QImag
 
                 for (int row = 0; row < height; row++)
                 {
-					for (int column = first_alpha_offset; column < width; column += pixel_offset)
-					{
-						uchar const * this_alpha_ptr = &(img_data[row * width + column]);
-						if (this_alpha_ptr != nullptr)
-						{
-							found_zero = (found_zero) ? found_zero : (*this_alpha_ptr == 0x00);
-							found_one = (found_one) ? found_one : (*this_alpha_ptr == 0xff);
-							found_blended = (found_blended) ? found_blended : ((*this_alpha_ptr != 0xff) && (*this_alpha_ptr != 0x00));
-						}
+                    for (int column = first_alpha_offset; column < width; column += pixel_offset)
+                    {
+                        uchar const * this_alpha_ptr = &(img_data[row * width + column]);
+                        if (this_alpha_ptr != nullptr)
+                        {
+                            found_zero = (found_zero) ? found_zero : (*this_alpha_ptr == 0x00);
+                            found_one = (found_one) ? found_one : (*this_alpha_ptr == 0xff);
+                            found_blended = (found_blended) ? found_blended : ((*this_alpha_ptr != 0xff) && (*this_alpha_ptr != 0x00));
+                        }
                     }
                 }
 
