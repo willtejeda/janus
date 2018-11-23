@@ -397,6 +397,9 @@ void RendererGL33::InitializeGLObjects()
 void RendererGL33::Render(QHash<size_t, QVector<AbstractRenderCommand>> * p_scoped_render_commands,
                           QHash<StencilReferenceValue, LightContainer> * p_scoped_light_containers)
 {
+    Q_UNUSED(p_scoped_render_commands);
+    Q_UNUSED(p_scoped_light_containers);
+
     //62.0 - draw
     DecoupledRender();
 }
@@ -487,8 +490,8 @@ void RendererGL33::UpdatePerObjectData(QHash<size_t, QVector<AbstractRenderComma
     {
         for (const RENDERER::RENDER_SCOPE scope : m_scopes)
         {
-            size_t const camer_count_this_scope = m_scoped_cameras_cache[m_rendering_index][static_cast<size_t>(scope)].size();
-            for (size_t camera_index = 0; camera_index < camer_count_this_scope; ++camera_index)
+            const int camera_count_this_scope = m_scoped_cameras_cache[m_rendering_index][static_cast<size_t>(scope)].size();
+            for (int camera_index = 0; camera_index < camera_count_this_scope; ++camera_index)
             {
                 m_per_frame_scoped_cameras_view_matrix[static_cast<size_t>(scope)][camera_index] = m_scoped_cameras_cache[m_rendering_index][static_cast<size_t>(scope)][camera_index].GetViewMatrix();
                 m_per_frame_scoped_cameras_is_left_eye[static_cast<size_t>(scope)][camera_index] = m_scoped_cameras_cache[m_rendering_index][static_cast<size_t>(scope)][camera_index].GetLeftEye();
@@ -500,14 +503,14 @@ void RendererGL33::UpdatePerObjectData(QHash<size_t, QVector<AbstractRenderComma
     {
         QVector<AbstractRenderCommand> & render_command_vector = (*p_scoped_render_commands)[static_cast<size_t>(scope)];
 
-        auto const command_count(render_command_vector.size());
-        auto const camera_count_this_scope(m_per_frame_scoped_cameras_view_matrix[static_cast<size_t>(scope)].size());
+        const int command_count(render_command_vector.size());
+        const int camera_count_this_scope(m_per_frame_scoped_cameras_view_matrix[static_cast<size_t>(scope)].size());
 
         // For each command
-        for (uint32_t command_index = 0; command_index < command_count; command_index += camera_count_this_scope)
+        for (int command_index = 0; command_index < command_count; command_index += camera_count_this_scope)
         {
             // Recompute matrices for each camera affecting each command in this scope
-            for (size_t camera_index = 0; camera_index < camera_count_this_scope; ++camera_index)
+            for (int camera_index = 0; camera_index < camera_count_this_scope; ++camera_index)
             {
                 const VirtualCamera& camera = m_scoped_cameras_cache[m_rendering_index][static_cast<size_t>(scope)][camera_index];
 

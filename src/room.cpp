@@ -1049,8 +1049,7 @@ void Room::DrawGL(MultiPlayerManager *multi_players, QPointer <Player> player, c
     }
     BindShader(user_portal_shader);
 
-    const QVector3D eye_point = player->GetProperties()->GetEyePoint();
-    for (auto & o : envobjects) {
+    for (QPointer <RoomObject> & o : envobjects) {
         if (o && o->GetType() == TYPE_LINK && o->GetProperties()->GetVisible()) {
             //59.0 bugfix - draw back if not in child room, and we are distant, and it's not a mirror
             o->DrawGL(user_portal_shader);
