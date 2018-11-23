@@ -1654,8 +1654,11 @@ void MainWindow::ActionSocial()
 
 void MainWindow::ActionVirtualMenu()
 {
-    game->GetVirtualMenu()->MenuButtonPressed();
-    glwidget->SetGrab(true);
+    //62.0 - do not show menu when in edit mode or doing something else
+    if (game->GetState() == JVR_STATE_DEFAULT) {
+        game->GetVirtualMenu()->MenuButtonPressed();
+        glwidget->SetGrab(true);
+    }
 }
 
 #ifndef __ANDROID__
