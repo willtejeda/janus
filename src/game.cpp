@@ -92,12 +92,8 @@ Game::~Game()
     multi_players->SetEnabled(false);
 
     //    Analytics::PostEvent("session", "end", NULL,  "end");
-
     SoundManager::StopAll();
     env->Shutdown();
-
-    //save settings
-    SettingsManager::SaveSettings();
 
     //    qDebug() << "Game::DoExitNow()";
     TextureManager::Clear();
@@ -4880,7 +4876,7 @@ void Game::EndOpInteractionDefault(const int i)
     if (o) {
         //55.2 - onclick is on mouse release, and should only happen once per mouse click
         QString click_code = o->GetProperties()->GetOnClick();
-        qDebug() << "onclick code" << click_code;
+//        qDebug() << "onclick code" << click_code;
         if (click_code.length() > 0) { //special javascript onclick code to run
             r->CallJSFunction(click_code, player, multi_players);
         }
