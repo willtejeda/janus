@@ -1049,8 +1049,7 @@ void Room::DrawGL(MultiPlayerManager *multi_players, QPointer <Player> player, c
     }
     BindShader(user_portal_shader);
 
-    const QVector3D eye_point = player->GetProperties()->GetEyePoint();
-    for (auto & o : envobjects) {
+    for (QPointer <RoomObject> & o : envobjects) {
         if (o && o->GetType() == TYPE_LINK && o->GetProperties()->GetVisible()) {
             //59.0 bugfix - draw back if not in child room, and we are distant, and it's not a mirror
             o->DrawGL(user_portal_shader);
@@ -3075,6 +3074,7 @@ void Room::Create()
         new_vid->SetDir(QVector3D(0,0,-1));
         new_vid->GetProperties()->SetScale(QVector3D(10,10,10));
         new_vid->GetProperties()->SetLighting(false);
+        new_vid->GetProperties()->SetAutoPlay(true);
         AddRoomObject(new_vid);
 
         entrance_object->GetProperties()->SetPos(QVector3D(0,0,0));
@@ -3275,10 +3275,10 @@ void Room::Create_Youtube()
     new_ws->SetHeight(700);
     AddAssetWebSurface(new_ws);   
 
-    QPointer <RoomObject> o(new RoomObject);    
-    o->GetProperties()->SetPos(QVector3D(0,0.2f,0.0f)); //56.0- fix falling through floor
-    o->SetDir(QVector3D(0,0,1));
-    SetEntranceObject(o);
+    if (entrance_object) {
+        entrance_object->GetProperties()->SetPos(QVector3D(0,0.2f,0.0f)); //56.0- fix falling through floor
+        entrance_object->SetDir(QVector3D(0,0,1));
+    }
 
     QPointer <RoomObject> new_obj = RoomObject::CreateObject("", "main", QColor(255,255,255), true);
     new_obj->GetProperties()->SetPos(QVector3D(0,0,0));
