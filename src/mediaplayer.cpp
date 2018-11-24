@@ -353,16 +353,8 @@ void MediaPlayer::UpdateTexture(MediaContext * ctx)
             }
             else
             {
-#ifdef __ANDROID__
                 RendererInterface::m_pimpl->UpdateTextureHandleData(ctx->m_texture_handles[0].get(), 0 ,0, 0,
-                                        ctx->img[0]->width(), ctx->img[0]->height(), GL_RGBA, GL_UNSIGNED_BYTE, (void *)ctx->img[0]->constBits(), ctx->img[0]->width() * ctx->img[0]->height() * 4);
-#elif __linux__
-                RendererInterface::m_pimpl->UpdateTextureHandleData(ctx->m_texture_handles[0].get(), 0 ,0, 0,
-                                        ctx->img[0]->width(), ctx->img[0]->height(), GL_RGBA, GL_UNSIGNED_BYTE, (void *)ctx->img[0]->constBits(), ctx->img[0]->width() * ctx->img[0]->height() * 4);
-#else
-                RendererInterface::m_pimpl->UpdateTextureHandleData(ctx->m_texture_handles[0].get(), 0 ,0, 0,
-                                        ctx->img[0]->width(), ctx->img[0]->height(), GL_BGRA, GL_UNSIGNED_BYTE, (void *)ctx->img[0]->constBits(), ctx->img[0]->width() * ctx->img[0]->height() * 4);
-#endif
+                        ctx->img[0]->width(), ctx->img[0]->height(), GL_RGBA, GL_UNSIGNED_BYTE, (void *)ctx->img[0]->constBits(), ctx->img[0]->width() * ctx->img[0]->height() * 4);
                 RendererInterface::m_pimpl->GenerateTextureHandleMipMap(ctx->m_texture_handles[0].get());
             }
         }
@@ -605,14 +597,8 @@ void MediaPlayer::unlock(void *data, void *id, void *const *)
                     ctx->video_height = videoTrack->i_height;
 
                     if (ctx->video_width > 1080 || ctx->video_height > 720) {
-
-#ifdef __ANDROID__
-                        QImage * new_0 = new QImage(ctx->img[0]->rgbSwapped().scaled(QSize(ctx->video_width,ctx->video_height)));
-                        QImage * new_1 = new QImage(ctx->img[0]->rgbSwapped().scaled(QSize(ctx->video_width,ctx->video_height)));
-#else
                         QImage * new_0 = new QImage(ctx->video_width, ctx->video_height, QImage::Format_ARGB32);
                         QImage * new_1 = new QImage(ctx->video_width, ctx->video_height, QImage::Format_ARGB32);
-#endif
 
                         delete ctx->img[0];
                         delete ctx->img[1];
@@ -631,11 +617,7 @@ void MediaPlayer::unlock(void *data, void *id, void *const *)
     //qDebug() << "Video size" << w << h;
 
     if (!resized) {
-#ifdef __ANDROID__
-        *(ctx->img[0]) = (ctx->img[0]->rgbSwapped().scaled(QSize(ctx->video_width,ctx->video_height)));
-#else
         *(ctx->img[0]) = (ctx->img[0]->scaled(QSize(ctx->video_width,ctx->video_height)));
-#endif
     }
 
     if (ctx->sbs3d || ctx->ou3d)
