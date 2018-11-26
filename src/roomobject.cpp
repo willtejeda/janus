@@ -987,7 +987,7 @@ void RoomObject::Update(const double dt_sec)
                 SetChatMessage(ghost_frame.chat_message);
 
                 //change the ghost's avatar
-                if (SettingsManager::GetUpdateCustomAvatars()) {
+//                if (SettingsManager::GetUpdateCustomAvatars()) {
                     if (!ghost_frame.avatar_data.isEmpty()
                             && QString::compare(ghost_frame.avatar_data.left(13), "<FireBoxRoom>") == 0
                             && QString::compare(GetAvatarCode(), ghost_frame.avatar_data) != 0) {
@@ -1003,7 +1003,7 @@ void RoomObject::Update(const double dt_sec)
                         props->SetJSID(js_id);
                         props->SetLoop(loop);
                     }
-                }
+//                }
 
                 //room edits/deletes
                 if (!ghost_frame.room_edits.isEmpty()) {
@@ -1894,11 +1894,15 @@ void RoomObject::UpdateMatrices()
             assetghost->GetGhostFrame(time_elapsed, frame);
         }
 
+        const QString body_id = props->GetBodyID();
+        const QString head_id = props->GetHeadID();
+        const bool custom_avatar = (SettingsManager::GetUpdateCustomAvatars() && (!body_id.isEmpty() || !head_id.isEmpty()));
+
         const float angle = MathUtil::RadToDeg(MathUtil::_PI_OVER_2 - atan2f(frame.dir.z(), frame.dir.x()));
         model_matrix_local.setToIdentity();
         model_matrix_local.translate(p);
         model_matrix_local.rotate(angle, 0, 1, 0);
-        model_matrix_local.scale(s);
+        model_matrix_local.scale(custom_avatar ? s : QVector3D(1.4f,1.4f,1.4f));
     }
     else if (t == TYPE_TEXT || t == TYPE_PARAGRAPH || t == TYPE_IMAGE || t == TYPE_VIDEO) {
         model_matrix_local.setColumn(0, xd);
@@ -2207,29 +2211,29 @@ void RoomObject::DrawGL(QPointer <AssetShader> shader, const bool left_eye, cons
                 scale_fac = qMin(1.0f, qMax(0.0f, 1.0f - time_disconnect*0.25f));
             }
 
-            if (scale_fac > 0.0f) {
+            if (scale_fac > 0.0f) {               
 
-                MathUtil::PushModelMatrix();
-                MathUtil::MultModelMatrix(model_matrix_local);
-                MathUtil::ModelMatrix().scale(scale_fac, scale_fac, scale_fac);
+                //draw body
+                const bool custom_avatar = (SettingsManager::GetUpdateCustomAvatars() && (!body_id.isEmpty() || !head_id.isEmpty()));
 
                 const QVector3D z = GetZDir();
                 const QVector3D s = GetScale();
                 const float angle = 90.0f - atan2f(z.z(), z.x()) * MathUtil::_180_OVER_PI;
 
-                //draw body
-                bool custom_avatar_body = false;
-                if (SettingsManager::GetUpdateCustomAvatars() && !body_id.isEmpty() && ghost_assetobjs.contains(body_id) && ghost_assetobjs[body_id]) {
-                    ghost_assetobjs[body_id]->Update();
-                    ghost_assetobjs[body_id]->UpdateGL();
+                MathUtil::PushModelMatrix();
+                MathUtil::MultModelMatrix(model_matrix_local);
+                MathUtil::ModelMatrix().scale(scale_fac, scale_fac, scale_fac);
 
-                    if (ghost_assetobjs[body_id]->GetFinished()) {
-                        custom_avatar_body = true;
-                        ghost_assetobjs[body_id]->DrawGL(shader, col);
+                if (custom_avatar) {
+                    if (ghost_assetobjs.contains(body_id) && ghost_assetobjs[body_id]) {
+                        ghost_assetobjs[body_id]->Update();
+                        ghost_assetobjs[body_id]->UpdateGL();
+                        if (ghost_assetobjs[body_id]->GetFinished()) {
+                            ghost_assetobjs[body_id]->DrawGL(shader, col);
+                        }
                     }
                 }
-
-                if (!custom_avatar_body && body_id.isEmpty() && head_id.isEmpty() && avatar_obj && avatar_obj->GetFinished()) {
+                else if (avatar_obj && avatar_obj->GetFinished()) {
                     avatar_obj->DrawGL(shader, col);
                 }
 
@@ -2242,17 +2246,17 @@ void RoomObject::DrawGL(QPointer <AssetShader> shader, const bool left_eye, cons
                 MathUtil::MultModelMatrix(m);
                 MathUtil::ModelMatrix().translate(-head_avatar_pos.x(), -head_avatar_pos.y(), -head_avatar_pos.z());
 
-                bool custom_avatar_head = false;
-                if (SettingsManager::GetUpdateCustomAvatars() && !head_id.isEmpty() && ghost_assetobjs.contains(head_id) && ghost_assetobjs[head_id]) {
-                    ghost_assetobjs[head_id]->Update();
-                    ghost_assetobjs[head_id]->UpdateGL();
+                if (custom_avatar) {
+                    if (ghost_assetobjs.contains(head_id) && ghost_assetobjs[head_id]) {
+                        ghost_assetobjs[head_id]->Update();
+                        ghost_assetobjs[head_id]->UpdateGL();
 
-                    if (ghost_assetobjs[head_id]->GetFinished()) {
-                        custom_avatar_head = true;
-                        ghost_assetobjs[head_id]->DrawGL(shader, col);
+                        if (ghost_assetobjs[head_id]->GetFinished()) {
+                            ghost_assetobjs[head_id]->DrawGL(shader, col);
+                        }
                     }
                 }
-                if (!custom_avatar_head && body_id.isEmpty() && head_id.isEmpty() && avatar_head_obj && avatar_head_obj->GetFinished()) {
+                else if (avatar_head_obj && avatar_head_obj->GetFinished()) {
                     avatar_head_obj->DrawGL(shader, col);
                 }
                 MathUtil::PopModelMatrix();

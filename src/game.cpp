@@ -954,9 +954,9 @@ void Game::DrawGL(const float ipd, const QMatrix4x4 head_xform, const bool set_m
         frames.push_back(frame1);
         player_avatar->GetAssetGhost()->SetFromFrames(frames, 1000);
 
-        // ghost needs to be processed
-        player_avatar->Update(player->GetDeltaTime());
-        player_avatar->DrawGL(shader, true, player->GetProperties()->GetPos()->toQVector3D());
+        // ghost needs to be processed        
+        player_avatar->Update(player->GetDeltaTime());        
+        player_avatar->DrawGL(shader, true, player->GetProperties()->GetPos()->toQVector3D());        
 
         r->UnbindShader(shader);
     }
