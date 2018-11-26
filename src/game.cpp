@@ -3007,7 +3007,7 @@ void Game::UpdateOverlays()
             info_text_geom.Clear();
 
             const ElementType t = obj->GetType();
-            QString type_str = DOMNode::ElementTypeToTagName(t) + " js_id=\"" + obj->GetProperties()->GetJSID();
+            QString type_str = DOMNode::ElementTypeToTagName(t) + " js_id=\"" + obj->GetProperties()->GetJSID() + "\"";
             if (t == TYPE_LINK) {
                 type_str += " url=\"" + obj->GetProperties()->GetURL().left(15)+ "...";
             }
