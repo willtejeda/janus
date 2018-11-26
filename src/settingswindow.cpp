@@ -2,9 +2,8 @@
 
 SettingsWindow::SettingsWindow(Game * g) :
     game(g)
-{
-    setMinimumSize(700, 400);
-    setWindowTitle("Settings");
+{    
+    setWindowTitle("Settings"); 
 
     tab_widget = new QTabWidget();
     tab_widget->addTab(GetAvatarWidget(), "Avatar");
@@ -13,10 +12,11 @@ SettingsWindow::SettingsWindow(Game * g) :
     tab_widget->addTab(GetAudioWidget(), "Audio");
     tab_widget->addTab(GetNetworkWidget(), "Network");
     tab_widget->addTab(GetDeveloperWidget(), "Developer");
+    tab_widget->setUsesScrollButtons(false); //62.0 - no scrolling, window should be large enough to show all tabs directly
 
     connect(tab_widget, SIGNAL(currentChanged(int)), this, SLOT(Update()));    
 
-    setCentralWidget(tab_widget);
+    setCentralWidget(tab_widget);    
     Update();   
 }
 
