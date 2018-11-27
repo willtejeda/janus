@@ -156,8 +156,7 @@ void Game::Initialize()
     }
     else {
         multi_players->SetEnabled(SettingsManager::GetMultiplayerEnabled());
-    }
-    multi_players->SetSessionTrackingEnabled(SettingsManager::GetSessionTrackingEnabled());
+    }    
 
     const float s = 0.02f * 2.5f;
     info_text_geom.SetFixedSize(true, s);
@@ -5482,8 +5481,7 @@ void Game::UpdateAudio()
 
 void Game::UpdateMultiplayer()
 {
-    multi_players->SetEnabled(SettingsManager::GetMultiplayerEnabled() && !do_exit);
-    multi_players->SetSessionTrackingEnabled(SettingsManager::GetSessionTrackingEnabled());
+    multi_players->SetEnabled(SettingsManager::GetMultiplayerEnabled() && !do_exit);    
     multi_players->SetPartyMode(SettingsManager::GetPartyModeEnabled());
 
     QPointer <Room> r = env->GetCurRoom();

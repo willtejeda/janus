@@ -194,11 +194,7 @@ QWidget * SettingsWindow::GetNetworkWidget()
 {
     checkbox_partymode = new QCheckBox();
     checkbox_partymode->setText("Party Mode");
-    connect(checkbox_partymode, SIGNAL(clicked(bool)), this, SLOT(SlotSetPartyMode()));
-
-    checkbox_sessiontracking = new QCheckBox();
-    checkbox_sessiontracking->setText("Session Tracking");
-    connect(checkbox_sessiontracking, SIGNAL(clicked(bool)), this, SLOT(SlotSetSessionTracking()));
+    connect(checkbox_partymode, SIGNAL(clicked(bool)), this, SLOT(SlotSetPartyMode()));  
 
     checkbox_multiplayer = new QCheckBox();
     checkbox_multiplayer->setText("Multiplayer");
@@ -212,8 +208,7 @@ QWidget * SettingsWindow::GetNetworkWidget()
 
     QFormLayout * network_layout = new QFormLayout();
 #ifndef __ANDROID__
-    network_layout->addRow(checkbox_partymode);
-    network_layout->addRow(checkbox_sessiontracking);
+    network_layout->addRow(checkbox_partymode);    
 #endif    
     network_layout->addRow(checkbox_multiplayer);
     network_layout->addRow("Home URL", lineedit_homeurl);
@@ -337,8 +332,7 @@ void SettingsWindow::Update()
 
     checkbox_invertpitch->setChecked(SettingsManager::GetInvertYEnabled());
     checkbox_partymode->setChecked(SettingsManager::GetPartyModeEnabled());
-    checkbox_selfavatar->setChecked(SettingsManager::GetSelfAvatar());
-    checkbox_sessiontracking->setChecked(SettingsManager::GetSessionTrackingEnabled());
+    checkbox_selfavatar->setChecked(SettingsManager::GetSelfAvatar());    
     checkbox_multiplayer->setChecked(SettingsManager::GetMultiplayerEnabled());
     checkbox_downloadcache->setChecked(SettingsManager::GetCacheEnabled());
     checkbox_antialiasing->setChecked(SettingsManager::GetAntialiasingEnabled());
@@ -427,11 +421,6 @@ void SettingsWindow::SlotSetSelfAvatar()
 void SettingsWindow::SlotSetPartyMode()
 {
     SettingsManager::settings["partymode"] = checkbox_partymode->isChecked();
-}
-
-void SettingsWindow::SlotSetSessionTracking()
-{
-    SettingsManager::settings["sessiontracking"] = checkbox_sessiontracking->isChecked();
 }
 
 void SettingsWindow::SlotSetMultiplayer()
