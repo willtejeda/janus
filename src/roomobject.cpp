@@ -2211,8 +2211,7 @@ void RoomObject::DrawGL(QPointer <AssetShader> shader, const bool left_eye, cons
                 scale_fac = qMin(1.0f, qMax(0.0f, 1.0f - time_disconnect*0.25f));
             }
 
-            if (scale_fac > 0.0f) {               
-
+            if (scale_fac > 0.0f) {
                 //draw body
                 const bool custom_avatar = (SettingsManager::GetUpdateCustomAvatars() && (!body_id.isEmpty() || !head_id.isEmpty()));
 
@@ -4671,7 +4670,11 @@ void RoomObject::DrawGhostUserIDChat(QPointer <AssetShader> shader)
     }
 
     //draw chat messages
-    const QVector3D s = GetScale();
+    const QString body_id = props->GetBodyID();
+    const QString head_id = props->GetHeadID();
+    const bool custom_avatar = (SettingsManager::GetUpdateCustomAvatars() && (!body_id.isEmpty() || !head_id.isEmpty()));
+
+    const QVector3D s = custom_avatar ? GetScale() : QVector3D(1.4f, 1.4f, 1.4f);
     MathUtil::PushModelMatrix();
     MathUtil::ModelMatrix().scale(1.0f/s.x(), 1.0f/s.y(), 1.0f/s.z());
     MathUtil::ModelMatrix().translate(userid_pos + QVector3D(0,2.0f,0));
@@ -4682,9 +4685,6 @@ void RoomObject::DrawGhostUserIDChat(QPointer <AssetShader> shader)
     m.setColumn(3, QVector4D(p, 1));
     m.setRow(3, QVector4D(0,0,0,1));
     MathUtil::LoadModelMatrix(m);
-
-    //disable active textures
-//    shader->SetUseTextureAll(false);
 
     //draw grey box
     MathUtil::PushModelMatrix();
