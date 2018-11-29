@@ -3181,10 +3181,14 @@ QString RoomObject::GetXMLCode(const bool show_defaults) const
     else {
         code_str += " >\n";
         //Add in all my child's tags recursively
-        for (int i=0; i<child_objects.size(); ++i) {
-            if (child_objects[i]) {
-                code_str += child_objects[i]->GetXMLCode(show_defaults) + "\n";
+        QMap <ElementType, QString> code;
+        for (const QPointer <RoomObject> & obj : child_objects) {
+            if (obj && obj->GetSaveToMarkup()) {
+                code[obj->GetType()] += obj->GetXMLCode(show_defaults) + "\n";
             }
+        }
+        for (const QString & s : code) {
+            code_str += s;
         }
 
         //closing tag
