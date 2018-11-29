@@ -424,6 +424,7 @@ float MediaPlayer::GetAspectRatio(MediaContext * ctx) const
 
         }
         else{
+//            qDebug() << "MediaPlayer::GetAspectRatio height width" << ctx->video_height << ctx->video_width;
             return (float(ctx->video_height) / float(ctx->video_width));
         }
     }

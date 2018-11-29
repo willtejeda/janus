@@ -5230,8 +5230,7 @@ void Game::DragAndDrop(const QString url_str, const QString drop_or_pin, const i
             r->AddAssetVideo(dynamic_cast<AssetVideo *>(new_asset.data()));
             new_object->SetAssetVideo(dynamic_cast<AssetVideo *>(new_asset.data()));
             new_object->SetType(TYPE_VIDEO);
-            new_object->GetProperties()->SetID(asset_id);
-            new_object->GetProperties()->SetCullFace("none");
+            new_object->GetProperties()->SetID(asset_id);            
             new_object->GetProperties()->SetLighting(false);
         }
         else if (t == TYPE_ASSETSOUND) {
