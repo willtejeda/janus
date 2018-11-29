@@ -2202,27 +2202,37 @@ void Game::keyPressEvent(QKeyEvent * e)
 
         case JVR_STATE_UNIT_COLLISIONID:
         {
+            QList <QString> col_id_list;
+            col_id_list.push_back("");            
+            col_id_list.push_back("capsule");
+            col_id_list.push_back("cone");
+            col_id_list.push_back("cube");
+            col_id_list.push_back("cylinder");
+            col_id_list.push_back("pipe");
+            col_id_list.push_back("plane");
+            col_id_list.push_back("pyramid");
+            col_id_list.push_back("sphere");
+            col_id_list.push_back("torus");
+            if (!col_id_list.contains(obj->GetProperties()->GetID())) {
+                col_id_list.push_back(obj->GetProperties()->GetID());
+            }
+
+            int cur_index = qMax(col_id_list.indexOf(obj->GetProperties()->GetCollisionID()), 0);
+
             switch (e->key()) {
             case Qt::Key_W:
+            case Qt::Key_Q:
             case Qt::Key_Up:
             case Qt::Key_A:
             case Qt::Key_Left:
+                cur_index = ((cur_index + col_id_list.size() - 1) % col_id_list.size());
+                break;
             case Qt::Key_D:
             case Qt::Key_Right:
             case Qt::Key_S:
             case Qt::Key_Down:
-            case Qt::Key_Q:
-            case Qt::Key_E:
-
-                if (obj->GetProperties()->GetCollisionID().length() > 0) {
-                    obj->GetProperties()->SetCollisionID("");
-                }
-                else {
-                    obj->GetProperties()->SetCollisionID(obj->GetProperties()->GetID());
-                }
-                r->SelectCollisionAssetForObject(sel, obj->GetProperties()->GetCollisionID());
-                obj->GetProperties()->SetSync(true);
-
+            case Qt::Key_E:                
+                cur_index = ((cur_index+1) % col_id_list.size());
                 break;
             case Qt::Key_Backtab:
                 state = JVR_STATE_UNIT_COLOUR;
@@ -2230,7 +2240,13 @@ void Game::keyPressEvent(QKeyEvent * e)
             case Qt::Key_Tab:
                 state = JVR_STATE_UNIT_COLLISIONSCALE;
                 break;
+            default:
+                break;
             }
+
+            obj->GetProperties()->SetCollisionID(col_id_list[cur_index]);
+            r->SelectCollisionAssetForObject(sel, col_id_list[cur_index]);
+            obj->GetProperties()->SetSync(true);
         }
 
             break;

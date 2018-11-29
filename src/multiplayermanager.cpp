@@ -143,12 +143,12 @@ void MultiPlayerManager::Clear()
 
 void MultiPlayerManager::SocketConnected()
 {
-    qDebug() << "MultiPlayerManager::SocketConnected()";    
+    qDebug() << "MultiPlayerManager::SocketConnected()";
 }
 
 void MultiPlayerManager::SocketDisconnected()
 {
-    qDebug() << "MultiPlayerManager::SocketDisconnected()";    
+    qDebug() << "MultiPlayerManager::SocketDisconnected()";
 
     for (int i=0; i<connection_list.size(); ++i) {
         ServerConnection & s = connection_list[i];
