@@ -87,6 +87,9 @@ RoomObject::RoomObject() :
     rescale_on_load_done = false;
 
     sound_buffers_sample_rate = 44100;
+
+    swallow_time = 0;
+    swallow_state = 0;
 }
 
 RoomObject::~RoomObject()
@@ -1279,19 +1282,19 @@ void RoomObject::UpdateMedia()
         alGenSources(1, &openal_stream_source);
     }
 
-    const ElementType obj_type = GetType();
+//    const ElementType obj_type = GetType();
 
     const bool positional_env = SettingsManager::GetPositionalEnvEnabled();
     const bool positional_voip = SettingsManager::GetPositionalVOIPEnabled();
     const float gain_env = SettingsManager::GetVolumeEnv()/100.0f;
-    const float gain_voip = SettingsManager::GetVolumeVOIP()/100.0f;
+//    const float gain_voip = SettingsManager::GetVolumeVOIP()/100.0f;
 
     if (openal_stream_source > 0) {
         const QVector3D pos = GetPos() + QVector3D(0, 1.6f, 0);
         const QVector3D vel = GetVel();
         const QVector3D dir = GetZDir();
         const QVector3D scale = GetScale();
-        const float dist = qMax(scale.x(), qMax(scale.y(), scale.z()));
+//        const float dist = qMax(scale.x(), qMax(scale.y(), scale.z()));
 
         if (positional_voip) {
             alSourcei(openal_stream_source, AL_SOURCE_RELATIVE, AL_FALSE);
@@ -2848,6 +2851,9 @@ void RoomObject::ReadXMLCode(const QString & str)
                 if (attributes.hasAttribute("cull_face")) {
                     props->SetCullFace(attributes.value("cull_face").toString());
                 }
+                if (attributes.hasAttribute("swallow")) {
+                    props->SetSwallow(MathUtil::GetStringAsBool(attributes.value("swallow").toString()));
+                }
 
                 props->SetType(DOMNode::StringToElementType(tag_name));
 
@@ -3137,6 +3143,9 @@ QString RoomObject::GetXMLCode(const bool show_defaults) const
     }
     if (t == TYPE_OBJECT && ((show_defaults) || props->GetDrawLayer() != 0)) {
         code_str += " draw_layer=" + MathUtil::GetIntAsString(props->GetDrawLayer());
+    }
+    if (t == TYPE_LINK && ((show_defaults) || props->GetSwallow())) {
+        code_str += " swallow=" + MathUtil::GetBoolAsString(props->GetSwallow());
     }
 
     //add text stuff if there is any in the middle
@@ -4914,4 +4923,24 @@ bool RoomObject::GetDrawBack() const
 void RoomObject::SetDrawBack(bool value)
 {
     draw_back = value;
+}
+
+void RoomObject::SetSwallowState(const int i)
+{
+    swallow_state = i;
+}
+
+int RoomObject::GetSwallowState() const
+{
+    return swallow_state;
+}
+
+void RoomObject::SetSwallowTime(const int i)
+{
+    swallow_time = i;
+}
+
+int RoomObject::GetSwallowTime() const
+{
+    return swallow_time;
 }
