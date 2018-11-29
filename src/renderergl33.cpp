@@ -214,7 +214,7 @@ void RendererGL33::CompileAndLinkShaderProgram2(std::shared_ptr<ProgramHandle> *
     else
     {
         fragment_empty = true;
-        QString default_object_fragment_shader_path("assets/shaders/default_no_alpha.txt");
+        QString default_object_fragment_shader_path("assets/shaders/default_linear_alpha.txt");
         QByteArray default_object_fragment_shader_bytes = MathUtil::LoadAssetFile(default_object_fragment_shader_path);
 
         UpgradeShaderSource(default_object_fragment_shader_bytes, false);
