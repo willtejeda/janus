@@ -460,8 +460,8 @@ bool RoomObject::GetRaycastIntersection(const QMatrix4x4 transform, QList <QVect
                     GeomMaterial & material = obj->GetGeom()->GetData().GetMaterial(materials[k]);
                     QVector<QVector<GeomTriangle>>& triangles_map = material.triangles;
                     QVector<GeomVBOData>& vbo_map = material.vbo_data;
-                    QVector<QPair<uint32_t, size_t>>& mesh_keys = material.mesh_keys;
-                    size_t const mesh_count = mesh_keys.size();
+                    QVector<QPair<uint32_t, int>>& mesh_keys = material.mesh_keys;
+                    const int mesh_count = mesh_keys.size();
 
                     // For each mesh that uses this material of this AssetObject
                     for (unsigned int mesh_index = 0; mesh_index < mesh_count; ++mesh_index)
@@ -477,8 +477,8 @@ bool RoomObject::GetRaycastIntersection(const QMatrix4x4 transform, QList <QVect
                         QMatrix4x4 instance_normal_transform;
                         QMatrix4x4 inv_instance_normal_transform;
 
-                        size_t const instance_count = mesh_instance_transforms.size();
-                        for (size_t instance_index = 0; instance_index < instance_count; ++instance_index)
+                        const int instance_count = mesh_instance_transforms.size();
+                        for (int instance_index = 0; instance_index < instance_count; ++instance_index)
                         {
                             // Transform ray into instance-local space
                             inv_instance_position_transform = mesh_instance_transforms[instance_index].inverted();
@@ -489,8 +489,8 @@ bool RoomObject::GetRaycastIntersection(const QMatrix4x4 transform, QList <QVect
                             ray_dir_instance_space.normalize();
 
                             // Raycast against the first 16k triangles of a mesh
-                            const size_t triangle_loop_count = qMin(triangles.size(), 16384);
-                            for (size_t i = 0; i < triangle_loop_count; ++i)
+                            const int triangle_loop_count = qMin(triangles.size(), 16384);
+                            for (int i = 0; i < triangle_loop_count; ++i)
                             {
                                 // per-triangle test
                                 QVector3D p0 = QVector3D(triangles[i].p[0][0],
