@@ -411,23 +411,34 @@ TextureHandle* MediaPlayer::GetRightTextureHandle(MediaContext * ctx)
 
 float MediaPlayer::GetAspectRatio(MediaContext * ctx) const
 {
+    float aspect = 0.7f;
     if (ctx->audio_only || !ctx->img[0] || ctx->img[0]->isNull() || ctx->video_width == 0 || ctx->video_height == 0) {
-        return 0.7f;
+        aspect = 0.7f;
     }
     else {
+        aspect = (float(ctx->video_height) / float(ctx->video_width));
         if (ctx->sbs3d){
-            return (float(ctx->video_height) / float(ctx->video_width / 2.0));
-
+            aspect *= 2.0f;
         }
         else if (ctx->ou3d){
-            return (float(ctx->video_height / 2.0) / float(ctx->video_width));
-
+            aspect *= 0.5f;
         }
-        else{
-//            qDebug() << "MediaPlayer::GetAspectRatio height width" << ctx->video_height << ctx->video_width;
-            return (float(ctx->video_height) / float(ctx->video_width));
+    }    
+
+    //62.0 - detect rotated videos, and alter aspect ratio accordingly
+    libvlc_video_orient_t orient = libvlc_video_orient_top_left;
+    libvlc_media_track_t **mediatracks;
+    unsigned trackcount = libvlc_media_tracks_get(ctx->media, &mediatracks);
+    for (uint t = 0; t < trackcount; ++t) {
+        if (mediatracks[t]->i_type == libvlc_track_video) {
+            orient = (*mediatracks)->video->i_orientation;
         }
     }
+    if (orient == libvlc_video_orient_left_bottom || orient == libvlc_video_orient_right_top) {
+        aspect = 1.0f / aspect;
+    }
+
+    return aspect;
 }
 
 
