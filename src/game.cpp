@@ -5224,6 +5224,7 @@ void Game::DragAndDrop(const QString url_str, const QString drop_or_pin, const i
             new_object->GetProperties()->SetCollisionID("plane");
             new_object->GetProperties()->SetImageID(asset_id);
             new_object->GetProperties()->SetCullFace("none");
+            new_object->GetProperties()->SetTexClamp(true);
             new_object->GetProperties()->SetLighting(false);
         }
         else if (t == TYPE_ASSETVIDEO) {
