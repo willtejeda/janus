@@ -4733,7 +4733,6 @@ void Room::AddAsset(const QString asset_type, const QVariantMap & property_list,
     case TYPE_ASSETWEBSURFACE:
     {
         QPointer <AbstractWebSurface> a;
-    #if !defined(__APPLE__) && !defined(__ANDROID__)
         a = (AbstractWebSurface*)new AssetWebSurface();
         a->SetTextureAlpha(true);
         if (a->GetWebView()) {
@@ -4745,19 +4744,6 @@ void Room::AddAsset(const QString asset_type, const QVariantMap & property_list,
             palette.setBrush(QPalette::Base, QColor(0,0,0,0));
             a->GetWebView()->setPalette(palette);
         }
-    #else
-        a = (AbstractWebSurface*)new AssetWebSurface();
-        a->SetTextureAlpha(true);
-        if (a->GetWebView()) {
-            a->GetWebView()->initializeNonMenu();
-
-            //adjust background colour palette based on if menu is in focus or not
-            QPalette palette = a->GetWebView()->palette();
-            palette.setBrush(QPalette::Window, Qt::white);
-            palette.setBrush(QPalette::Base, QColor(0,0,0,0));
-            a->GetWebView()->setPalette(palette);
-        }
-    #endif
 
         a->SetSrc(url, property_list["src"].toString());
         a->SetProperties(property_list);
