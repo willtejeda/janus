@@ -21,6 +21,7 @@ enum RoomPhysicsColliderType : short
 
 class RoomPhysics : public QObject
 {
+
 public:
 
     RoomPhysics();

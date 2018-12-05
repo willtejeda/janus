@@ -279,8 +279,8 @@ QVector3D RoomPhysics::GetRigidBodyPos(const QString js_id)
     }
 
     btRigidBody * rb = rigidBodies[js_id];
-    btTransform worldTrans;
-    rb->getMotionState()->getWorldTransform(worldTrans);
+    btTransform worldTrans = rb->getWorldTransform();
+    //rb->getMotionState()->getWorldTransform(worldTrans);
     btVector3 p = worldTrans.getOrigin();
 
     return QVector3D(p.x(), p.y(), p.z());
@@ -293,8 +293,8 @@ QVector3D RoomPhysics::GetRigidBodyXDir(const QString js_id)
     }
 
     btRigidBody * rb = rigidBodies[js_id];
-    btTransform worldTrans;
-    rb->getMotionState()->getWorldTransform(worldTrans);
+    btTransform worldTrans = rb->getWorldTransform();
+    //rb->getMotionState()->getWorldTransform(worldTrans);
     btVector3 p = worldTrans.getBasis().getColumn(0);
 
     return QVector3D(p.x(), p.y(), p.z());
@@ -354,9 +354,10 @@ void RoomPhysics::UpdateToRigidBody(QPointer <Player> player)
 //        motionState->setWorldTransform(btTransform(btBasis, btP));
 //        rb->setLinearVelocity(btVector3(v.x(), v.y(), v.z()));
 //        rb->setMotionState(motionState);
-        if (rb->getMotionState()) {
-            delete rb->getMotionState();
-        }
+        //if (rb->getMotionState()) {
+        //    delete rb->getMotionState();
+        //}
+
         btDefaultMotionState * motionState = new btDefaultMotionState(btTransform(btBasis, btP));
         rb->setLinearVelocity(btVector3(v.x(), v.y(), v.z()));
         rb->setMotionState(motionState);
@@ -371,8 +372,8 @@ void RoomPhysics::UpdateFromRigidBody(QPointer <Player> player)
     }
 
     btRigidBody * rb = rigidBodies["__player"];
-    btTransform worldTrans;
-    rb->getMotionState()->getWorldTransform(worldTrans);
+    btTransform worldTrans = rb->getWorldTransform();
+    //rb->getMotionState()->getWorldTransform(worldTrans);
 
     const btVector3 p = worldTrans.getOrigin();
     const btVector3 lv = rb->getLinearVelocity();
@@ -413,8 +414,8 @@ void RoomPhysics::UpdateFromRigidBody(const QPointer <RoomObject> o)
 
     btRigidBody * rb = rigidBodies[o->GetProperties()->GetJSID()];
 
-    btTransform worldTrans;
-    rb->getMotionState()->getWorldTransform(worldTrans);
+    btTransform worldTrans = rb->getWorldTransform();
+    //rb->getMotionState()->getWorldTransform(worldTrans);
 
     btVector3 p = worldTrans.getOrigin();
     btVector3 x = worldTrans.getBasis().getColumn(0);

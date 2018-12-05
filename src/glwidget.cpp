@@ -695,6 +695,7 @@ void GLWidget::paintGL()
     //for screenshots, we do
     uint32_t overrideWidth = RendererInterface::m_pimpl->GetWindowWidth();
     uint32_t overrideHeight = RendererInterface::m_pimpl->GetWindowHeight();
+
     if (take_screenshot) {
         //take_screenshot_path
 #ifdef __ANDROID__
@@ -1336,8 +1337,13 @@ void GLWidget::paintGL()
         m_viewPortArray.reserve(4);
         m_viewPortArray.push_back(0.0f);
         m_viewPortArray.push_back(0.0f);
+#ifdef __APPLE__
+        m_viewPortArray.push_back(w * dpr);
+        m_viewPortArray.push_back(h * dpr);
+#else
         m_viewPortArray.push_back(overrideWidth * dpr);
         m_viewPortArray.push_back(overrideHeight * dpr);
+#endif
 
         cameras.clear();
         cameras.reserve(3);

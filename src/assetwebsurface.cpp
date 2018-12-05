@@ -239,7 +239,7 @@ void AssetWebSurface::keyReleaseEvent(QKeyEvent * e)
 {
     const int height = props->GetHeight();
 
-    if (webview) {        
+    if (webview) {
         webview->keyReleaseEvent(e);
     }
 }

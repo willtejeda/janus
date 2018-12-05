@@ -29,3 +29,5 @@ moc_*.h
 dist/
 janusvr
 .qmake.stash
+resources/cef/mac/Debug/*
+resources/cef/mac/Release/*

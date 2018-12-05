@@ -158,11 +158,6 @@ public:
     void SetSoundsEnabled(const bool b);
     void ResetSoundTriggers();
 
-#ifdef __ANDROID__
-    void Pause();
-    void Resume();
-#endif
-
     bool SaveXML(const QString & filename);
     void SaveXML(QTextStream & ofs);
 

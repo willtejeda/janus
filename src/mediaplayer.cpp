@@ -61,6 +61,8 @@ void MediaPlayer::handleEvent(const libvlc_event_t* pEvt, void* pUserData)
 
 void MediaPlayer::SetupOutput(MediaContext * ctx, QString vid_url, const bool loop, const bool audio_only)
 {
+    if (!vlcInstance) return;
+
     if (!ctx->setup){
         MediaPlayer::ClearOutput(ctx);
 
@@ -135,6 +137,8 @@ void MediaPlayer::SetupOutput(MediaContext * ctx, QString vid_url, const bool lo
 
 void MediaPlayer::ClearVLC(MediaContext * ctx)
 {
+    if (!vlcInstance) return;
+
     if (libvlc_media_player_is_playing(ctx->media_player)){
         libvlc_media_player_stop(ctx->media_player);
     }
@@ -148,6 +152,8 @@ void MediaPlayer::ClearVLC(MediaContext * ctx)
 
 void MediaPlayer::ClearOutput(MediaContext * ctx)
 {
+    if (!vlcInstance) return;
+
     ctx->video_lock.lock();
     ctx->audio_lock.lock();
 
@@ -219,11 +225,13 @@ void MediaPlayer::Set3D(const bool sbs3d, const bool ou3d, const bool reverse3d)
 
 bool MediaPlayer::GetPlaying(MediaContext * ctx) const
 {
+    if (!vlcInstance) return false;
     return (ctx->media_player && libvlc_media_player_is_playing(ctx->media_player));
 }
 
 bool MediaPlayer::CanPause(MediaContext * ctx)
 {
+    if (!vlcInstance) return false;
     return (ctx->media_player && libvlc_media_player_can_pause(ctx->media_player));
 }
 
@@ -235,11 +243,13 @@ bool MediaPlayer::GetReady(MediaContext * ctx) const
 
 void MediaPlayer::SetVolume(MediaContext * ctx, const int i)
 {
+    if (!vlcInstance) return;
     if (ctx->media_player) libvlc_audio_set_volume(ctx->media_player, i);
 }
 
 int MediaPlayer::GetVolume(MediaContext * ctx) const
 {
+    if (!vlcInstance) return 70;
     return (ctx->media_player) ? (int) libvlc_audio_get_volume(ctx->media_player) : 70;
 }
 
@@ -250,6 +260,7 @@ void MediaPlayer::Play(MediaContext * ctx)
 
 void MediaPlayer::slotPlay(MediaContext *ctx)
 {
+    if (!vlcInstance) return;
     if (ctx->media_player && !ctx->playing && libvlc_media_player_is_playing(ctx->media_player) == 0){
         libvlc_media_player_play(ctx->media_player);
         ctx->playing = true;
@@ -263,6 +274,7 @@ void MediaPlayer::Restart(MediaContext * ctx)
 
 void MediaPlayer::slotRestart(MediaContext *ctx)
 {
+    if (!vlcInstance) return;
     if (ctx->media_player){
         libvlc_media_player_stop(ctx->media_player);
         libvlc_media_player_play(ctx->media_player);
@@ -277,6 +289,7 @@ void MediaPlayer::Seek(MediaContext * ctx, const float pos)
 
 void MediaPlayer::slotSeek(MediaContext *ctx, float pos)
 {
+    if (!vlcInstance) return;
     if (ctx->media_player && libvlc_media_player_is_seekable(ctx->media_player)) {
         libvlc_media_player_set_time(ctx->media_player, pos*1000.0f);
     }
@@ -289,6 +302,7 @@ void MediaPlayer::Pause(MediaContext * ctx)
 
 void MediaPlayer::slotPause(MediaContext *ctx)
 {
+    if (!vlcInstance) return;
     if (ctx->media_player && ctx->playing && libvlc_media_player_can_pause(ctx->media_player)){
         libvlc_media_player_pause(ctx->media_player); //Pause if playing
         ctx->playing = false;
@@ -302,6 +316,7 @@ void MediaPlayer::Stop(MediaContext * ctx)
 
 void MediaPlayer::slotStop(MediaContext *ctx)
 {
+    if (!vlcInstance) return;
     if (ctx->media_player) {
         libvlc_media_player_stop(ctx->media_player);
         ctx->playing = false;
@@ -310,6 +325,7 @@ void MediaPlayer::slotStop(MediaContext *ctx)
 
 float MediaPlayer::GetCurTime(MediaContext * ctx) const
 {
+    if (!vlcInstance) return 0;
     if (ctx->media_player){
         return float(double(libvlc_media_player_get_time(ctx->media_player)) / 1000.0);
     }
@@ -318,6 +334,7 @@ float MediaPlayer::GetCurTime(MediaContext * ctx) const
 
 float MediaPlayer::GetTotalTime(MediaContext * ctx) const
 {
+    if (!vlcInstance) return 0;
     if (ctx->media_player){
         return float(double(libvlc_media_player_get_length(ctx->media_player)) / 1000.0);
     }
@@ -341,7 +358,7 @@ void MediaPlayer::SetUpdateTexture(MediaContext * ctx, const bool b)
 
 void MediaPlayer::UpdateTexture(MediaContext * ctx)
 {
-    if (ctx->audio_only) return;
+    if (ctx->audio_only || !vlcInstance) return;
     if (ctx->update_tex && ctx->video_lock.tryLock())
     {
         if (ctx->img[0] && !ctx->img[0]->isNull())
@@ -365,7 +382,7 @@ void MediaPlayer::UpdateTexture(MediaContext * ctx)
 
 void MediaPlayer::UpdateLeftRightTextures(MediaContext * ctx)
 {
-    if (ctx->audio_only) return;    
+    if (ctx->audio_only || !vlcInstance) return;
     if (ctx->update_tex && ctx->video_lock.tryLock())
     {
         for (int i=0; i<2; ++i)
@@ -444,7 +461,7 @@ float MediaPlayer::GetAspectRatio(MediaContext * ctx) const
 
 void MediaPlayer::DrawInterfaceOverlay(MediaContext * ctx, QImage & img)
 {
-    if (ctx->audio_only) return;
+    if (ctx->audio_only || !vlcInstance) return;
     //render interface overlay
     if (ctx->cursor_active) {
         const int height = img.height();

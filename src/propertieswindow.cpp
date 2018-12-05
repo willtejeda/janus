@@ -399,7 +399,7 @@ void PropertiesWindow::UpdateProperties()
     }
     else {
         const QString t = type_widget->text();
-        if (t != cur_object->GetType()) {
+        if (t != DOMNode::ElementTypeToString(cur_object->GetType())) {
             cur_object->SetType(DOMNode::StringToElementType(t));
             UpdateLayout();
         }

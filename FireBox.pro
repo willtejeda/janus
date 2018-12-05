@@ -10,7 +10,7 @@ __VERSION=62.0
 #JamesMcCrae: define this when doing Oculus-submitted builds (either for Rift of GearVR app categories)
 #DEFINES += OCULUS_SUBMISSION_BUILD
 #Daydream store build
-DEFINES += DAYDREAM_SUBMISSION_BUILD
+#DEFINES += DAYDREAM_SUBMISSION_BUILD
 
 DEFINES += __JANUS_VERSION=\\\"$$__VERSION\\\"
 DEFINES += __JANUS_VERSION_COMPLETE=__JANUS_VERSION\\\".$$system(git --git-dir ./.git --work-tree . describe --always --tags --abbrev=7)\\\"
@@ -150,6 +150,7 @@ SOURCES += \
     src/virtualmenu.cpp
 
 unix:!android:!macx:SOURCES += ./resources/cef/linux/libcef_dll/base/cef_atomicops_x86_gcc.cc
+unix:!android:macx:SOURCES += ./resources/cef/mac/libcef_dll/base/cef_atomicops_x86_gcc.cc
 
 HEADERS += \
     src/abstracthmdmanager.h \
@@ -280,6 +281,7 @@ contains(ANDROID_TARGET_ARCH,armeabi) {
 # Chromium Embedded Framework CEF
 win32:INCLUDEPATH += "./resources/cef/windows/"
 unix:!macx:!android:INCLUDEPATH += "./resources/cef/linux"
+unix:macx:INCLUDEPATH += "./resources/cef/mac"
 
 win32:LIBS += -L"$$PWD/dependencies/windows/"
 unix:!macx:!android:LIBS += -L"$$PWD/dependencies/linux/"
@@ -295,6 +297,9 @@ CONFIG(release) {
 
 win32:LIBS += -llibcef -llibcef_dll_wrapper
 unix:!macx:!android:LIBS += -lcef -lcef_dll_wrapper
+
+unix:macx:LIBS += -L"$$PWD/resources/cef/mac/libcef_dll_wrapper/"
+unix:macx:LIBS += -lcef_dll_wrapper
 
 #GoogleVR
 contains(ANDROID_TARGET_ARCH,armeabi-v7a) {
@@ -655,8 +660,14 @@ unix:!macx:!android:{
 }
 
 unix:macx:LIBS += -lz -framework IOKit -framework CoreFoundation
-unix:macx:QMAKE_LFLAGS += -F"$$PWD/resources/qtpdf/lib/mac"
-unix:macx:LIBS += -framework QtPdf
+CONFIG(debug) {
+    unix:macx:QMAKE_LFLAGS += -F"$$PWD/resources/cef/mac/Debug"
+}
+CONFIG(release) {
+    unix:macx:QMAKE_LFLAGS += -F"$$PWD/resources/cef/mac/Release"
+}
+
+unix:macx:LIBS += -framework "Chromium Embedded Framework"
 unix:macx:{
    QMAKE_LFLAGS += -Wl,-rpath,"@loader_path/../Frameworks"
 }

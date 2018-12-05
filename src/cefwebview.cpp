@@ -320,7 +320,7 @@ CEFWebView::CEFWebView() :
     browserSettings.windowless_frame_rate = 60; // 30 is default
 
     // in linux set a gtk widget, in windows a hwnd. If not available set nullptr - may cause some render errors, in context-menu and plugins.
-#ifdef WIN32
+#if defined(WIN32) || defined(__APPLE__)
     window_info.SetAsWindowless(NULL); // false means no transparency (site background colour)
 #else
     std::size_t windowHandle = 0;

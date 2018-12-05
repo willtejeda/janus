@@ -41,7 +41,7 @@ public:
     void DecoupledRender();       
 
 public slots:
-    void PrintFPS();
+     void PrintFPS();
 
 private:
 

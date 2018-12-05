@@ -282,7 +282,7 @@ void MathUtil::Initialize()
 
     if (vid_extensions.isEmpty()) {
         vid_extensions.push_back("mpg");
-        vid_extensions.push_back("mp4");        
+        vid_extensions.push_back("mp4");
         vid_extensions.push_back("mkv");
         vid_extensions.push_back("avi");
         vid_extensions.push_back("ogv");

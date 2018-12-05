@@ -2857,11 +2857,11 @@ void RoomObject::ReadXMLCode(const QString & str)
 
                 props->SetType(DOMNode::StringToElementType(tag_name));
 
-                if (tag_name == TYPE_TEXT) {
+                if (props->GetType() == TYPE_TEXT) {
                     reader.readNext();
                     SetText(reader.text().toString());
                 }
-                else if (tag_name == TYPE_PARAGRAPH) {
+                else if (props->GetType() == TYPE_PARAGRAPH) {
                     reader.readNext();
                     SetText(reader.text().toString());
                 }
