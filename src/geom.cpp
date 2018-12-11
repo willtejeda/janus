@@ -2092,9 +2092,11 @@ void Geom::CalculateFinalPoses()
 
             globalTransform = parentTransform * nodeTransform;           
 
+#ifdef WIN32
             if (first) {
                 first = false;
             }
+#endif
 
             if (extra_global_transforms.contains(bone_id))
             {
@@ -2114,11 +2116,11 @@ void Geom::CalculateFinalPoses()
             }
 
             QMatrix4x4 m = git * globalTransform;
-#ifdef WIN32
+//#ifdef WIN32
             QVector4D c = m.column(3);
             c.setW(1.0f);
             m.setColumn(3, c);
-#endif
+//#endif
 
             final_poses[bone_to_boneid[node_name]] = m;
             skin_joints[bone_to_boneid[node_name]] = m * bone_offset_matrix[node_name];
