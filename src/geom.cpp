@@ -998,7 +998,7 @@ void Geom::DrawGL(QPointer <AssetShader> shader, const QColor col, const bool ov
     {
         GeomMaterial & mat = data.GetMaterial(materials[i]);
 
-        size_t const mesh_count = mat.vbo_data.size();
+        const int mesh_count = mat.vbo_data.size();
         if (mesh_count == 0)
         {
             // Skip materials with no meshes
@@ -1077,7 +1077,7 @@ void Geom::DrawGL(QPointer <AssetShader> shader, const QColor col, const bool ov
             }
         }
 
-        for (size_t mesh_index = 0; mesh_index < mesh_count; ++mesh_index)
+        for (int mesh_index = 0; mesh_index < mesh_count; ++mesh_index)
         {
             GeomVBOData & vbo_data = data.GetVBOData(materials[i], mesh_index);
 
@@ -1114,8 +1114,8 @@ void Geom::DrawGL(QPointer <AssetShader> shader, const QColor col, const bool ov
                                     renderer->GetPolyMode(),
                                     renderer->GetColorMask());
 
-            size_t const instance_count = vbo_data.m_instance_transforms.size();
-            for (size_t instance_index = 0; instance_index < instance_count; ++instance_index)
+            const int instance_count = vbo_data.m_instance_transforms.size();
+            for (int instance_index = 0; instance_index < instance_count; ++instance_index)
             {
                 MathUtil::PushModelMatrix();
                 MathUtil::MultModelMatrix(vbo_data.m_instance_transforms[instance_index]);
@@ -1390,8 +1390,8 @@ void Geom::PrepareVBOs()
             // If we have not already processed this mesh do so.
             GeomMaterial & mat = data.GetMaterial(mat_name);
             bool mesh_has_been_processed = false;
-            size_t mesh_index = mat.mesh_keys.size();
-            for (QPair<uint32_t, size_t>& mesh_key : mat.mesh_keys)
+            int mesh_index = mat.mesh_keys.size();
+            for (QPair<uint32_t, int>& mesh_key : mat.mesh_keys)
             {
                 if (mesh_key.first == nd->mMeshes[n])
                 {
@@ -1646,7 +1646,7 @@ void Geom::PrepareVBOs()
                 } // for (uint32_t vertex_index = 0; vertex_index < num_verts; ++vertex_index)
 
                 // Store key as we need this for parsing in the physics code
-                mat.mesh_keys.push_back(QPair<uint32_t, size_t>(nd->mMeshes[n], mesh_index));
+                mat.mesh_keys.push_back(QPair<uint32_t, int>(nd->mMeshes[n], mesh_index));
             } // if (mesh_has_been_processed == false)
 
             // Add new transform for this mesh this is the object-space to instance-space transform for this instance
@@ -1682,8 +1682,8 @@ void Geom::BuildVBOsGL()
         GeomMaterial & mat = data.GetMaterial(materials[i]);
 
         // For each mesh
-        size_t const mesh_count = mat.vbo_data.size();
-        for (size_t mesh_index = 0; mesh_index < mesh_count; ++mesh_index)
+        const int mesh_count = mat.vbo_data.size();
+        for (int mesh_index = 0; mesh_index < mesh_count; ++mesh_index)
         {
             GeomVBOData & vbo_data = data.GetVBOData(materials[i], mesh_index);
             RendererInterface::m_pimpl->CreateMeshHandleForGeomVBOData(&vbo_data);
@@ -1968,17 +1968,20 @@ void Geom::CalcInterpolatedPosition(QVector3D & p, const double t, aiNodeAnim * 
     }
 }
 
-void Geom::DoLocalTransformation(aiNodeAnim * a, QMatrix4x4 & mat)
+void Geom::DoLocalTransformation(aiNodeAnim * a, QMatrix4x4 & mat, bool translate)
 {
     aiQuaternion q;
     QVector3D p, s;
 
-    CalcInterpolatedPosition(p, cur_time, a);
-    CalcInterpolatedRotation(q, cur_time, a);
-    CalcInterpolatedScaling(s, cur_time, a);
+    if (translate) {
+        CalcInterpolatedPosition(p, cur_time, a);
+        mat.translate(p.x(), p.y(), p.z());
+    }
 
-    mat.translate(p.x(), p.y(), p.z());
+    CalcInterpolatedRotation(q, cur_time, a);
     mat.rotate(QQuaternion(q.w, q.x, q.y, q.z));
+
+    CalcInterpolatedScaling(s, cur_time, a);
     mat.scale(s);
 }
 
@@ -2015,6 +2018,11 @@ void Geom::CalculateFinalPoses()
         return;
     }
 
+    QMatrix4x4 git = m_globalInverseTransform;
+    if (geom != this) {
+        git = git * geom->m_globalInverseTransform;
+    }
+
     /* draw all meshes assigned to this node */
     //iterate through everything
     nodes_to_process.clear();
@@ -2030,6 +2038,7 @@ void Geom::CalculateFinalPoses()
     }
 
     //on first pass, set up node hierarchy and node indexes for whole scene
+    bool first = true;
     while (nodes_to_process.size() != 0)
     {
         aiNode * nd = nodes_to_process.back();
@@ -2042,12 +2051,8 @@ void Geom::CalculateFinalPoses()
         QMatrix4x4 globalTransform;
         QMatrix4x4 nodeTransform; // = aiToQMatrix4x4(nd->mTransformation);
 
-        if (bone_to_boneid.contains(node_name))
-        { //its a bone
+        if (bone_to_boneid.contains(node_name)) { //its a bone
 
-//            qDebug() << "animating" << node_name << bone_to_boneid.contains(node_name);
-
-//            QMatrix4x4 m = aiToQMatrix4x4(nd->mTransformation);
             const unsigned int bone_id = bone_to_boneid[node_name];
 //            if we can't find the animation, just multiply by the base transform
 //            anim associated with the bone can be either (call bone name X):
@@ -2062,35 +2067,34 @@ void Geom::CalculateFinalPoses()
             bool xform_anim = false;
             if (geom->anims.contains(node_name+"_$assimpfbx$_translation"))
             {
-                DoLocalTransformation(geom->anims[node_name+"_$assimpfbx$_translation"], nodeTransform);
+                DoLocalTransformation(geom->anims[node_name+"_$assimpfbx$_translation"], nodeTransform, first);
                 xform_anim = true;
             }
             if (geom->anims.contains(node_name+"_$assimpfbx$_prerotation"))
             {
-                DoLocalTransformation(geom->anims[node_name+"_$assimpfbx$_prerotation"], nodeTransform);
+                DoLocalTransformation(geom->anims[node_name+"_$assimpfbx$_prerotation"], nodeTransform, first);
                 xform_anim = true;
             }
             if (geom->anims.contains(node_name+"_$assimpfbx$_rotation"))
             {
-                DoLocalTransformation(geom->anims[node_name+"_$assimpfbx$_rotation"], nodeTransform);
+                DoLocalTransformation(geom->anims[node_name+"_$assimpfbx$_rotation"], nodeTransform, first);
                 xform_anim = true;
             }
             if (geom->anims.contains(node_name))
             {               
-                DoLocalTransformation(geom->anims[node_name], nodeTransform);
-//                nodeTransform.setColumn(3, QVector4D(0,0,0,1));
-//                qDebug() << "node_name1" << node_name << nodeTransform;
+                DoLocalTransformation(geom->anims[node_name], nodeTransform, first);
                 xform_anim = true;
             }
 
-            if (!xform_anim)
-            {
-//                qDebug() << "node_name2" << node_name;
-                nodeTransform = aiToQMatrix4x4(nd->mTransformation);
-            }           
+            if (!xform_anim) {
+                nodeTransform *= aiToQMatrix4x4(nd->mTransformation);
+            }
 
+            globalTransform = parentTransform * nodeTransform;           
 
-            globalTransform = parentTransform * nodeTransform;
+            if (first) {
+                first = false;
+            }
 
             if (extra_global_transforms.contains(bone_id))
             {
@@ -2109,18 +2113,15 @@ void Geom::CalculateFinalPoses()
                 globalTransform *= extra_relative_transforms[bone_id];
             }
 
-//            60.0 - HACK - default avatar animates right on assimp 4.1.0
-            QMatrix4x4 m = m_globalInverseTransform * globalTransform;
+            QMatrix4x4 m = git * globalTransform;
 #ifdef WIN32
             QVector4D c = m.column(3);
-            c *= 0.5f;
             c.setW(1.0f);
             m.setColumn(3, c);
 #endif
 
             final_poses[bone_to_boneid[node_name]] = m;
             skin_joints[bone_to_boneid[node_name]] = m * bone_offset_matrix[node_name];
-//            qDebug() << "node_name" << node_name << skin_joints[bone_to_boneid[node_name]];
         }
         else {
             globalTransform = parentTransform * aiToQMatrix4x4(nd->mTransformation);

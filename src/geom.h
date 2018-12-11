@@ -109,7 +109,7 @@ struct GeomMaterial
     // appending to the one mesh.
     QVector <QVector<GeomTriangle>> triangles;
     QVector <GeomVBOData> vbo_data;
-    QVector <QPair<uint32_t, size_t>> mesh_keys;
+    QVector <QPair<uint32_t, int>> mesh_keys;
 
     int material_index; //hack to fix some broken texture references
 };
@@ -334,7 +334,7 @@ protected:
 private:
 
     void CalculateFinalPoses();
-    void DoLocalTransformation(aiNodeAnim * a, QMatrix4x4 & mat);
+    void DoLocalTransformation(aiNodeAnim * a, QMatrix4x4 & mat, bool translate=false);
     void CalcInterpolatedPosition(QVector3D & p, const double t, aiNodeAnim * a);
     void CalcInterpolatedRotation(aiQuaternion & r, const double t, aiNodeAnim * a);
     void CalcInterpolatedScaling(QVector3D & s, const double t, aiNodeAnim * a);
