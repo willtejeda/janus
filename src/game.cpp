@@ -4335,6 +4335,13 @@ void Game::UpdateControllers()
     x0 += JNIUtil::GetWalkJoystickX();
     y0 += -JNIUtil::GetWalkJoystickY();
 
+    if (!JNIUtil::GetGamepadConnected()) {
+        x0 += x1;
+        y0 += y1;
+        x1 = 0.0f;
+        y1 = 0.0f;
+    }
+
     if (!websurface_selected[0]
             || (controller_manager->GetUsingGamepad() && JNIUtil::GetGamepadConnected())
             || !(controller_manager->GetHMDManager() && controller_manager->GetHMDManager()->GetEnabled() && controller_manager->GetUsingSpatiallyTrackedControllers()))
