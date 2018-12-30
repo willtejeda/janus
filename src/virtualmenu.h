@@ -246,6 +246,8 @@ public:
     bool GetDoForward();
     bool GetDoReload();
     bool GetDoEscapeToHome();
+    bool GetDoSetUserID();
+    QString GetEnteredUserID();
     bool GetDoExit();
     bool GetDoCreatePortal();
     QString GetDoCreatePortalURL();
@@ -310,10 +312,13 @@ private:
     QString entered_url;
 
     bool do_search;
-    QString entered_search;
+    QString entered_search;    
     QTime entered_search_time;
     WebAsset search_data_request;
     QVariantList search_data;
+
+    bool do_setuserid;
+    QString entered_userid;
 
     QPointer <AbstractWebSurface> websurface; //for virtual keyboard and text entry for websurfaces
 };

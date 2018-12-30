@@ -4673,6 +4673,9 @@ void Game::UpdateVirtualMenu()
         if (virtualmenu->GetDoEscapeToHome()) {
             StartEscapeToHome();
         }
+        if (virtualmenu->GetDoSetUserID()) {
+            SetUserID(virtualmenu->GetEnteredUserID());
+        }
         if (virtualmenu->GetDoExit()) {
             if (controller_manager->GetHMDManager() && (controller_manager->GetHMDManager()->GetHMDType() == "go" || controller_manager->GetHMDManager()->GetHMDType() == "gear")){
 #if defined(__ANDROID__) && defined(OCULUS_SUBMISSION_BUILD)
@@ -5375,6 +5378,7 @@ void Game::SetRoomDeleteCode(const QString s)
 
 void Game::SetUserID(const QString s)
 {
+//    qDebug() << "Game::SetUserID" << s;
     player->GetProperties()->SetUserID(s);
 
     if (!multi_players.isNull() && !env.isNull()) {
