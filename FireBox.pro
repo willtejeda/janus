@@ -5,7 +5,7 @@
 #-------------------------------------------------
 
 # Define version
-__VERSION=62.1
+__VERSION=62.2
 
 #JamesMcCrae: define this when doing Oculus-submitted builds (either for Rift of GearVR app categories)
 #DEFINES += OCULUS_SUBMISSION_BUILD

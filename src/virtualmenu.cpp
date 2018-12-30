@@ -257,157 +257,162 @@ void VirtualMenu::mousePressEvent(const QString selected)
 
 void VirtualMenu::mouseReleaseEvent(const QString selected)
 {
-        switch (menu_index) {
-        case VirtualMenuIndex_MAIN:
-            if (selected == "__bookmarkadd") {
-                do_bookmark_add = true;
+    //62.2 - ignore release events if not on objects in this menu
+    if (!envobjects[menu_index].contains(selected)) {
+        return;
+    }
+
+    switch (menu_index) {
+    case VirtualMenuIndex_MAIN:
+        if (selected == "__bookmarkadd") {
+            do_bookmark_add = true;
+        }
+        else if (selected == "__bookmarkremove") {
+            do_bookmark_remove = true;
+        }
+        else if (selected == "__url") {
+            entered_url = "http://";
+            if (envobjects_text[VirtualMenuIndex_URL]["__enteredurl_label"]) {
+                envobjects_text[VirtualMenuIndex_URL]["__enteredurl_label"]->SetText(entered_url);
             }
-            else if (selected == "__bookmarkremove") {
-                do_bookmark_remove = true;
+            menu_index = VirtualMenuIndex_URL;
+        }
+        else if (selected == "__back") {
+            do_back = true;
+        }
+        else if (selected == "__forward") {
+            do_forward = true;
+        }
+        else if (selected == "__reload") {
+            do_reload = true;
+        }
+        else if (selected == "__home") {
+            do_escape_to_home = true;
+        }
+        else if (selected == "__bookmarks") {
+            menu_index = VirtualMenuIndex_BOOKMARKS;
+        }
+        else if (selected == "__avatar") {
+            menu_index = VirtualMenuIndex_AVATAR;
+        }
+        else if (selected == "__search") {
+            menu_index = VirtualMenuIndex_SEARCH;
+        }
+        else if (selected == "__social") {
+            menu_index = VirtualMenuIndex_SOCIAL;
+        }
+        else if (selected == "__exit") {
+            do_exit = true;
+        }
+        break;
+    case VirtualMenuIndex_URL:
+        if (selected == "__backspace") {
+            entered_url = entered_url.left(entered_url.length()-1);
+            if (envobjects_text[VirtualMenuIndex_URL]["__enteredurl_label"]) {
+                envobjects_text[VirtualMenuIndex_URL]["__enteredurl_label"]->SetText(entered_url);
             }
-            else if (selected == "__url") {
-                entered_url = "http://";
-                if (envobjects_text[VirtualMenuIndex_URL]["__enteredurl_label"]) {
-                    envobjects_text[VirtualMenuIndex_URL]["__enteredurl_label"]->SetText(entered_url);
-                }
-                menu_index = VirtualMenuIndex_URL;
+        }
+        else if (selected == "__enter") {
+            menu_index = VirtualMenuIndex_MAIN;
+            do_create_portal = true;
+            create_portal_url = entered_url;
+        }
+        else if (selected == "__enteredurl") {
+
+        }
+        else {
+            entered_url += selected.right(1);
+            if (envobjects_text[VirtualMenuIndex_URL]["__enteredurl_label"]) {
+                envobjects_text[VirtualMenuIndex_URL]["__enteredurl_label"]->SetText(entered_url);
             }
-            else if (selected == "__back") {
-                do_back = true;
+        }
+        break;
+    case VirtualMenuIndex_SEARCH:
+        if (selected == "__backspace") {
+            do_search = true;
+            entered_search_time.restart();
+            entered_search = entered_search.left(entered_search.length()-1);
+            if (envobjects_text[VirtualMenuIndex_SEARCH]["__enteredsearch_label"]) {
+                envobjects_text[VirtualMenuIndex_SEARCH]["__enteredsearch_label"]->SetText(entered_search);
             }
-            else if (selected == "__forward") {
-                do_forward = true;
+        }
+        else if (selected == "__space") {
+            do_search = true;
+            entered_search_time.restart();
+            entered_search += " ";
+            if (envobjects_text[VirtualMenuIndex_SEARCH]["__enteredsearch_label"]) {
+                envobjects_text[VirtualMenuIndex_SEARCH]["__enteredsearch_label"]->SetText(entered_search);
             }
-            else if (selected == "__reload") {
-                do_reload = true;
-            }
-            else if (selected == "__home") {
-                do_escape_to_home = true;
-            }
-            else if (selected == "__bookmarks") {
-                menu_index = VirtualMenuIndex_BOOKMARKS;
-            }
-            else if (selected == "__avatar") {
-                menu_index = VirtualMenuIndex_AVATAR;
-            }
-            else if (selected == "__search") {
-                menu_index = VirtualMenuIndex_SEARCH;
-            }
-            else if (selected == "__social") {
-                menu_index = VirtualMenuIndex_SOCIAL;
-            }
-            else if (selected == "__exit") {
-                do_exit = true;
-            }
-            break;
-        case VirtualMenuIndex_URL:
-            if (selected == "__backspace") {
-                entered_url = entered_url.left(entered_url.length()-1);
-                if (envobjects_text[VirtualMenuIndex_URL]["__enteredurl_label"]) {
-                    envobjects_text[VirtualMenuIndex_URL]["__enteredurl_label"]->SetText(entered_url);
-                }
-            }
-            else if (selected == "__enter") {
+        }
+        else if (selected == "__enteredsearch") {
+        }
+        else if (selected.left(10) == "__bookmark") {
+            if (envobjects[VirtualMenuIndex_SEARCH][selected]) {
                 menu_index = VirtualMenuIndex_MAIN;
                 do_create_portal = true;
-                create_portal_url = entered_url;
+                create_portal_url = envobjects[VirtualMenuIndex_SEARCH][selected]->GetURL();
             }
-            else if (selected == "__enteredurl") {
-
-            }
-            else {
-                entered_url += selected.right(1);
-                if (envobjects_text[VirtualMenuIndex_URL]["__enteredurl_label"]) {
-                    envobjects_text[VirtualMenuIndex_URL]["__enteredurl_label"]->SetText(entered_url);
-                }
-            }
-            break;
-        case VirtualMenuIndex_SEARCH:
-            if (selected == "__backspace") {
-                do_search = true;
-                entered_search_time.restart();
-                entered_search = entered_search.left(entered_search.length()-1);
-                if (envobjects_text[VirtualMenuIndex_SEARCH]["__enteredsearch_label"]) {
-                    envobjects_text[VirtualMenuIndex_SEARCH]["__enteredsearch_label"]->SetText(entered_search);
-                }
-            }
-            else if (selected == "__space") {
-                do_search = true;
-                entered_search_time.restart();
-                entered_search += " ";
-                if (envobjects_text[VirtualMenuIndex_SEARCH]["__enteredsearch_label"]) {
-                    envobjects_text[VirtualMenuIndex_SEARCH]["__enteredsearch_label"]->SetText(entered_search);
-                }
-            }
-            else if (selected == "__enteredsearch") {
-            }
-            else if (selected.left(10) == "__bookmark") {
-                if (envobjects[VirtualMenuIndex_SEARCH][selected]) {
-                    menu_index = VirtualMenuIndex_MAIN;
-                    do_create_portal = true;
-                    create_portal_url = envobjects[VirtualMenuIndex_SEARCH][selected]->GetURL();
-                }
-            }
-            else {
-                do_search = true;
-                entered_search_time.restart();
-                entered_search += selected.right(1);
-                if (envobjects_text[VirtualMenuIndex_SEARCH]["__enteredsearch_label"]) {
-                    envobjects_text[VirtualMenuIndex_SEARCH]["__enteredsearch_label"]->SetText(entered_search);
-                }
-            }
-            break;
-        case VirtualMenuIndex_BOOKMARKS:
-            if (selected == "__bookmarkup") {
-                if (cur_bookmark+16 < num_bookmarks) {
-                    cur_bookmark += 16;
-                    ConstructSubmenus();
-                }
-            }
-            else if (selected == "__bookmarkdown") {
-                menu_index = VirtualMenuIndex_BOOKMARKS;
-                if (cur_bookmark>0) {
-                    cur_bookmark -= 16;
-                    ConstructSubmenus();
-                }
-            }
-            else {
-                QPointer <RoomObject> o = envobjects[VirtualMenuIndex_BOOKMARKS][selected];
-                if (o) {
-                    menu_index = VirtualMenuIndex_MAIN;
-                    do_create_portal = true;
-                    create_portal_url = o->GetProperties()->GetURL();
-                    create_portal_thumb = o->GetAssetImage() ? o->GetAssetImage()->GetURL().toString() : "";
-                }
-            }
-            break;
-        case VirtualMenuIndex_SOCIAL:
-            if (selected == "__socialup") {
-                if (cur_user+16 < num_users) {
-                    cur_user += 16;
-                    ConstructSubmenus();
-                }
-            }
-            else if (selected == "__socialdown") {
-                menu_index = VirtualMenuIndex_BOOKMARKS;
-                if (cur_user>0) {
-                    cur_user -= 16;
-                    ConstructSubmenus();
-                }
-            }
-            else {
-                QPointer <RoomObject> o = envobjects[VirtualMenuIndex_SOCIAL][selected];
-                if (o) {
-                    menu_index = VirtualMenuIndex_MAIN;
-                    do_create_portal = true;
-                    create_portal_url = o->GetProperties()->GetURL();
-                    create_portal_thumb = o->GetAssetImage() ? o->GetAssetImage()->GetURL().toString() : "";
-                }
-            }
-            break;
-        default:
-            break;
         }
+        else {
+            do_search = true;
+            entered_search_time.restart();
+            entered_search += selected.right(1);
+            if (envobjects_text[VirtualMenuIndex_SEARCH]["__enteredsearch_label"]) {
+                envobjects_text[VirtualMenuIndex_SEARCH]["__enteredsearch_label"]->SetText(entered_search);
+            }
+        }
+        break;
+    case VirtualMenuIndex_BOOKMARKS:
+        if (selected == "__bookmarkup") {
+            if (cur_bookmark+16 < num_bookmarks) {
+                cur_bookmark += 16;
+                ConstructSubmenus();
+            }
+        }
+        else if (selected == "__bookmarkdown") {
+            menu_index = VirtualMenuIndex_BOOKMARKS;
+            if (cur_bookmark>0) {
+                cur_bookmark -= 16;
+                ConstructSubmenus();
+            }
+        }
+        else {
+            QPointer <RoomObject> o = envobjects[VirtualMenuIndex_BOOKMARKS][selected];
+            if (o) {
+                menu_index = VirtualMenuIndex_MAIN;
+                do_create_portal = true;
+                create_portal_url = o->GetProperties()->GetURL();
+                create_portal_thumb = o->GetAssetImage() ? o->GetAssetImage()->GetURL().toString() : "";
+            }
+        }
+        break;
+    case VirtualMenuIndex_SOCIAL:
+        if (selected == "__socialup") {
+            if (cur_user+16 < num_users) {
+                cur_user += 16;
+                ConstructSubmenus();
+            }
+        }
+        else if (selected == "__socialdown") {
+            menu_index = VirtualMenuIndex_BOOKMARKS;
+            if (cur_user>0) {
+                cur_user -= 16;
+                ConstructSubmenus();
+            }
+        }
+        else {
+            QPointer <RoomObject> o = envobjects[VirtualMenuIndex_SOCIAL][selected];
+            if (o) {
+                menu_index = VirtualMenuIndex_MAIN;
+                do_create_portal = true;
+                create_portal_url = o->GetProperties()->GetURL();
+                create_portal_thumb = o->GetAssetImage() ? o->GetAssetImage()->GetURL().toString() : "";
+            }
+        }
+        break;
+    default:
+        break;
+    }
 }
 
 void VirtualMenu::SetModelMatrix(const QMatrix4x4 m)
