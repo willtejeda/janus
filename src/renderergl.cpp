@@ -34,7 +34,7 @@ void RendererGL::Initialize()
     m_name = QString((char *)(m_gl_funcs->glGetString(GL_VERSION)));
 
     // Store minor/major GL version used
-    const QStringList s = m_name.split(".");
+    const QStringList s = m_name.left(m_name.indexOf(" ")).split(".");
     if (s.size() >= 2) {
         m_major_version = s[0].toInt();
         m_minor_version = s[1].toInt();
