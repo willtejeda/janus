@@ -720,6 +720,7 @@ void Geom::Load()
         | aiProcess_JoinIdenticalVertices
         | aiProcess_SplitLargeMeshes
         | aiProcess_ValidateDataStructure
+            //62.3 - enabling some of these messes up our FBX support
 //        | aiProcess_OptimizeGraph // SLOW
         //| aiProcess_OptimizeMeshes // SLOW
 //        | aiProcess_RemoveRedundantMaterials // SLOW
@@ -804,7 +805,8 @@ void Geom::Update()
 //            qDebug() << "Geom::Update()" << path << mat_names[i] << i << mat.textures.size();
             for (int j=0; j<mat.textures.size(); ++j) {
                 QString s = mat.textures[j].filename.trimmed();
-                s = s.replace("\%5C", "/");
+                s = s.replace("\\", "/");
+                s = s.replace("%5C", "/");
 
                 // Search embedded textures for a filename match
                 QString s3(mat.textures[j].filename_unresolved);
@@ -1956,7 +1958,6 @@ void Geom::CalculateFinalPoses()
     }
 
     //on first pass, set up node hierarchy and node indexes for whole scene
-    bool first = true;
     while (nodes_to_process.size() != 0)
     {
         aiNode * nd = nodes_to_process.back();
@@ -1985,22 +1986,22 @@ void Geom::CalculateFinalPoses()
             bool xform_anim = false;
             if (geom->anims.contains(node_name+"_$assimpfbx$_translation"))
             {
-                DoLocalTransformation(geom->anims[node_name+"_$assimpfbx$_translation"], nodeTransform, first);
+                DoLocalTransformation(geom->anims[node_name+"_$assimpfbx$_translation"], nodeTransform, false);
                 xform_anim = true;
             }
             if (geom->anims.contains(node_name+"_$assimpfbx$_prerotation"))
             {
-                DoLocalTransformation(geom->anims[node_name+"_$assimpfbx$_prerotation"], nodeTransform, first);
+                DoLocalTransformation(geom->anims[node_name+"_$assimpfbx$_prerotation"], nodeTransform, false);
                 xform_anim = true;
             }
             if (geom->anims.contains(node_name+"_$assimpfbx$_rotation"))
             {
-                DoLocalTransformation(geom->anims[node_name+"_$assimpfbx$_rotation"], nodeTransform, first);
+                DoLocalTransformation(geom->anims[node_name+"_$assimpfbx$_rotation"], nodeTransform, false);
                 xform_anim = true;
             }
             if (geom->anims.contains(node_name))
             {               
-                DoLocalTransformation(geom->anims[node_name], nodeTransform, first);
+                DoLocalTransformation(geom->anims[node_name], nodeTransform, false);
                 xform_anim = true;
             }
 
@@ -2009,12 +2010,6 @@ void Geom::CalculateFinalPoses()
             }
 
             globalTransform = parentTransform * nodeTransform;           
-
-#ifdef WIN32
-            if (first) {
-                first = false;
-            }
-#endif
 
             if (extra_global_transforms.contains(bone_id))
             {
@@ -2034,11 +2029,10 @@ void Geom::CalculateFinalPoses()
             }
 
             QMatrix4x4 m = git * globalTransform;
-//#ifdef WIN32
+
             QVector4D c = m.column(3);
             c.setW(1.0f);
             m.setColumn(3, c);
-//#endif
 
             final_poses[bone_to_boneid[node_name]] = m;
             skin_joints[bone_to_boneid[node_name]] = m * bone_offset_matrix[node_name];
