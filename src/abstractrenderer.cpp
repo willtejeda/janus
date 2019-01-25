@@ -1033,7 +1033,8 @@ void AbstractRenderer::InitializeState()
     MathUtil::glFuncs->glDepthMask(GL_TRUE);
     m_depth_func = DepthFunc::LEQUAL;
     m_current_depth_func = m_depth_func;
-    MathUtil::glFuncs->glClearDepth(1.0);
+
+    MathUtil::glFuncs->glClearDepthf(1.0f);
     MathUtil::glFuncs->glDepthFunc(GL_LEQUAL);
 
     // Custom clip planes
@@ -1066,12 +1067,8 @@ void AbstractRenderer::InitializeState()
     MathUtil::glFuncs->glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     m_color_mask = ColorMask::COLOR_WRITES_ENABLED;
     m_current_color_mask = m_color_mask;
-    MathUtil::glFuncs->glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-    m_poly_mode = PolyMode::FILL;
-    m_current_poly_mode = m_poly_mode;
-#ifndef __ANDROID__
-    MathUtil::glFuncs->glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-#endif
+    MathUtil::glFuncs->glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);    
+
     MathUtil::glFuncs->glEnable(GL_CULL_FACE);
     m_face_cull_mode = FaceCullMode::BACK;
     m_current_face_cull_mode = m_face_cull_mode;
@@ -1365,25 +1362,6 @@ StencilOp AbstractRenderer::GetStencilOp() const
     return m_stencil_op;
 }
 
-void AbstractRenderer::SetPolyMode(PolyMode p_poly_mode)
-{
-    m_poly_mode = p_poly_mode;
-
-    if (m_current_poly_mode != m_poly_mode && m_update_GPU_state)
-    {
-#ifndef __ANDROID__
-        MathUtil::glFuncs->glPolygonMode(GL_FRONT_AND_BACK,
-                                         static_cast<GLenum>(m_poly_mode));
-        m_current_poly_mode = m_poly_mode;
-#endif
-    }
-}
-
-PolyMode AbstractRenderer::GetPolyMode() const
-{
-    return m_poly_mode;
-}
-
 void AbstractRenderer::SetColorMask(ColorMask p_color_mask)
 {
     m_color_mask = p_color_mask;
@@ -1462,9 +1440,6 @@ void AbstractRenderer::GenerateEnvMapsFromCubemapTextureHandle(Cubemaps& p_cubem
     for (int face_index = 0; face_index < 6; ++face_index)
     {
         // Load face data into memory via glReadPixels
-#ifndef __ANDROID__
-        MathUtil::glFuncs->glGetTexImage(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face_index, target_mip_level, (gl_tex_red_size == 8) ? GL_BGR : GL_RGBA, (gl_tex_red_size == 8) ? GL_UNSIGNED_BYTE : GL_HALF_FLOAT, pixel_data.data());
-#else
         GLint draw_fbo = 0;
         GLint read_fbo = 0;
         GLuint dummy_fbo = 0;
@@ -1482,7 +1457,6 @@ void AbstractRenderer::GenerateEnvMapsFromCubemapTextureHandle(Cubemaps& p_cubem
         MathUtil::glFuncs->glBindFramebuffer(GL_READ_FRAMEBUFFER, read_fbo);
 
         MathUtil::glFuncs->glDeleteFramebuffers(1, &dummy_fbo);
-#endif
 
         // Create and save gli based dds file into memory
         memcpy(texture2d.data(0, 0, 0), pixel_data.data(), pixel_data.size());
@@ -1491,256 +1465,6 @@ void AbstractRenderer::GenerateEnvMapsFromCubemapTextureHandle(Cubemaps& p_cubem
 
     p_cubemaps.m_channel_size = gl_tex_red_size;
 
-}
-
-void AbstractRenderer::RenderObjectsStereoViewportInstanced(const RENDERER::RENDER_SCOPE p_scope,
-                                                            const QVector<AbstractRenderCommand> &p_object_render_commands,
-                                                            const QHash<StencilReferenceValue, LightContainer> &p_scoped_light_containers)
-{
-#ifndef __ANDROID__
-    const int camera_count_this_scope = m_per_frame_scoped_cameras_view_matrix[static_cast<int>(p_scope)].size();
-
-    QVector<float> viewports;
-    viewports.reserve(camera_count_this_scope * 4);
-
-    QVector4D viewport;
-    for (int camera_index = 0; camera_index < camera_count_this_scope; camera_index++)
-    {
-        VirtualCamera& camera = m_scoped_cameras_cache[m_rendering_index][static_cast<int>(p_scope)][camera_index];
-        viewport = camera.GetViewport();
-        viewports.push_back(viewport.x());
-        viewports.push_back(viewport.y());
-        viewports.push_back(viewport.z());
-        viewports.push_back(viewport.w());
-    }
-
-    const int cmd_array_limit = p_object_render_commands.size();
-    const int cmd_count = cmd_array_limit;
-    const float viewport_count_float = camera_count_this_scope;
-    const float viewport_count = camera_count_this_scope;
-
-    float encompassing_viewport[4] = { 0.0, 0.0, 0.0, 0.0};
-    for (int viewport_index = 0; viewport_index < viewport_count; ++ viewport_index)
-    {
-        encompassing_viewport[0] = (viewports[viewport_index * 4 + 0] < encompassing_viewport[0]) ? viewports[viewport_index * 4 + 0] : encompassing_viewport[0];
-        encompassing_viewport[1] = (viewports[viewport_index * 4 + 1] < encompassing_viewport[1]) ? viewports[viewport_index * 4 + 1] : encompassing_viewport[1];
-        encompassing_viewport[2] = (viewports[viewport_index * 4 + 2] > encompassing_viewport[2]) ? viewports[viewport_index * 4 + 2] : encompassing_viewport[2];
-        encompassing_viewport[3] = (viewports[viewport_index * 4 + 3] > encompassing_viewport[3]) ? viewports[viewport_index * 4 + 3] : encompassing_viewport[3];
-    }
-
-    if (p_scope == RENDERER::RENDER_SCOPE::CURRENT_ROOM_SKYBOX)
-    {
-        if (camera_count_this_scope == 0)
-        {
-            MathUtil::glFuncs->glViewport(0, 0, m_window_width, m_window_height);
-        }
-        else
-        {
-            MathUtil::glFuncs->glViewport(encompassing_viewport[0], encompassing_viewport[1], encompassing_viewport[2], encompassing_viewport[3]);
-        }
-        m_update_GPU_state = true;
-        SetDepthMask(DepthMask::DEPTH_WRITES_ENABLED);
-        SetColorMask(ColorMask::COLOR_WRITES_ENABLED);
-        MathUtil::glFuncs->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); //clear
-        m_update_GPU_state = false;
-    }
-
-    if (camera_count_this_scope == 0)
-    {
-        return;
-    }
-
-    StencilReferenceValue current_stencil_ref = -1;
-
-    bool is_left_eye = true;
-    GLuint current_programID = 0;
-    ProgramHandle* current_program_handle = nullptr;
-
-    QVector<GLfloat> default_color;
-    default_color.resize(4);
-    default_color[0] = 1.0f;
-    default_color[1] = 1.0f;
-    default_color[2] = 1.0f;
-    default_color[3] = 1.0f;
-    QVector<GLfloat> default_normal;
-    default_normal.resize(4);
-    default_normal[0] = 0.0f;
-    default_normal[1] = 0.0f;
-    default_normal[2] = 0.0f;
-    default_normal[3] = 0.0f;
-    AssetShader_Frame const * current_frame_uniforms = nullptr;
-    AssetShader_Room const * current_room_uniforms = nullptr;
-    AssetShader_Material const * current_material_uniforms = nullptr;
-    AssetShader_Object const * current_object_uniforms = nullptr;
-
-    m_update_GPU_state = true;
-
-    m_active_texture_slot_render = 0;
-    MathUtil::glFuncs->glActiveTexture(GL_TEXTURE0);
-
-    float base_viewport = 0.0f;
-    float current_base_viewport = 0.0f;
-
-    // If we have at least one command to draw in this scope
-    if (cmd_count != 0)
-    {
-        // For each command in this scope
-        int cmd_stride = 0;
-        for (int cmd_index = 0; cmd_index < cmd_count;)
-        {
-            cmd_stride = camera_count_this_scope;
-            MathUtil::glFuncs->glViewportArrayv(0, camera_count_this_scope, viewports.data());
-
-            AbstractRenderCommand const & current_render_command = p_object_render_commands[cmd_index];
-
-            // Change face culling state if necessary,
-            // SetFaceCullMode() will only change state if needed so we call it either way.
-            //FaceCullMode face_cull_mode = current_render_command.GetFaceCullMode();
-            SetFaceCullMode(current_render_command.m_active_face_cull_mode);
-
-            // Push polymode if necessary,
-            // SetPolyMode() will only change state if needed so we call it either way.
-            //PolyMode poly_mode = current_render_command.GetPolyMode();
-            SetPolyMode(current_render_command.m_poly_mode);
-
-            // Push depth state if necessary,
-            // SetDepthFunc() and SetDepthMask() will only change state if needed so we call it either way.
-            //DepthFunc depth_func = current_render_command.GetDepthFunc();
-            SetDepthFunc(current_render_command.m_depth_func);
-            //DepthMask depth_mask = current_render_command.GetDepthMask();
-            SetDepthMask(current_render_command.m_depth_mask);
-
-            // Push color mask state if necessary,
-            // SetColorMask() will only change state if needed so we call it either way.
-            //ColorMask color_mask = current_render_command.GetColorMask();
-            SetColorMask(current_render_command.m_color_mask);
-
-            // Push stencil test state if necessary,
-            // SetStencilFunc() will only change state if needed so we call it either way.
-            //StencilFunc stencil_func = current_render_command.GetStencilFunc();
-            StencilReferenceValue stencil_ref = current_render_command.m_stencil_func.m_ref_value;
-            SetStencilFunc(current_render_command.m_stencil_func);
-            //StencilOp stencil_op = current_render_command.GetStencilOp();
-            SetStencilOp(current_render_command.m_stencil_op);
-
-            // Bind new shader if necessary
-            bool shader_changed = false;
-            ProgramHandle* program_handle = current_render_command.m_shader;
-            if (program_handle != nullptr) // Skip when an invalid program ID is passed
-            {
-                if (current_program_handle == nullptr || program_handle != current_program_handle)
-                {
-                    GLuint programID = GetProgramHandleID(program_handle);
-                    MathUtil::glFuncs->glUseProgram(programID);
-                    current_programID = programID;
-                    current_program_handle = program_handle;
-                    shader_changed = true;
-                }
-
-                // Special case for textures that vary per-viewport
-                base_viewport = cmd_index % camera_count_this_scope;
-                is_left_eye = m_per_frame_scoped_cameras_is_left_eye[static_cast<int>(p_scope)][base_viewport];
-                bool is3DTexture = current_render_command.m_texture_set.GetIs3DTexture();
-
-                // Push new frame uniforms if necessary
-                AssetShader_Frame const * frame_uniforms = current_render_command.GetFrameUniformsPointer();
-				if (frame_uniforms != nullptr 
-					&& (current_frame_uniforms == nullptr 
-					|| *frame_uniforms != *current_frame_uniforms
-					|| shader_changed == true
-					|| current_base_viewport != base_viewport)
-					)
-                {
-                    ((AssetShader_Frame *)frame_uniforms)->iViewportCount = QVector4D(viewport_count_float, base_viewport, 0.0f, 0.0f);
-                    UpdateFrameUniforms(current_programID, frame_uniforms);
-                    current_frame_uniforms = frame_uniforms;
-                    current_base_viewport = base_viewport;
-                }
-
-                // Push new room uniforms if necessary
-                AssetShader_Room const * room_uniforms = current_render_command.GetRoomUniformsPointer();
-                if(current_room_uniforms == nullptr || *room_uniforms != *current_room_uniforms || shader_changed == true)
-                {
-                    UpdateRoomUniforms(current_programID, room_uniforms);
-                    current_room_uniforms = room_uniforms;
-                }
-
-                // Push new light data if necessary
-                if (current_stencil_ref != stencil_ref)
-                {
-                    current_stencil_ref = stencil_ref;
-                    QHash<StencilReferenceValue, LightContainer>::const_iterator itr = p_scoped_light_containers.find(current_stencil_ref);
-                    if (itr != p_scoped_light_containers.end())
-                    {
-                        //p_main_thread_renderer->PushNewLightData(&(itr->second));
-                        PushNewLightData(&(itr.value()));
-                    }
-                    else
-                    {
-                        PushNewLightData(&m_empty_light_container);
-                    }
-                }
-
-                // Push new object uniforms if necessary
-                AssetShader_Object const * object_uniforms = current_render_command.GetObjectUniformsPointer();
-                if (current_object_uniforms == nullptr || *object_uniforms != *current_object_uniforms || shader_changed == true)
-                {
-                    UpdateObjectUniforms(current_programID, object_uniforms);
-                    current_object_uniforms = object_uniforms;
-                }
-
-                // Push new material uniforms if necessary
-                AssetShader_Material const * material_uniforms = current_render_command.GetMaterialUniformsPointer();
-                if (current_material_uniforms == nullptr || *material_uniforms != *current_material_uniforms || shader_changed == true)
-                {
-                    UpdateMaterialUniforms(current_programID, material_uniforms);
-                    current_material_uniforms = material_uniforms;
-                }
-
-                // Push texture state if necessary
-                for (uint32_t texture_slot = 0; texture_slot < ASSETSHADER_NUM_COMBINED_TEXURES; ++texture_slot)
-                {
-                    TextureHandle * texture_handle_ref = current_render_command.m_texture_set.GetTextureHandleRef(texture_slot, is_left_eye);
-                    if (!texture_handle_ref || (texture_handle_ref->m_UUID.m_in_use_flag == 0))
-                    {
-                        continue;
-                    }
-
-                    BindTextureHandleRef(&(m_texture_handle_to_GL_ID), texture_slot, texture_handle_ref);
-                }
-
-                // Render object
-                GLenum current_mode = static_cast<GLenum>(current_render_command.GetPrimitiveType());
-                GLuint current_primitive_count = current_render_command.GetPrimitiveCount();
-                GLuint instance_count = (is3DTexture) ? 1 : camera_count_this_scope * current_render_command.GetInstanceCount();
-                //GLuint instance_count = (is3DTexture) ? 1 : camera_count_this_scope;
-                cmd_stride = instance_count;
-                if (current_primitive_count != 0)
-                {
-                    auto current_mesh_handle = current_render_command.m_mesh_handle;
-                    if (current_mesh_handle != nullptr)
-                    {
-                        BindMeshHandle(current_mesh_handle);
-                        if (current_mesh_handle->m_UUID.m_has_INDICES == 1)
-                        {
-                            MathUtil::glFuncs->glDrawElementsInstanced(current_mode, current_primitive_count, GL_UNSIGNED_INT, 0, instance_count);
-                        }
-                        else
-                        {
-                            MathUtil::glFuncs->glDrawArraysInstanced(current_mode, 0, current_primitive_count, instance_count);
-                        }
-                        // Vertex atrributes that are disabled during a draw by a VAO bind annoyingly need their value refreshed
-                        // as they default to undefined every time they are disabled.
-                        MathUtil::glFuncs->glVertexAttrib4fv((uint32_t)VAO_ATTRIB::COLOR, default_color.data());
-                        MathUtil::glFuncs->glVertexAttrib4fv((uint32_t)VAO_ATTRIB::NORMAL, default_normal.data());
-                    }
-                }
-            }
-            cmd_index += cmd_stride;
-        }
-    }
-    m_update_GPU_state = false;
-#endif
 }
 
 void AbstractRenderer::RenderObjectsNaive(RENDERER::RENDER_SCOPE const , QVector<AbstractRenderCommand> const & , QHash<StencilReferenceValue, LightContainer> const & )
@@ -1803,10 +1527,6 @@ void AbstractRenderer::RenderObjectsNaive(RENDERER::RENDER_SCOPE const , QVector
             // Push face culling state
             FaceCullMode current_face_cull_mode = current_render_command.GetFaceCullMode();
             SetFaceCullMode(current_face_cull_mode);
-
-            // Push polymode
-            PolyMode current_poly_mode = current_render_command.GetPolyMode();
-            SetPolyMode(current_poly_mode);
 
             // Push depth test state
             DepthFunc current_depth_func = current_render_command.GetDepthFunc();
@@ -1912,11 +1632,6 @@ void AbstractRenderer::RenderObjectsNaive(RENDERER::RENDER_SCOPE const , QVector
                 // SetFaceCullMode() will only change state if needed so we call it either way.
                 FaceCullMode face_cull_mode = current_render_command.GetFaceCullMode();
                 SetFaceCullMode(face_cull_mode);
-
-                // Push polymode if necessary,
-                // SetPolyMode() will only change state if needed so we call it either way.
-                PolyMode poly_mode = current_render_command.GetPolyMode();
-                SetPolyMode(poly_mode);
 
                 // Push depth state if necessary,
                 // SetDepthFunc() and SetDepthMask() will only change state if needed so we call it either way.
@@ -2182,11 +1897,6 @@ void AbstractRenderer::RenderObjectsNaiveDecoupled(const RENDERER::RENDER_SCOPE 
                 FaceCullMode face_cull_mode = current_render_command.GetFaceCullMode();
                 SetFaceCullMode(face_cull_mode);
 
-                // Push polymode if necessary,
-                // SetPolyMode() will only change state if needed so we call it either way.
-                PolyMode poly_mode = current_render_command.GetPolyMode();
-                SetPolyMode(poly_mode);
-
                 // Push depth state if necessary,
                 // SetDepthFunc() and SetDepthMask() will only change state if needed so we call it either way.
                 DepthFunc depth_func = current_render_command.GetDepthFunc();
@@ -2335,25 +2045,6 @@ GLuint AbstractRenderer::InitGLVertexAttribBuffer(GLenum p_dataType, GLboolean p
     return ID;
 }
 
-#if !defined(__APPLE__) && !defined(__ANDROID__)
-void AbstractRenderer::initPersistentlyMappedGLBuffer(GLsizeiptr* p_bufferPtr, GLuint* p_bufferID
-                                                            , GLsizeiptr* p_alignedChunkSizeInBytes, GLuint p_bufferIndex
-                                                            , GLsizeiptr p_chunkSizeInBytes, GLuint p_chunkCount
-                                                            , GLenum p_bufferType)
-{
-    MathUtil::glFuncs->glGenBuffers(1, p_bufferID);
-    MathUtil::glFuncs->glBindBuffer(p_bufferType, *p_bufferID);
-    MathUtil::glFuncs->glBindBufferBase(p_bufferType, p_bufferIndex, *p_bufferID);
-    GLint bufferAlignment;
-    MathUtil::glFuncs->glGetIntegerv(GL_MIN_MAP_BUFFER_ALIGNMENT, &bufferAlignment);
-    if (bufferAlignment < 16) bufferAlignment = 16;
-    *p_alignedChunkSizeInBytes = static_cast<GLsizeiptr>(std::ceil((double)p_chunkSizeInBytes / (double)bufferAlignment) * bufferAlignment);
-    GLsizeiptr totalBufferSize = *p_alignedChunkSizeInBytes * p_chunkCount;
-    MathUtil::glFuncs->glBufferStorage(p_bufferType, totalBufferSize, 0, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
-    *p_bufferPtr = (GLsizeiptr)MathUtil::glFuncs->glMapBufferRange(p_bufferType, 0, totalBufferSize,  GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
-}
-#endif
-
 void AbstractRenderer::CopyDataBetweenBuffers(GLuint p_src, GLuint p_dst, GLsizeiptr p_size, GLintptr p_srcOffset, GLintptr p_dstOffset)
 {
     if (p_size > 0)
@@ -2382,43 +2073,6 @@ void AbstractRenderer::CreateShadowFBO(GLuint p_FBO, QVector<GLuint> p_texture_i
     Q_UNUSED(p_texture_ids);
 }
 
-#if !defined(__APPLE__) && !defined(__ANDROID__)
-void AbstractRenderer::CreateMatrixSSBO(int p_ssbo_size, GLuint* p_ssbo_handle, GLintptr& p_ssbo_GPU_ptr, int* p_aligned_size)
-{
-    // Create the ssbo handle
-    MathUtil::glFuncs->glGenBuffers(1, p_ssbo_handle);
-
-    // Bind the handle to the correct target
-    MathUtil::glFuncs->glBindBuffer(GL_SHADER_STORAGE_BUFFER, *p_ssbo_handle);
-
-    // Bind the live portion of the buffer as accessable for the GPU
-    MathUtil::glFuncs->glBindBufferRange(GL_SHADER_STORAGE_BUFFER, 2, *p_ssbo_handle, 0, p_ssbo_size);
-
-    // Flags for persistent buffer mapping to avoid any further glMap* calls
-    const GLbitfield mapFlags = GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT;
-    const GLbitfield createFlags = mapFlags | GL_DYNAMIC_STORAGE_BIT;
-
-    // Ensure alignement is at least SSE2 friendly
-    GLint bufferAlignment;
-    MathUtil::glFuncs->glGetIntegerv(GL_MIN_MAP_BUFFER_ALIGNMENT, &bufferAlignment);
-    if (bufferAlignment < 16)
-    {
-        bufferAlignment = 16; // Minimum alignment of 16 bytes to allow for future SSE2 use.
-    }
-
-    // Compute the size needed for one chink of triple buffered SSBO with each chunk aligned as expected
-    *p_aligned_size = static_cast<int>(ceil((double)p_ssbo_size / (double)bufferAlignment) * bufferAlignment); // This is to ensure that the buffer is aligned correctly
-
-    // Allocate enough immutable GPU storage for 3 aligned chunks
-    MathUtil::glFuncs->glBufferStorage(GL_SHADER_STORAGE_BUFFER, *p_aligned_size * 3, 0, createFlags);
-
-    // Get a CPU addressable pointer to the GPU buffer so we can directly memcpy the data to the GPU.
-    // Because of the flags used this will be a persistent pointer that remains valid even while the buffer is bound for GPU reading
-    // as opposed to the normal glMap behaviour that causes pointers to become invalid when the buffer is bound.
-    p_ssbo_GPU_ptr = (GLintptr)MathUtil::glFuncs->glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, *p_aligned_size * 3, mapFlags);
-}
-#endif
-
 void AbstractRenderer::WaitforFrameSyncObject()
 {
     GLuint frame_index = m_frame_counter % BUFFER_CHUNK_COUNT;
@@ -2442,48 +2096,10 @@ void AbstractRenderer::LockFrameSyncObject()
 
 void AbstractRenderer::StartFrame()
 {
-    GLuint frame_index = m_frame_counter % BUFFER_CHUNK_COUNT;
-#ifndef __ANDROID__
-    MathUtil::glFuncs->glBeginQuery(GL_TIME_ELAPSED, m_GPUTimeQuery[frame_index]);
-#endif
 }
 
 void AbstractRenderer::EndFrame()
 {
-#ifndef __ANDROID__
-    MathUtil::glFuncs->glEndQuery(GL_TIME_ELAPSED);
-#endif
-
-    // Read frames back BUFFER_CHUNK_COUNT frames late to ensure the timer
-    // queries are complete and wont stall the thread.
-    if (m_frame_counter >= (BUFFER_CHUNK_COUNT-1))
-    {
-        GLuint frame_index = m_frame_counter - (BUFFER_CHUNK_COUNT-1);
-        GLuint query_index = frame_index % BUFFER_CHUNK_COUNT;
-        GLuint results_index = frame_index % m_GPUTimeQueryResults.size();
-#ifdef __ANDROID__
-        GLuint available = GL_TRUE; // 0
-        //MathUtil::glFuncs->glGetQueryObjectuiv(m_GPUTimeQuery[query_index], GL_QUERY_RESULT_AVAILABLE, &available);
-#else
-        GLint available = 0;
-        MathUtil::glFuncs->glGetQueryObjectiv(m_GPUTimeQuery[query_index], GL_QUERY_RESULT_AVAILABLE, &available);
-#endif
-
-        if (available == GL_TRUE)
-        {
-#ifdef __ANDROID__
-            //GLuint query_result;
-            //MathUtil::glFuncs->glGetQueryObjectuiv(m_GPUTimeQuery[query_index], GL_QUERY_RESULT, &query_result);
-            m_GPUTimeQueryResults[results_index] = (uint64_t) 0; //query_result
-#else
-            MathUtil::glFuncs->glGetQueryObjectui64v(m_GPUTimeQuery[query_index], GL_QUERY_RESULT_NO_WAIT, &m_GPUTimeQueryResults[results_index]);
-#endif
-        }
-    }
-    GLuint cpu_results_index = m_frame_counter % m_GPUTimeQueryResults.size();
-    m_CPUTimeQueryResults[cpu_results_index] = m_frame_time_timer.nsecsElapsed();
-    m_frame_time_timer.restart();
-    m_frame_counter++;
 }
 
 int64_t AbstractRenderer::GetFrameCounter()
@@ -2565,11 +2181,7 @@ std::shared_ptr<ProgramHandle> AbstractRenderer::CompileAndLinkShaderProgram(QBy
 #endif
     {
         UpgradeShaderSource(*p_vertex_shader, true);
-#ifdef __ANDROID__
         const char * shader_data = p_vertex_shader->data();
-#else
-        GLchar * shader_data = p_vertex_shader->data();
-#endif
         GLint shader_data_size = p_vertex_shader->size();
         MathUtil::glFuncs->glShaderSource(vertex_shader_id, 1, &shader_data, &shader_data_size);
         MathUtil::glFuncs->glCompileShader(vertex_shader_id);
@@ -2594,11 +2206,7 @@ std::shared_ptr<ProgramHandle> AbstractRenderer::CompileAndLinkShaderProgram(QBy
         default_object_vertex_shader_file.close();
 
         UpgradeShaderSource(default_object_vertex_shader_bytes, true);
-#ifdef __ANDROID__
         const char * shader_data = default_object_vertex_shader_bytes.data();
-#else
-        GLchar * shader_data = default_object_vertex_shader_bytes.data();
-#endif
         GLint shader_data_size = default_object_vertex_shader_bytes.size();
         MathUtil::glFuncs->glShaderSource(vertex_shader_id, 1, &shader_data, &shader_data_size);
         MathUtil::glFuncs->glCompileShader(vertex_shader_id);
@@ -2622,11 +2230,7 @@ std::shared_ptr<ProgramHandle> AbstractRenderer::CompileAndLinkShaderProgram(QBy
 #endif
     {
         UpgradeShaderSource(*p_fragment_shader, false);
-#ifdef __ANDROID__
         const char * shader_data = p_fragment_shader->data();
-#else
-        GLchar * shader_data = p_fragment_shader->data();
-#endif
         GLint shader_data_size = p_fragment_shader->size();
         MathUtil::glFuncs->glShaderSource(fragment_shader_id, 1, &shader_data, &shader_data_size);
         MathUtil::glFuncs->glCompileShader(fragment_shader_id);
@@ -2651,11 +2255,7 @@ std::shared_ptr<ProgramHandle> AbstractRenderer::CompileAndLinkShaderProgram(QBy
         default_object_fragment_shader_file.close();
 
         UpgradeShaderSource(default_object_fragment_shader_bytes, false);
-#ifdef __ANDROID__
         const char * shader_data = default_object_fragment_shader_bytes.data();
-#else
-        GLchar * shader_data = default_object_fragment_shader_bytes.data();
-#endif
         GLint shader_data_size = default_object_fragment_shader_bytes.size();
         MathUtil::glFuncs->glShaderSource(fragment_shader_id, 1, &shader_data, &shader_data_size);
         MathUtil::glFuncs->glCompileShader(fragment_shader_id);
@@ -4052,21 +3652,6 @@ std::shared_ptr<TextureHandle> AbstractRenderer::CreateTextureFromGLIData(const 
     MathUtil::glFuncs->glTexParameteri(targetType, GL_TEXTURE_SWIZZLE_A, Format.Swizzles[3]);
 
     // Allocate Data
-#ifndef __ANDROID__
-    if (targetType == GL_TEXTURE_CUBE_MAP)
-    {
-        MathUtil::glFuncs->glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, internal_format, Extent.x, Extent.y, 0, static_cast<GLenum>(Format.External), static_cast<GLenum>(Format.Type), 0);
-        MathUtil::glFuncs->glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, internal_format, Extent.x, Extent.y, 0, static_cast<GLenum>(Format.External), static_cast<GLenum>(Format.Type), 0);
-        MathUtil::glFuncs->glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, internal_format, Extent.x, Extent.y, 0, static_cast<GLenum>(Format.External), static_cast<GLenum>(Format.Type), 0);
-        MathUtil::glFuncs->glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, internal_format, Extent.x, Extent.y, 0, static_cast<GLenum>(Format.External), static_cast<GLenum>(Format.Type), 0);
-        MathUtil::glFuncs->glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, internal_format, Extent.x, Extent.y, 0, static_cast<GLenum>(Format.External), static_cast<GLenum>(Format.Type), 0);
-        MathUtil::glFuncs->glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, internal_format, Extent.x, Extent.y, 0, static_cast<GLenum>(Format.External), static_cast<GLenum>(Format.Type), 0);
-    }
-    else
-    {
-        MathUtil::glFuncs->glTexImage2D(targetType, 0, internal_format, Extent.x, Extent.y, 0, static_cast<GLenum>(Format.External), static_cast<GLenum>(Format.Type), 0);
-    }
-#else
     if (targetType == GL_TEXTURE_CUBE_MAP)
     {
         MathUtil::glFuncs->glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, static_cast<GLenum>(Format.Internal), Extent.x, Extent.y, 0, static_cast<GLenum>(Format.External), static_cast<GLenum>(Format.Type), 0);
@@ -4080,7 +3665,6 @@ std::shared_ptr<TextureHandle> AbstractRenderer::CreateTextureFromGLIData(const 
     {
         MathUtil::glFuncs->glTexImage2D(targetType, 0, static_cast<GLenum>(Format.Internal), Extent.x, Extent.y, 0, static_cast<GLenum>(Format.External), static_cast<GLenum>(Format.Type), 0);
     }
-#endif
 
     if (tex_mipmap)
     {
@@ -4524,55 +4108,6 @@ void AbstractRenderer::GenerateTextureHandleMipMap(TextureHandle* p_handle)
     MathUtil::glFuncs->glGenerateMipmap(target);
 }
 
-void AbstractRenderer::CopyTextureHandleDataToTextureHandle(TextureHandle* p_src_handle, const int32_t p_src_level, const int32_t p_src_x, const int32_t p_src_y, const int32_t p_src_z, TextureHandle* p_dst_handle, const int32_t p_dst_level, const int32_t p_dst_x, const int32_t p_dst_y, const int32_t p_dst_z, const int32_t p_src_width, const int32_t p_src_height, const int32_t p_src_depth)
-{
-    if (!p_src_handle || !p_dst_handle)
-    {
-        return;
-    }
-
-    GLuint src_id = 0;
-    GLenum src_target = 0;
-    GLuint dst_id = 0;
-    GLenum dst_target = 0;
-    bool found_src = false;
-    bool found_dst = false;
-    TextureHandle * p_src_pointer = p_src_handle;
-    TextureHandle * p_dst_pointer = p_dst_handle;
-    TextureHandle * itr_pointer = nullptr;
-
-    const int tex_count = m_texture_handle_to_GL_ID.size();
-    for (int itr = 0; itr < tex_count; ++itr)
-    {
-        QPair<TextureHandle*, GLuint>& pair_ref = m_texture_handle_to_GL_ID[itr];
-        itr_pointer = pair_ref.first;
-
-        if (itr_pointer->m_UUID.m_UUID == p_src_pointer->m_UUID.m_UUID)
-        {
-            src_id = pair_ref.second;
-            src_target = static_cast<GLenum>(pair_ref.first->GetTextureType() == TextureHandle::TEXTURE_2D ? GL_TEXTURE_2D : GL_TEXTURE_CUBE_MAP);
-            found_src = true;
-        }
-
-        if (itr_pointer->m_UUID.m_UUID == p_dst_pointer->m_UUID.m_UUID)
-        {
-            dst_id = pair_ref.second;
-            dst_target = static_cast<GLenum>(pair_ref.first->GetTextureType() == TextureHandle::TEXTURE_2D ? GL_TEXTURE_2D : GL_TEXTURE_CUBE_MAP);
-            found_dst = true;
-        }
-    }
-
-    if (found_src && found_dst)
-    {
-#ifndef __ANDROID__
-        // This is GL 4.3+, GL33Renderer will need to override this method with a FBO blitting based approach
-        MathUtil::glFuncs->glCopyImageSubData(src_id, src_target, p_src_level, p_src_x, p_src_y, p_src_z,
-                                              dst_id, dst_target, p_dst_level, p_dst_x, p_dst_y, p_dst_z,
-                                              p_src_width, p_src_height, p_src_depth);
-#endif
-    }
-}
-
 void AbstractRenderer::CopyReadBufferToTextureHandle(QVector<QPair<TextureHandle *, GLuint>> * const , TextureHandle* p_handle, uint32_t p_target, int32_t p_level, int32_t p_dst_x, int32_t p_dst_y, int32_t p_src_x, int32_t p_src_y, int32_t p_src_width, int32_t p_src_height)
 {
     if (p_handle) {
@@ -4875,11 +4410,7 @@ void AbstractRenderer::UpdateFramebuffer()
             MathUtil::glFuncs->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, static_cast<GLint>(GL_CLAMP_TO_EDGE));
             if (texture_type == GL_TEXTURE_2D_MULTISAMPLE)
             {
-#ifndef __ANDROID__
-                MathUtil::glFuncs->glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, m_msaa_count, GL_RGBA8, m_window_width, m_window_height, GL_TRUE);
-#else
                 MathUtil::glFuncs->glTexStorage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, m_msaa_count, GL_RGBA8, m_window_width, m_window_height, GL_TRUE);
-#endif
             }
             else
             {
@@ -4935,15 +4466,11 @@ void AbstractRenderer::UpdateFramebuffer()
 				m_depth_func = DepthFunc::LEQUAL;
 				MathUtil::glFuncs->glDepthFunc(GL_GEQUAL);
                 m_current_depth_func = DepthFunc::GEQUAL;
-                MathUtil::glFuncs->glClearDepth(0.0);
+                MathUtil::glFuncs->glClearDepthf(0.0);
 				
 				if (texture_type == GL_TEXTURE_2D_MULTISAMPLE)
                 {
-#ifndef __ANDROID__
-                MathUtil::glFuncs->glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, m_msaa_count, GL_DEPTH32F_STENCIL8, m_window_width, m_window_height, GL_TRUE);
-#else
-                MathUtil::glFuncs->glTexStorage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, m_msaa_count, GL_DEPTH32F_STENCIL8, m_window_width, m_window_height, GL_TRUE);
-#endif
+                    MathUtil::glFuncs->glTexStorage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, m_msaa_count, GL_DEPTH32F_STENCIL8, m_window_width, m_window_height, GL_TRUE);
                 }
                 else
                 {
@@ -4961,19 +4488,14 @@ void AbstractRenderer::UpdateFramebuffer()
 				m_depth_func = DepthFunc::LEQUAL;
 				MathUtil::glFuncs->glDepthFunc(GL_LEQUAL);
                 m_current_depth_func = DepthFunc::LEQUAL;
-                MathUtil::glFuncs->glClearDepth(1.0);
+                MathUtil::glFuncs->glClearDepthf(1.0);
 				
-				if (texture_type == GL_TEXTURE_2D_MULTISAMPLE)
+                if (texture_type == GL_TEXTURE_2D_MULTISAMPLE)
                 {
-#ifndef __ANDROID__
-                MathUtil::glFuncs->glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, m_msaa_count, GL_DEPTH24_STENCIL8, m_window_width, m_window_height, GL_TRUE);
-#else
-                MathUtil::glFuncs->glTexStorage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, m_msaa_count, GL_DEPTH24_STENCIL8, m_window_width, m_window_height, GL_TRUE);
-#endif
+                    MathUtil::glFuncs->glTexStorage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, m_msaa_count, GL_DEPTH24_STENCIL8, m_window_width, m_window_height, GL_TRUE);
                 }
                 else
                 {
-
                     MathUtil::glFuncs->glTexImage2D(GL_TEXTURE_2D, 0, static_cast<GLint>(GL_DEPTH24_STENCIL8), m_window_width,  m_window_height, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL);
                 }
             }

@@ -113,17 +113,6 @@ void ProcessCmdLineArgs1(int argc, char *argv[])
                 ++i;
                 continue;
             }
-            else if (QString::compare(eacharg, "-gl", Qt::CaseInsensitive) == 0) {
-#ifdef __APPLE__
-                MathUtil::m_requested_gl_version = "3.3";
-#elif defined(__ANDROID__)
-                MathUtil::m_requested_gl_version = "ES";
-#else
-                MathUtil::m_requested_gl_version = QString(argv[i+1]);
-#endif
-                ++i;
-                continue;
-            }
             else if (QString::compare(eacharg, "-adapter", Qt::CaseInsensitive) == 0 && i < argc-1) {
                 QString eacharg2(argv[i+1]);
                 MainWindow::use_screen = eacharg2.toInt();

@@ -457,13 +457,6 @@ enum class StencilOpAction : uint32_t
 	INVERT = 0x150A
 };
 
-enum class PolyMode : uint32_t
-{
-	POINT = 0x1B00,
-	LINE = 0x1B01,
-	FILL = 0x1B02
-};
-
 enum class BlendFunction : uint32_t
 {
     ZERO = 0,
@@ -1103,7 +1096,6 @@ public:
 		DepthMask p_depth_mask,
 		StencilFunc p_stencil_func,
 		StencilOp p_stencil_op,
-		PolyMode p_poly_mode,
         ColorMask p_color_mask);
 	AbstractRenderCommand(const AbstractRenderCommand& p_copy);
 	AbstractRenderCommand(AbstractRenderCommand&& p_move);
@@ -1127,7 +1119,6 @@ public:
 	DepthMask GetDepthMask() const;
 	StencilFunc GetStencilFunc() const;
 	StencilOp GetStencilOp() const;
-	PolyMode GetPolyMode() const;
 	ColorMask GetColorMask() const;
 
 	// Mutators, these are for special cases only
@@ -1274,7 +1265,6 @@ private:
 	DepthMask m_depth_mask;
 	StencilFunc m_stencil_func;
 	StencilOp m_stencil_op;
-	PolyMode m_poly_mode;
 	ColorMask m_color_mask;
 };
 
@@ -1481,7 +1471,7 @@ class RendererInterface
 public:
     virtual ~RendererInterface(){}
 
-	virtual void Initialize(const QString& p_requested_gl_version) = 0;
+    virtual void Initialize() = 0;
 	virtual void InitializeState() = 0;
 	virtual void InitializeLightUBOs() = 0;
     virtual void InitializeHMDManager(QPointer <AbstractHMDManager> p_hmd_manager) = 0;
@@ -1549,9 +1539,6 @@ public:
 	virtual void SetStencilOp(StencilOp p_stencil_op) = 0;
 	virtual StencilOp GetStencilOp() const = 0;
 
-	virtual void SetPolyMode(PolyMode p_poly_mode) = 0;
-	virtual PolyMode GetPolyMode() const = 0;
-
 	virtual void SetColorMask(ColorMask p_color_mask) = 0;
 	virtual ColorMask GetColorMask() const = 0;
 
@@ -1566,25 +1553,13 @@ public:
     virtual uint64_t GetLastSubmittedFrameID() = 0;
 	virtual void Render() = 0;
     virtual void PushAbstractRenderCommand(AbstractRenderCommand& p_object_render_command) = 0;
-	virtual void RenderObjects() = 0;
-	virtual void RenderObjectsDebug() = 0;
-	virtual void ClearObjectRenderQueue() = 0;
+	virtual void RenderObjects() = 0;	
 
     virtual void PushLightContainer(LightContainer const * p_light_container, StencilReferenceValue p_room_stencil_ref) = 0;
 
 	virtual void BeginScope(RENDERER::RENDER_SCOPE p_scope) = 0;
 	virtual void EndCurrentScope() = 0;
 	virtual RENDERER::RENDER_SCOPE GetCurrentScope() = 0;
-
-	virtual bool AreObjectsVisible() const = 0;
-	virtual bool AreBoundingBoxesVisible() const = 0;
-	virtual bool ArePhysicsProxiesVisible() const = 0;
-	virtual bool AreWireframesVisible() const = 0;
-	virtual bool AreNormalsVisible() const = 0;
-	virtual bool AreFramebufferLayersVisible() const = 0;
-	virtual void ToggleImmediateMode() = 0;
-
-	virtual void ClearRenderQueues() = 0;
 
     virtual QVector<uint64_t>& GetGPUTimeQueryResults() = 0;
     virtual QVector<uint64_t>& GetCPUTimeQueryResults() = 0;

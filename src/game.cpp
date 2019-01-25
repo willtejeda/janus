@@ -723,7 +723,6 @@ void Game::DrawFadingGL()
                                 renderer->GetDepthMask(),
                                 renderer->GetStencilFunc(),
                                 renderer->GetStencilOp(),
-                                renderer->GetPolyMode(),
                                 renderer->GetColorMask());
         renderer->PushAbstractRenderCommand(a);
 
@@ -2573,8 +2572,7 @@ void Game::keyReleaseEvent(QKeyEvent * e)
 
     default:
         break;
-    }
-    MathUtil::m_capture_frame = e->key() == Qt::Key_Minus;
+    }    
 
     //logic for stop speech
     //if capturedeviceenabled, and !micalwayson, and speaking, set speaking false
@@ -3113,11 +3111,10 @@ void Game::UpdateOverlays()
         const int num_tris = r->GetRoomNumTris();
         const int num_objs = r->GetRoomObjects().size();
 
-        QString version_text = QString("Version: ") + menu_ops.version + " Renderer: " + RendererInterface::m_pimpl->GetRendererName();
+        QString version_text = QString("Version: ") + menu_ops.version;
+        QString renderer_text = QString("Renderer: ") + RendererInterface::m_pimpl->GetRendererName();
 #ifndef __ANDROID__
         double current_render_fps = 1000.0 / perf_logger.GetAverageRenderThreadCPUTime();
-        QString fps_text =  QString("GPU:    ") + QString::number(perf_logger.GetAverageRenderThreadGPUTime(),'f', 1) + QString("ms/") + QString::number(1000.0 / perf_logger.GetAverageRenderThreadGPUTime(),'f', 1) + QString("fps ");
-        QString fps_text2 = QString("CPU:    ") + QString::number(perf_logger.GetAverageRenderThreadCPUTime(),'f', 1) + QString("ms/") + QString::number(current_render_fps,'f', 1) + QString("fps ");
         QString fps_text3 = QString("Update: ") + QString::number(perf_logger.GetAverageMainThreadCPUTime(),'f', 1) + QString("ms/") + QString::number(1000.0 / perf_logger.GetAverageMainThreadCPUTime(),'f', 1) + QString("fps");
 #endif
         QString tricount_text = QString("Room: ") + QString::number(num_tris) + " tris, " + QString::number(num_objs) + " objects";
@@ -3144,20 +3141,15 @@ void Game::UpdateOverlays()
         info2_text_geom.AddText(ydir_text);
         info2_text_geom.AddText(zdir_text);
         info2_text_geom.AddText(version_text);
+        info2_text_geom.AddText(renderer_text);
 #ifndef __ANDROID__
         if (current_render_fps >= 90) {
-            info2_text_geom.AddText(fps_text,QColor(0,255,0));
-            info2_text_geom.AddText(fps_text2,QColor(0,255,0));
             info2_text_geom.AddText(fps_text3,QColor(0,255,0));
         }
         else if (current_render_fps >= 45) {
-            info2_text_geom.AddText(fps_text,QColor(255,255,0));
-            info2_text_geom.AddText(fps_text2,QColor(255,255,0));
             info2_text_geom.AddText(fps_text3,QColor(255,255,0));
         }
         else {
-            info2_text_geom.AddText(fps_text,QColor(255,0,0));
-            info2_text_geom.AddText(fps_text2,QColor(255,0,0));
             info2_text_geom.AddText(fps_text3,QColor(255,0,0));
         }
 #endif
@@ -3220,7 +3212,6 @@ void Game::DrawOverlaysGL()
     PerformanceLogger & perf_logger = r->GetPerformanceLogger();
 #endif
 
-    RendererInterface::m_pimpl->SetPolyMode(PolyMode::FILL);
     RendererInterface::m_pimpl->SetDefaultFaceCullMode(FaceCullMode::DISABLED);
     RendererInterface::m_pimpl->SetDepthFunc(DepthFunc::ALWAYS);
     RendererInterface::m_pimpl->SetDepthMask(DepthMask::DEPTH_WRITES_ENABLED);
@@ -3310,7 +3301,6 @@ void Game::DrawOverlaysGL()
                                 renderer->GetDepthMask(),
                                 renderer->GetStencilFunc(),
                                 renderer->GetStencilOp(),
-                                renderer->GetPolyMode(),
                                 renderer->GetColorMask());
         renderer->PushAbstractRenderCommand(a);
 

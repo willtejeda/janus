@@ -247,72 +247,6 @@ MainWindow::MainWindow()
     glwidget = new GLWidget();
     glwidget->setUpdateBehavior(QOpenGLWidget::NoPartialUpdate);
 
-//    glwidget->setMouseTracking(true);
-
-//    QSurfaceFormat format;
-
-//    int major = 4;
-//    int minor = 4;
-
-//    if (MathUtil::m_requested_gl_version == "3.3")
-//    {
-//        major = 3;
-//        minor = 3;
-//    }
-
-//    format.setMajorVersion(major);
-//    format.setMinorVersion(minor);
-//    format.setProfile(QSurfaceFormat::CoreProfile);
-//    format.setRenderableType(QSurfaceFormat::OpenGL);
-//    format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
-
-//#if defined(QT_DEBUG)
-//    format.setOption(QSurfaceFormat::DebugContext);
-//#endif
-//    format.setDepthBufferSize(24);
-//    format.setStencilBufferSize(8);
-
-    //this->create() called implicitly on show()
-//    m_context = new QOpenGLContext();
-//    m_context->setFormat(format);
-//    bool creation_result = m_context->create();
-//    auto major_version = m_context->format().majorVersion();
-//    auto minor_version = m_context->format().minorVersion();
-//    bool const is_gl_44_context = (major_version > 4 || (major_version == 4 && minor_version >= 4));
-
-
-//    if (!creation_result || !is_gl_44_context)
-//    {
-//        format.setMajorVersion(3);
-//        format.setMinorVersion(3);
-//        m_context->setFormat(format);
-//        creation_result = m_context->create();
-//        major_version = m_context->format().majorVersion();
-//        minor_version = m_context->format().minorVersion();
-//        bool const is_gl_33_context = (major_version > 3 || (major_version == 3 && minor_version >= 3));
-
-//        if (!creation_result || !is_gl_33_context)
-//        {
-//            MathUtil::ErrorLog(QString("CRITICAL ERROR: Unable to create GL 3.3 context for rendering"));
-//            MathUtil::FlushErrorLog();
-//        }
-//        else {
-//            qDebug() << "MainWindow::MainWindow() - Creating GL 3.3 context";
-//        }
-//    }
-//    else {
-//        qDebug() << "MainWindow::MainWindow() - Creating GL 4.4 context";
-//    }
-
-    //set vsync appropriately
-//    if ((hmd_manager && hmd_manager->GetEnabled()) || novsync) {
-//        format.setSwapInterval(0); //this disables vsync
-//    }
-
-    //setFormat(format);
-//    glwidget->setFormat(format);
-    //glwidget->initializeOpenGLFunctions();
-
     //set screen size
     QRect screenSize = QApplication::desktop()->screenGeometry();
     int margin_x = int(float(screenSize.width())*0.1f);
@@ -334,7 +268,6 @@ MainWindow::MainWindow()
 
 MainWindow::~MainWindow()
 {
-//    disconnect(&timer2);
     MathUtil::FlushErrorLog();
 
     CookieJar::cookie_jar->SaveToDisk();
@@ -343,9 +276,6 @@ MainWindow::~MainWindow()
 #if !defined(__APPLE__) && !defined(__ANDROID__)
     GamepadShutdown();
 #endif
-
-    //60.0 - causes a crash in the render thread
-//    delete RendererInterface::m_pimpl;
 }
 
 void MainWindow::dragEnterEvent(QDragEnterEvent* event)

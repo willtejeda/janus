@@ -278,20 +278,6 @@ public:
     void UpdateTextureHandleData(TextureHandle* p_handle, uint const p_level, uint const p_x_offset, uint const p_y_offset, uint const p_width, uint const p_height, int const p_pixel_format, int const p_pixel_type, void* const p_pixel_data, uint32_t const p_data_size);
     void GenerateTextureHandleMipMap(TextureHandle* p_handle);
 
-    virtual void CopyTextureHandleDataToTextureHandle(TextureHandle* p_src_handle,
-                                                      int32_t const p_src_level,
-                                                      int32_t const p_src_x,
-                                                      int32_t const p_src_y,
-                                                      int32_t const p_src_z,
-                                                      TextureHandle* p_dst_handle,
-                                                      int32_t const p_dst_level,
-                                                      int32_t const p_dst_x,
-                                                      int32_t const p_dst_y,
-                                                      int32_t const p_dst_z,
-                                                      int32_t const p_src_width,
-                                                      int32_t const p_src_height,
-                                                      int32_t const p_src_depth);
-
     void CopyReadBufferToTextureHandle(QVector<QPair<TextureHandle *, GLuint> > * const p_map, TextureHandle* p_handle,
                                                uint32_t p_target,
                                                int32_t p_level,
@@ -510,15 +496,11 @@ public:
     void SetStencilOp(StencilOp p_stencil_op);
     StencilOp GetStencilOp() const;
 
-    void SetPolyMode(PolyMode p_poly_mode);
-    PolyMode GetPolyMode() const;
-
     void SetColorMask(ColorMask p_color_mask);
     ColorMask GetColorMask() const;
 
     void RenderObjectsNaive(RENDERER::RENDER_SCOPE const p_scope, QVector<AbstractRenderCommand> const & p_object_render_commands, QHash<StencilReferenceValue, LightContainer> const & p_scoped_light_containers);
     void RenderObjectsNaiveDecoupled(RENDERER::RENDER_SCOPE const p_scope, QVector<AbstractRenderCommand> const & p_object_render_commands, QHash<StencilReferenceValue, LightContainer> const & p_scoped_light_containers);
-    void RenderObjectsStereoViewportInstanced(RENDERER::RENDER_SCOPE const p_scope, QVector<AbstractRenderCommand> const & p_object_render_commands, QHash<StencilReferenceValue, LightContainer> const & p_scoped_light_containers);
 
     void InitializeLightUBOs();
     void PushNewLightData(LightContainer const * p_lightContainer);
@@ -536,10 +518,7 @@ public:
     void CopyDataBetweenBuffers(GLuint p_src, GLuint p_dst, GLsizeiptr p_size, GLintptr p_srcOffset, GLintptr p_dstOffset);
     void CreateShadowVAO(GLuint p_VAO, QVector<GLuint> p_VBOs);
     void CreateShadowFBO(GLuint p_FBO, QVector<GLuint> p_texture_ids);
-#if !defined(__APPLE__) && !defined(__ANDROID__)
-    void CreateMatrixSSBO(int p_ssbo_size, GLuint* p_ssbo_handle, GLintptr& p_ssbo_GPU_ptr, int* p_aligned_size);
-    static void initPersistentlyMappedGLBuffer(GLsizeiptr* p_bufferPtr, GLuint* p_bufferID, GLsizeiptr* p_alignedChunkSizeInBytes, GLuint p_bufferIndex, GLsizeiptr p_chunkSizeInBytes, GLuint p_chunkCount, GLenum p_bufferType);
-#endif
+
     void WaitforFrameSyncObject();
     void LockFrameSyncObject();
     void StartFrame();
@@ -830,9 +809,7 @@ private:
     StencilFunc m_stencil_func;
     StencilFunc m_current_stencil_func;
     StencilOp m_stencil_op;
-    StencilOp m_current_stencil_op;
-    PolyMode m_poly_mode;
-    PolyMode m_current_poly_mode;
+    StencilOp m_current_stencil_op;    
     ColorMask m_color_mask;
     ColorMask m_current_color_mask;
     BlendFunction m_blend_src;
@@ -843,142 +820,6 @@ private:
     LightContainer m_dummyLights;
     GLuint m_active_light_UBO_index;
 };
-
-#if !defined(__APPLE__) && !defined(__ANDROID__)
-template <uint32_t CHUNKCOUNT, GLuint BINDINGINDEX>
-class PersistentGLBuffer
-{
-public:
-    PersistentGLBuffer<CHUNKCOUNT, BINDINGINDEX>()
-        : m_ID(0),
-          m_ptr(0),
-          m_offset(0),
-          m_dataSize(0),
-          m_last_updated_data_size(0),
-          m_alignedDataSize(0),
-          m_totalDataSize(0),
-          m_currentChunk(0),
-          m_previousChunk(0),
-          m_mostRecentDataOffset(0),
-          m_chunkCount(CHUNKCOUNT),          
-          m_bindingIndex(BINDINGINDEX),
-          m_bufferType(0)
-    {
-    }   
-
-    ~PersistentGLBuffer()
-    {
-        Cleanup();
-    }
-
-    void Cleanup()
-    {
-        MathUtil::glFuncs->glDeleteBuffers(1, &m_ID);
-        m_ID = 0;
-        m_ptr = 0;
-        m_offset = 0;
-        m_dataSize = 0;
-        m_last_updated_data_size = 0;
-        m_alignedDataSize = 0;
-        m_totalDataSize = 0;
-        m_currentChunk = 0;
-        m_previousChunk = 0;
-        m_mostRecentDataOffset = 0;
-    }
-
-    void Initialize(void* p_data, GLsizeiptr p_dataSize, GLenum p_bufferType)
-    {
-        m_bufferType = p_bufferType;
-        m_dataSize = p_dataSize;
-        m_last_updated_data_size = p_dataSize;
-        // Create our persistently mapped perObject SSBO
-        AbstractRenderer::initPersistentlyMappedGLBuffer(
-                    &m_ptr, &m_ID, &m_alignedDataSize,
-                    BINDINGINDEX, m_dataSize, m_chunkCount, m_bufferType);
-
-        // Copy our data into the first chunk of the buffer
-        void* dst = (void*)(m_ptr + m_offset);
-        memcpy(dst, p_data, m_dataSize);
-
-        // Bind our now current chunk of the buffer
-        MathUtil::glFuncs->glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_ID);
-
-        GLsizeiptr work_group_aligned_data_size = ((p_dataSize + 32 - 1) / 32) * 32;
-        MathUtil::glFuncs->glBindBufferRange(m_bufferType, BINDINGINDEX, m_ID, m_offset, work_group_aligned_data_size);
-        m_mostRecentDataOffset = m_offset;
-
-        // Adjust the offset and current chunk accordingly
-        m_offset = (m_offset + m_alignedDataSize) % (m_alignedDataSize * m_chunkCount);
-        m_previousChunk = m_currentChunk;
-        m_currentChunk = (m_currentChunk + 1) % m_chunkCount;
-    }
-
-    void UpdateData(void* p_data, GLsizeiptr p_dataSize)
-    {
-        if (m_dataSize < p_dataSize)
-        {
-            qDebug("ERROR: Trying to copy more data into a buffer than it can fit, you likely haven't initialized it yet.");
-            return;
-        }
-
-        if (p_dataSize == 0)
-        {
-            // Don't try to copy no data into the buffer, this results in GL errors and makes no sense.
-            return;
-        }
-
-        // Copy our data into the current chunk of the buffer
-        GLsizeiptr dst = m_ptr + m_offset;
-        void* ds_ptr = (void*)dst;
-        memcpy(ds_ptr, p_data, p_dataSize);
-        m_last_updated_data_size = p_dataSize;
-
-        // Bind our now current chunk of the buffer
-        //MathUtil::glFuncs->glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_ID);
-        GLsizeiptr work_group_aligned_data_size = ((p_dataSize + 32 - 1) / 32) * 32;
-        MathUtil::glFuncs->glBindBufferRange(m_bufferType, BINDINGINDEX, m_ID, m_offset, work_group_aligned_data_size);
-        m_mostRecentDataOffset = m_offset;
-
-        // Adjust the offset and current chunk accordingly
-        m_offset = (m_offset + m_alignedDataSize) % (m_alignedDataSize * m_chunkCount);
-        m_previousChunk = m_currentChunk;
-        m_currentChunk = (m_currentChunk + 1) % m_chunkCount;
-    }
-
-    void Bind()
-    {
-        // Bind our now current chunk of the buffer
-        //MathUtil::glFuncs->glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_ID);
-        MathUtil::glFuncs->glBindBufferRange(m_bufferType, BINDINGINDEX, m_ID, m_mostRecentDataOffset, m_last_updated_data_size);
-    }
-
-    void BindNextChunk(GLsizeiptr p_data_size)
-    {
-        m_last_updated_data_size = p_data_size;
-
-        MathUtil::glFuncs->glBindBufferRange(m_bufferType, BINDINGINDEX, m_ID, m_offset, p_data_size);
-
-        // Adjust the offset and current chunk accordingly
-        m_offset = (m_offset + m_alignedDataSize) % (m_alignedDataSize * m_chunkCount);
-        m_previousChunk = m_currentChunk;
-        m_currentChunk = (m_currentChunk + 1) % m_chunkCount;
-    }
-
-    GLuint m_ID;
-    GLsizeiptr m_ptr;
-    GLsizeiptr m_offset;
-    GLsizeiptr m_dataSize;
-    GLsizeiptr m_last_updated_data_size;
-    GLsizeiptr m_alignedDataSize;
-    GLsizeiptr m_totalDataSize;
-    uint32_t m_currentChunk;
-    uint32_t m_previousChunk;
-    uint32_t m_mostRecentDataOffset;
-    const uint32_t m_chunkCount;
-    const GLuint m_bindingIndex;
-    GLenum m_bufferType;
-};
-#endif
 
 #endif // ABSTRACTRENDERER_H
 

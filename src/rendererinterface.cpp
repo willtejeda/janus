@@ -21,8 +21,7 @@ AbstractRenderCommand::AbstractRenderCommand()
       m_depth_func(DepthFunc::LEQUAL),
       m_depth_mask(DepthMask::DEPTH_WRITES_ENABLED),
       m_stencil_func(),
-      m_stencil_op(),
-      m_poly_mode(PolyMode::FILL),
+      m_stencil_op(),      
       m_color_mask(ColorMask::COLOR_WRITES_ENABLED)
 {
 }
@@ -45,8 +44,7 @@ AbstractRenderCommand::AbstractRenderCommand(PrimitiveType p_primitive_type,
     DepthFunc p_depth_func,
     DepthMask p_depth_mask,
     StencilFunc p_stencil_func,
-    StencilOp p_stencil_op,
-    PolyMode p_poly_mode,
+    StencilOp p_stencil_op,    
     ColorMask p_color_mask) :
     m_draw_id(0),
     m_camera_id(0),
@@ -67,8 +65,7 @@ AbstractRenderCommand::AbstractRenderCommand(PrimitiveType p_primitive_type,
 	m_depth_func(p_depth_func),
 	m_depth_mask(p_depth_mask),
 	m_stencil_func(p_stencil_func),
-	m_stencil_op(p_stencil_op),
-	m_poly_mode(p_poly_mode),
+	m_stencil_op(p_stencil_op),	
     m_color_mask(p_color_mask)
 {
 
@@ -93,7 +90,6 @@ AbstractRenderCommand::AbstractRenderCommand(const AbstractRenderCommand& p_copy
 	m_depth_mask(p_copy.m_depth_mask),
 	m_stencil_func(p_copy.m_stencil_func),
 	m_stencil_op(p_copy.m_stencil_op),
-	m_poly_mode(p_copy.m_poly_mode),
     m_color_mask(p_copy.m_color_mask)
 {
     if (p_copy.m_mesh_handle != nullptr)
@@ -157,8 +153,7 @@ AbstractRenderCommand::AbstractRenderCommand(AbstractRenderCommand&& p_move) :
 	m_depth_func(std::move(p_move.m_depth_func)),
 	m_depth_mask(std::move(p_move.m_depth_mask)),
 	m_stencil_func(std::move(p_move.m_stencil_func)),
-	m_stencil_op(std::move(p_move.m_stencil_op)),
-	m_poly_mode(std::move(p_move.m_poly_mode)),
+	m_stencil_op(std::move(p_move.m_stencil_op)),	
     m_color_mask(std::move(p_move.m_color_mask))
 {
 
@@ -210,7 +205,6 @@ AbstractRenderCommand& AbstractRenderCommand::operator=(const AbstractRenderComm
 	m_depth_mask = p_copy.m_depth_mask;
 	m_stencil_func = p_copy.m_stencil_func;
 	m_stencil_op = p_copy.m_stencil_op;
-	m_poly_mode = p_copy.m_poly_mode;
 	m_color_mask = p_copy.m_color_mask;
 	m_draw_id = p_copy.m_draw_id;
 	m_camera_id = p_copy.m_camera_id;
@@ -239,7 +233,6 @@ AbstractRenderCommand& AbstractRenderCommand::operator=(AbstractRenderCommand&& 
 	m_depth_mask = std::move(p_move.m_depth_mask);
 	m_stencil_func = std::move(p_move.m_stencil_func);
 	m_stencil_op = std::move(p_move.m_stencil_op);
-	m_poly_mode = std::move(p_move.m_poly_mode);
 	m_color_mask = std::move(p_move.m_color_mask);
 	m_draw_id = std::move(p_move.m_draw_id);
 	m_camera_id = std::move(p_move.m_camera_id);
@@ -254,11 +247,7 @@ bool AbstractRenderCommand::IsInstancableWith(const AbstractRenderCommand& p_cop
     bool is_instancable = (
           (m_shader == p_copy.m_shader)
         & (m_stencil_func == p_copy.m_stencil_func)
-        //& (m_texture_set == p_copy.m_texture_set)
         & (m_mesh_handle == p_copy.m_mesh_handle)
-        //& (m_first_index == p_copy.m_first_index)
-        //& (m_primitive_type == p_copy.m_primitive_type)
-        & (m_poly_mode == p_copy.m_poly_mode)
         & (m_active_face_cull_mode == p_copy.m_active_face_cull_mode)
         & (m_object_uniforms.iUseFlags[0] == 0.0f)
         & (p_copy.m_object_uniforms.iUseFlags[0] == 0.0f)
@@ -356,11 +345,6 @@ StencilFunc AbstractRenderCommand::GetStencilFunc() const
 StencilOp AbstractRenderCommand::GetStencilOp() const
 {
 	return m_stencil_op;
-}
-
-PolyMode AbstractRenderCommand::GetPolyMode() const
-{
-	return m_poly_mode;
 }
 
 ColorMask AbstractRenderCommand::GetColorMask() const

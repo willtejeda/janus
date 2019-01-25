@@ -4,14 +4,7 @@ RendererInterface* RendererInterface::m_pimpl = nullptr;
 
 Renderer::Renderer()
     : m_current_scope(RENDERER::RENDER_SCOPE::NONE),
-      m_abstractRenderer(nullptr),
-      m_render_objects(1),
-      m_render_bounding_boxes(0),
-      m_render_physics_proxies(0),
-      m_render_wireframes(0),
-      m_render_normals(0),
-      m_render_framebuffer_layers(0),
-      m_immediate_mode(false)
+      m_abstractRenderer(nullptr)
 {
 }
 
@@ -50,15 +43,8 @@ inline void Renderer::InitializeScopes()
     m_abstractRenderer->m_scoped_light_containers_cache.resize(3);
 }
 
-void Renderer::Initialize(QString const & p_requested_gl_version)
+void Renderer::Initialize()
 {
-//    qDebug() << "Renderer::Initialize" << this << p_requested_gl_version;
-#ifdef __APPLE__
-    m_requested_version_string = "3.3";
-#else
-    m_requested_version_string = p_requested_gl_version;
-#endif
-
     m_abstractRenderer = std::unique_ptr<AbstractRenderer>(new RendererGL33());
 
     InitializeScopes();
@@ -244,20 +230,6 @@ void Renderer::SetIsUsingEnhancedDepthPrecision(bool const p_is_using)
     m_abstractRenderer->SetIsUsingEnhancedDepthPrecision(p_is_using);
 }
 
-void Renderer::ToggleImmediateMode()
-{
-    m_immediate_mode = !m_immediate_mode;
-    qDebug() << "ImmediateMode: " << m_immediate_mode;
-}
-
-void Renderer::ClearRenderQueues()
-{    
-    /*for (QVector<AbstractRenderCommand>& render_command_vector : m_scoped_render_commands_cache[0])
-    {
-        render_command_vector.erase(render_command_vector.begin(), render_command_vector.end());
-    }*/
-}
-
 void Renderer::SetDefaultFaceCullMode(FaceCullMode p_face_cull_mode)
 {
     m_abstractRenderer->SetDefaultFaceCullMode(p_face_cull_mode);
@@ -316,16 +288,6 @@ void Renderer::SetStencilOp(StencilOp p_stencil_op)
 StencilOp Renderer::GetStencilOp() const
 {
     return m_abstractRenderer->GetStencilOp();
-}
-
-void Renderer::SetPolyMode(PolyMode p_poly_mode)
-{
-    m_abstractRenderer->SetPolyMode(p_poly_mode);
-}
-
-PolyMode Renderer::GetPolyMode() const
-{
-    return m_abstractRenderer->GetPolyMode();
 }
 
 void Renderer::SetColorMask(ColorMask p_color_mask)
@@ -560,117 +522,114 @@ void Renderer::SortRenderCommandsByDistance(QVector<AbstractRenderCommand>& rend
 
 void Renderer::PushAbstractRenderCommand(AbstractRenderCommand& p_object_render_command)
 {
-    if (AreObjectsVisible() == true)
+    // To remove any special case code for objects viewed in a mirror throughout the rest of the codebase
+    // I do the face cull mode flipping here at the point where they are submitted to the renderer.
+    if (GetMirrorMode() == true)
     {
-        // To remove any special case code for objects viewed in a mirror throughout the rest of the codebase
-        // I do the face cull mode flipping here at the point where they are submitted to the renderer.
-        if (GetMirrorMode() == true)
+        switch (p_object_render_command.m_active_face_cull_mode)
         {
-            switch (p_object_render_command.m_active_face_cull_mode)
+        case FaceCullMode::BACK:
+            p_object_render_command.m_active_face_cull_mode = FaceCullMode::FRONT;
+            break;
+        case FaceCullMode::FRONT:
+            p_object_render_command.m_active_face_cull_mode = FaceCullMode::BACK;
+            break;
+        default:
+            break;
+        }
+    }
+
+    ProgramHandle* shader = p_object_render_command.GetShaderRef();
+    if (((shader) != nullptr) && (p_object_render_command.GetMeshHandle() != nullptr))
+    {
+
+        bool const scope_has_transparency_pass = (   m_current_scope == RENDERER::RENDER_SCOPE::CURRENT_ROOM_OBJECTS
+                                                     || m_current_scope == RENDERER::RENDER_SCOPE::CHILD_ROOM_OBJECTS
+                                                     );
+
+        bool const is_command_material_transparent = p_object_render_command.IsMaterialTransparent();
+        bool const is_current_room = p_object_render_command.GetStencilFunc().GetStencilReferenceValue() == 0.0;
+
+        RENDERER::RENDER_SCOPE command_vector_scope = m_current_scope;
+
+        if (m_current_scope == RENDERER::RENDER_SCOPE::CURSOR)
+        {
+            // Force cursor to use linear alpha shader
+            p_object_render_command.SetShader(m_abstractRenderer->m_default_object_shader_linear_alpha.get());
+        }
+        if (m_current_scope == RENDERER::RENDER_SCOPE::OVERLAYS)
+        {
+            // Force cursor to use linear alpha shader
+            p_object_render_command.SetShader(m_abstractRenderer->m_default_object_shader_linear_alpha.get());
+        }
+
+
+        // If we need discards alter the shader to have them
+        // Not having discard calls in the default object shader is a significant performance increase
+        if (is_command_material_transparent == true
+                && scope_has_transparency_pass == true)
+        {
+            TextureHandle::ALPHA_TYPE material_alpha_type = p_object_render_command.GetAlphaType();
+            switch (material_alpha_type)
             {
-            case FaceCullMode::BACK:
-                p_object_render_command.m_active_face_cull_mode = FaceCullMode::FRONT;
+            // Cutouts only, opaque pass, requires discards
+            case TextureHandle::ALPHA_TYPE::CUTOUT:
+                if (shader->m_UUID.m_UUID == m_abstractRenderer->m_default_object_shader->m_UUID.m_UUID)
+                {
+                    p_object_render_command.SetShader(m_abstractRenderer->m_default_object_shader_binary_alpha.get());
+                }
+                command_vector_scope = (is_current_room) ? RENDERER::RENDER_SCOPE::CURRENT_ROOM_OBJECTS_CUTOUT : RENDERER::RENDER_SCOPE::CHILD_ROOM_OBJECTS_CUTOUT;
                 break;
-            case FaceCullMode::FRONT:
-                p_object_render_command.m_active_face_cull_mode = FaceCullMode::BACK;
+                // Alpha blending via object/material constants, transparency pass required
+                // For textures with a mix of full-opacity and blended alpha we still put it into the transparency pass
+                // so that it can blend with the opaques but keep depth testing enabled so that it doesn't have ordering
+                // issues with the fully opaque parts of itself.
+            case TextureHandle::ALPHA_TYPE::NONE:
+                // Alpha blending via texture, transparency pass
+            case TextureHandle::ALPHA_TYPE::BLENDED:
+                if (shader->m_UUID.m_UUID == m_abstractRenderer->m_default_object_shader->m_UUID.m_UUID)
+                {
+                    p_object_render_command.SetShader(m_abstractRenderer->m_default_object_shader_linear_alpha.get());
+                    p_object_render_command.SetDepthMask(DepthMask::DEPTH_WRITES_DISABLED);
+                }
+                command_vector_scope = (is_current_room) ? RENDERER::RENDER_SCOPE::CURRENT_ROOM_OBJECTS_BLENDED : RENDERER::RENDER_SCOPE::CHILD_ROOM_OBJECTS_BLENDED;
+                break;
+            case TextureHandle::ALPHA_TYPE::MIXED:
+                if (shader->m_UUID.m_UUID == m_abstractRenderer->m_default_object_shader->m_UUID.m_UUID)
+                {
+                    p_object_render_command.SetShader(m_abstractRenderer->m_default_object_shader_linear_alpha.get());
+                }
+                command_vector_scope = (is_current_room) ? RENDERER::RENDER_SCOPE::CURRENT_ROOM_OBJECTS_BLENDED : RENDERER::RENDER_SCOPE::CHILD_ROOM_OBJECTS_BLENDED;
                 break;
             default:
                 break;
             }
         }
-
-        ProgramHandle* shader = p_object_render_command.GetShaderRef();
-        if (((shader) != nullptr) && (p_object_render_command.GetMeshHandle() != nullptr))
+        else if (scope_has_transparency_pass == true && is_command_material_transparent == false)
         {
+            command_vector_scope = (is_current_room) ? RENDERER::RENDER_SCOPE::CURRENT_ROOM_OBJECTS_OPAQUE : RENDERER::RENDER_SCOPE::CHILD_ROOM_OBJECTS_OPAQUE;
+        }
 
-            bool const scope_has_transparency_pass = (   m_current_scope == RENDERER::RENDER_SCOPE::CURRENT_ROOM_OBJECTS
-                                                      || m_current_scope == RENDERER::RENDER_SCOPE::CHILD_ROOM_OBJECTS
-                                                     );
 
-            bool const is_command_material_transparent = p_object_render_command.IsMaterialTransparent();
-            bool const is_current_room = p_object_render_command.GetStencilFunc().GetStencilReferenceValue() == 0.0;
+        auto & command_vector = m_abstractRenderer->m_scoped_render_commands_cache[m_abstractRenderer->m_current_submission_index][(int)command_vector_scope];
 
-            RENDERER::RENDER_SCOPE command_vector_scope = m_current_scope;
+        const int camera_count = m_abstractRenderer->m_scoped_cameras_cache[m_abstractRenderer->m_current_submission_index][(int)command_vector_scope].size();
 
-            if (m_current_scope == RENDERER::RENDER_SCOPE::CURSOR)
+        p_object_render_command.m_draw_id = m_abstractRenderer->m_draw_id;
+
+        for (int camera_index = 0; camera_index < camera_count; ++camera_index)
+        {
+            p_object_render_command.m_camera_id = static_cast<uint32_t>(camera_index);
+            if (camera_index != camera_count - 1)
             {
-                // Force cursor to use linear alpha shader
-                p_object_render_command.SetShader(m_abstractRenderer->m_default_object_shader_linear_alpha.get());
+                //(command_uses_transparency_scope) ? command_vector.insert(command_vector.begin(), p_object_render_command) : command_vector.emplace_back(p_object_render_command);
+                command_vector.push_back(p_object_render_command);
             }
-            if (m_current_scope == RENDERER::RENDER_SCOPE::OVERLAYS)
+            else
             {
-                // Force cursor to use linear alpha shader
-                p_object_render_command.SetShader(m_abstractRenderer->m_default_object_shader_linear_alpha.get());
-            }
-
-
-            // If we need discards alter the shader to have them
-            // Not having discard calls in the default object shader is a significant performance increase
-            if (is_command_material_transparent == true
-                && scope_has_transparency_pass == true)
-            {
-                TextureHandle::ALPHA_TYPE material_alpha_type = p_object_render_command.GetAlphaType();
-                switch (material_alpha_type)
-                {
-                // Cutouts only, opaque pass, requires discards
-                case TextureHandle::ALPHA_TYPE::CUTOUT:
-                    if (shader->m_UUID.m_UUID == m_abstractRenderer->m_default_object_shader->m_UUID.m_UUID)
-                    {
-                        p_object_render_command.SetShader(m_abstractRenderer->m_default_object_shader_binary_alpha.get());
-                    }
-                    command_vector_scope = (is_current_room) ? RENDERER::RENDER_SCOPE::CURRENT_ROOM_OBJECTS_CUTOUT : RENDERER::RENDER_SCOPE::CHILD_ROOM_OBJECTS_CUTOUT;
-                    break;
-                // Alpha blending via object/material constants, transparency pass required
-                // For textures with a mix of full-opacity and blended alpha we still put it into the transparency pass
-                // so that it can blend with the opaques but keep depth testing enabled so that it doesn't have ordering
-                // issues with the fully opaque parts of itself.
-                case TextureHandle::ALPHA_TYPE::NONE:
-                // Alpha blending via texture, transparency pass
-                case TextureHandle::ALPHA_TYPE::BLENDED:
-                    if (shader->m_UUID.m_UUID == m_abstractRenderer->m_default_object_shader->m_UUID.m_UUID)
-                    {
-                        p_object_render_command.SetShader(m_abstractRenderer->m_default_object_shader_linear_alpha.get());
-                        p_object_render_command.SetDepthMask(DepthMask::DEPTH_WRITES_DISABLED);
-                    }
-                    command_vector_scope = (is_current_room) ? RENDERER::RENDER_SCOPE::CURRENT_ROOM_OBJECTS_BLENDED : RENDERER::RENDER_SCOPE::CHILD_ROOM_OBJECTS_BLENDED;
-                    break;
-                case TextureHandle::ALPHA_TYPE::MIXED:
-                    if (shader->m_UUID.m_UUID == m_abstractRenderer->m_default_object_shader->m_UUID.m_UUID)
-                    {
-                        p_object_render_command.SetShader(m_abstractRenderer->m_default_object_shader_linear_alpha.get());
-                    }
-                    command_vector_scope = (is_current_room) ? RENDERER::RENDER_SCOPE::CURRENT_ROOM_OBJECTS_BLENDED : RENDERER::RENDER_SCOPE::CHILD_ROOM_OBJECTS_BLENDED;
-                    break;
-                default:
-                    break;
-                }
-            }
-            else if (scope_has_transparency_pass == true && is_command_material_transparent == false)
-            {
-                command_vector_scope = (is_current_room) ? RENDERER::RENDER_SCOPE::CURRENT_ROOM_OBJECTS_OPAQUE : RENDERER::RENDER_SCOPE::CHILD_ROOM_OBJECTS_OPAQUE;
-            }
-
-
-            auto & command_vector = m_abstractRenderer->m_scoped_render_commands_cache[m_abstractRenderer->m_current_submission_index][(int)command_vector_scope];
-
-            const int camera_count = m_abstractRenderer->m_scoped_cameras_cache[m_abstractRenderer->m_current_submission_index][(int)command_vector_scope].size();
-
-            p_object_render_command.m_draw_id = m_abstractRenderer->m_draw_id;
-
-            for (int camera_index = 0; camera_index < camera_count; ++camera_index)
-            {
-                p_object_render_command.m_camera_id = static_cast<uint32_t>(camera_index);
-                if (camera_index != camera_count - 1)
-                {
-                    //(command_uses_transparency_scope) ? command_vector.insert(command_vector.begin(), p_object_render_command) : command_vector.emplace_back(p_object_render_command);
-                    command_vector.push_back(p_object_render_command);
-                }
-                else
-                {
-                    // I can move contruct here because I know I'm not using p_object_render_command after this line
-                    //(command_uses_transparency_scope) ? command_vector.insert(command_vector.begin(),std::move(p_object_render_command)) : command_vector.emplace_back(std::move(p_object_render_command));
-                    command_vector.push_back(p_object_render_command);
-                }
+                // I can move contruct here because I know I'm not using p_object_render_command after this line
+                //(command_uses_transparency_scope) ? command_vector.insert(command_vector.begin(),std::move(p_object_render_command)) : command_vector.emplace_back(std::move(p_object_render_command));
+                command_vector.push_back(p_object_render_command);
             }
         }
     }
@@ -680,45 +639,6 @@ void Renderer::PushAbstractRenderCommand(AbstractRenderCommand& p_object_render_
 void Renderer::RenderObjects()
 {
     m_abstractRenderer->Render(&(m_abstractRenderer->m_scoped_render_commands_cache[m_abstractRenderer->m_rendering_index]), &(m_abstractRenderer->m_scoped_light_containers_cache[m_abstractRenderer->m_rendering_index]));
-}
-
-void Renderer::RenderObjectsDebug()
-{
-    // TODO: Generate alternate render queues that contain commands
-    // to render helpful debug information such as:
-    // bounding boxes,
-    // face normals,
-    // collision proxies, etc.
-    // Each of these will be toggleable via a boolean in either the Renderer
-    // itself or in a "configuration" class that can be queried each frame.
-
-    // Example of a bounding box command queue
-    /*if(AreBoundingBoxesVisible() == true)
-    {
-        const int object_count = m_scoped_render_commands[m_current_scope].size();
-        QVector<AbstractRenderCommand> bounding_boxes;
-        bounding_boxes.reserve(object_count);
-
-        for (int i = 0; i < m_scoped_render_commands[m_current_scope].size(); ++i)
-        {
-            // Query object AABB and update bounding_box to draw a primitive
-            // such as box, cyclinder, capsule or sphere with the correct parameters
-            // for the object it is indexing
-            bounding_boxes.emplace_back(AbstractRenderCommand());
-        }
-
-        m_abstractRenderer->Render(m_current_scope, bounding_boxes, m_scoped_light_containers);
-        bounding_boxes.clear();
-    }*/
-}
-
-void Renderer::ClearObjectRenderQueue()
-{
-    // I erase rather than clear in order to not free the memory used by this QVector
-    // It's extremely likely that the next frame will require the same number of entries so
-    // there is no point deallocating the memory to reallocate it next frame.
-    //m_scoped_render_commands[m_current_scope].clear();
-    //m_scoped_render_commands_cache[m_rendering_index][(int)m_current_scope].erase(m_scoped_render_commands_cache[m_rendering_index][(int)m_current_scope].begin(), m_scoped_render_commands_cache[m_rendering_index][(int)m_current_scope].end());
 }
 
 void Renderer::PushLightContainer(LightContainer const * p_light_container, StencilReferenceValue p_room_stencil_ref)
@@ -741,36 +661,6 @@ void Renderer::EndCurrentScope()
 RENDERER::RENDER_SCOPE Renderer::GetCurrentScope()
 {
     return m_current_scope;
-}
-
-bool Renderer::AreObjectsVisible() const
-{
-    return static_cast<bool>(m_render_objects);
-}
-
-bool Renderer::AreBoundingBoxesVisible() const
-{
-    return static_cast<bool>(m_render_bounding_boxes);
-}
-
-bool Renderer::ArePhysicsProxiesVisible() const
-{
-    return static_cast<bool>(m_render_physics_proxies);
-}
-
-bool Renderer::AreWireframesVisible() const
-{
-    return static_cast<bool>(m_render_wireframes);
-}
-
-bool Renderer::AreNormalsVisible() const
-{
-    return static_cast<bool>(m_render_normals);
-}
-
-bool Renderer::AreFramebufferLayersVisible() const
-{
-    return static_cast<bool>(m_render_framebuffer_layers);
 }
 
 QVector<GLuint64> & Renderer::GetGPUTimeQueryResults()
@@ -797,7 +687,6 @@ QString Renderer::GetRendererName()
 {
     return (m_abstractRenderer ? m_abstractRenderer->GetRendererName() : QString());
 }
-
 
 std::shared_ptr<MeshHandle> Renderer::GetSkyboxCubeVAO()
 {

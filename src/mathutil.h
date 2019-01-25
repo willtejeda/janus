@@ -3,15 +3,10 @@
 
 #include <QtGui>
 
-//#include <QOpenGLFunctions>
 #ifdef __ANDROID__
 #include <QOpenGLExtraFunctions>
 #define gli glm
 #include "gli/gli.hpp"
-#endif
-#include <QOpenGLFunctions_4_4_Core>
-#include <QOpenGLFunctions_3_3_Core>
-#ifdef __ANDROID__
 #define GLdouble GLfloat
 #include <GLES3/gl31.h>
 #include <GLES2/gl2ext.h>
@@ -403,15 +398,7 @@ public:
     static float _PI_OVER_2;
     static float _PI_OVER_4;
 
-#ifndef __ANDROID__
-    static QOpenGLFunctions_4_4_Core * glFuncs;
-#else
-    static QOpenGLExtraFunctions * glFuncs;
-#endif
-    static QOpenGLContext* m_sharedContext;
-    static bool m_using_GL44;
-    static QString m_requested_gl_version;
-    static bool m_loop_render;
+    static QOpenGLExtraFunctions * glFuncs; 
 
     static QList <QMatrix4x4> modelmatrix_stack;
     static QMatrix4x4 viewmatrix;
@@ -424,8 +411,7 @@ public:
 
     static QByteArray loadFile(const QString fname);
     static void printShaderError(const GLuint p_shader);
-    static bool loadGLShaderFromFile(GLuint* const p_program, const QString vertName, const QString fragName);
-    static bool m_capture_frame;
+    static bool loadGLShaderFromFile(GLuint* const p_program, const QString vertName, const QString fragName);    
     static uint64_t m_frame_limiter_render_thread;
     static bool m_linear_framebuffer;
     static bool m_do_equi;

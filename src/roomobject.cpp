@@ -2099,26 +2099,6 @@ void RoomObject::DrawGL(QPointer <AssetShader> shader, const bool left_eye, cons
         particle_system->DrawGL(shader, player_pos, assetobject, override_texture);
         MathUtil::PopModelMatrix();
 
-#ifndef __ANDROID__
-        if (selected && edit_mode_enabled) {
-            shader->SetConstColour(QVector4D(0.5f, 1.0f, 0.5f, 1.0f));
-            shader->SetChromaKeyColour(QVector4D(0.0f, 0.0f, 0.0f, 0.0f));
-            shader->SetUseTextureAll(false);
-            shader->SetUseLighting(false);
-            shader->SetAmbient(QVector3D(1.0f, 1.0f, 1.0f));
-            shader->SetDiffuse(QVector3D(1.0f, 1.0f, 1.0f));
-            shader->SetSpecular(QVector3D(0.04f, 0.04f, 0.04f));
-            shader->SetShininess(20.0f);
-
-            RendererInterface::m_pimpl->SetPolyMode(PolyMode::LINE);
-            particle_system->DrawGL(shader, player_pos, assetobject, true);
-
-            shader->SetConstColour(QVector4D(1,1,1,1));
-
-            RendererInterface::m_pimpl->SetPolyMode(PolyMode::FILL);
-        }
-#endif
-
         if (assetobject.isNull()) {
             RendererInterface::m_pimpl->SetDefaultFaceCullMode(FaceCullMode::BACK);
             RendererInterface::m_pimpl->SetDepthMask(DepthMask::DEPTH_WRITES_ENABLED);
@@ -2133,9 +2113,8 @@ void RoomObject::DrawGL(QPointer <AssetShader> shader, const bool left_eye, cons
         MathUtil::MultModelMatrix(model_matrix_local);
         textgeom->DrawGL(shader);
 
-#ifndef __ANDROID__
         if (selected && edit_mode_enabled) {
-            shader->SetConstColour(QVector4D(0.5f, 1.0f, 0.5f, 1.0f));
+            shader->SetConstColour(QVector4D(0.5f, 1.0f, 0.5f, 0.25f));
             shader->SetChromaKeyColour(QVector4D(0.0f, 0.0f, 0.0f, 0.0f));
             shader->SetUseTextureAll(false);
             shader->SetUseLighting(false);
@@ -2143,15 +2122,9 @@ void RoomObject::DrawGL(QPointer <AssetShader> shader, const bool left_eye, cons
             shader->SetDiffuse(QVector3D(1.0f, 1.0f, 1.0f));
             shader->SetSpecular(QVector3D(0.04f, 0.04f, 0.04f));
             shader->SetShininess(20.0f);
-
-            RendererInterface::m_pimpl->SetPolyMode(PolyMode::LINE);
             textgeom->DrawSelectedGL(shader);
-
             shader->SetConstColour(QVector4D(1,1,1,1));
-
-            RendererInterface::m_pimpl->SetPolyMode(PolyMode::FILL);
         }
-#endif
 
         MathUtil::PopModelMatrix();
         RendererInterface::m_pimpl->SetDefaultFaceCullMode(FaceCullMode::BACK);
@@ -2196,7 +2169,6 @@ void RoomObject::DrawGL(QPointer <AssetShader> shader, const bool left_eye, cons
                                     renderer->GetDepthMask(),
                                     renderer->GetStencilFunc(),
                                     renderer->GetStencilOp(),
-                                    renderer->GetPolyMode(),
                                     renderer->GetColorMask());
             renderer->PushAbstractRenderCommand(a);
 
@@ -2337,14 +2309,12 @@ void RoomObject::DrawGL(QPointer <AssetShader> shader, const bool left_eye, cons
             MathUtil::PushModelMatrix();
             MathUtil::MultModelMatrix(model_matrix_local);
 
-#ifndef __ANDROID__
             if (selected && edit_mode_enabled) {
                 MathUtil::PushModelMatrix();
                 MathUtil::ModelMatrix().scale(1.0f, assetimage->GetAspectRatio(), 1.0f);
                 assetimage->DrawSelectedGL(shader);
                 MathUtil::PopModelMatrix();
             }
-#endif
 
             shader->SetUseTexture(0, true);
             shader->SetUseLighting(props->GetLighting());
@@ -2432,7 +2402,6 @@ void RoomObject::DrawGL(QPointer <AssetShader> shader, const bool left_eye, cons
         }
         shader->SetUseTextureAll(false);
 
-#ifndef __ANDROID__
         if (obj && selected && edit_mode_enabled) {
             shader->SetChromaKeyColour(QVector4D(0.0f, 0.0f, 0.0f, 0.0f));
             shader->SetUseLighting(false);
@@ -2441,8 +2410,7 @@ void RoomObject::DrawGL(QPointer <AssetShader> shader, const bool left_eye, cons
             shader->SetSpecular(QVector3D(0.04f, 0.04f, 0.04f));
             shader->SetShininess(20.0f);
 
-            RendererInterface::m_pimpl->SetPolyMode(PolyMode::LINE);
-            obj->DrawGL(shader, QColor(128, 255, 128, 255), true);
+            obj->DrawGL(shader, QColor(128, 255, 128, 64), true);
 
             if (assetobject_collision && assetobject_collision->GetFinished()) {
                 const QVector3D p = props->GetCollisionPos()->toQVector3D();
@@ -2451,15 +2419,13 @@ void RoomObject::DrawGL(QPointer <AssetShader> shader, const bool left_eye, cons
                 MathUtil::PushModelMatrix();
                 MathUtil::ModelMatrix().translate(p);
                 MathUtil::ModelMatrix().scale(s);
-                assetobject_collision->DrawGL(shader, QColor(255, 0, 0, 255), true);
+                assetobject_collision->DrawGL(shader, QColor(255, 0, 0, 64), true);
                 MathUtil::PopModelMatrix();
             }
 
             shader->SetConstColour(QVector4D(1,1,1,1));
-
-            RendererInterface::m_pimpl->SetPolyMode(PolyMode::FILL);
         }
-#endif
+
         MathUtil::PopModelMatrix();
     }
         break;
@@ -2536,12 +2502,9 @@ void RoomObject::DrawIconGL(QPointer <AssetShader> shader, const QPointer <Asset
         auto tex_id = img->GetTextureHandle(true);
         anim->DrawIconGL(shader, true, tex_id, QColor(255,255,255));
 
-        if (selected) {
-            RendererInterface::m_pimpl->SetPolyMode(PolyMode::LINE);
-            anim->DrawIconGL(shader, true, 0, QColor(128,255,128));
-
-            shader->SetConstColour(QVector4D(1,1,1,1));
-            RendererInterface::m_pimpl->SetPolyMode(PolyMode::FILL);
+        if (selected) {            
+            anim->DrawIconGL(shader, true, 0, QColor(128,255,128,64));
+            shader->SetConstColour(QVector4D(1,1,1,1));            
         }
 
         MathUtil::PopModelMatrix();
@@ -2560,17 +2523,12 @@ void RoomObject::DrawCollisionModelGL(QPointer <AssetShader> shader)
 
     const ElementType t = GetType();
     if (t == TYPE_OBJECT) {
-        shader->SetConstColour(QVector4D(1,0.5f,0.5f,1));
-        RendererInterface::m_pimpl->SetPolyMode(PolyMode::LINE);
-
+        shader->SetConstColour(QVector4D(1,0.5f,0.5f,0.25f));
         MathUtil::PushModelMatrix();
         MathUtil::MultModelMatrix(model_matrix_local);
         assetobject_collision->DrawGL(shader);
         MathUtil::PopModelMatrix();
-
-        shader->SetConstColour(QVector4D(1,1,1,1));
-
-        RendererInterface::m_pimpl->SetPolyMode(PolyMode::FILL);
+        shader->SetConstColour(QVector4D(1,1,1,1));       
     }          
 }
 
@@ -3578,11 +3536,10 @@ void RoomObject::DrawPortalGL(QPointer <AssetShader> shader)
     shader->SetUseLighting(false);
 
     if (selected) {
-        shader->SetConstColour(QVector4D(0.5f, 1.0f, 0.5f, 1.0f));
+        shader->SetConstColour(QVector4D(0.5f, 1.0f, 0.5f, 0.5f));
 
         shader->UpdateObjectUniforms();
 
-        RendererInterface::m_pimpl->SetPolyMode(PolyMode::LINE);
         RendererInterface * renderer = RendererInterface::m_pimpl;
         AbstractRenderCommand a(PrimitiveType::TRIANGLES,
                                 renderer->GetTexturedCubePrimCount(),
@@ -3602,10 +3559,8 @@ void RoomObject::DrawPortalGL(QPointer <AssetShader> shader)
                                 renderer->GetDepthMask(),
                                 renderer->GetStencilFunc(),
                                 renderer->GetStencilOp(),
-                                renderer->GetPolyMode(),
                                 renderer->GetColorMask());
-        renderer->PushAbstractRenderCommand(a);
-        RendererInterface::m_pimpl->SetPolyMode(PolyMode::FILL);
+        renderer->PushAbstractRenderCommand(a);        
     }
 
     shader->SetUseTexture(0, true);
@@ -3710,7 +3665,6 @@ void RoomObject::DrawPortalBackGL(QPointer <AssetShader> shader) const
                                 renderer->GetDepthMask(),
                                 renderer->GetStencilFunc(),
                                 renderer->GetStencilOp(),
-                                renderer->GetPolyMode(),
                                 renderer->GetColorMask());
         renderer->PushAbstractRenderCommand(a);
     }
@@ -3734,7 +3688,6 @@ void RoomObject::DrawPortalBackGL(QPointer <AssetShader> shader) const
                                 renderer->GetDepthMask(),
                                 renderer->GetStencilFunc(),
                                 renderer->GetStencilOp(),
-                                renderer->GetPolyMode(),
                                 renderer->GetColorMask());
         renderer->PushAbstractRenderCommand(a);
     }
@@ -3795,7 +3748,6 @@ void RoomObject::DrawPortalInsideGL(QPointer <AssetShader> shader) const
                                 renderer->GetDepthMask(),
                                 renderer->GetStencilFunc(),
                                 renderer->GetStencilOp(),
-                                renderer->GetPolyMode(),
                                 renderer->GetColorMask());
         renderer->PushAbstractRenderCommand(a);
     }
@@ -3819,7 +3771,6 @@ void RoomObject::DrawPortalInsideGL(QPointer <AssetShader> shader) const
                                 renderer->GetDepthMask(),
                                 renderer->GetStencilFunc(),
                                 renderer->GetStencilOp(),
-                                renderer->GetPolyMode(),
                                 renderer->GetColorMask());
         renderer->PushAbstractRenderCommand(a);
     }
@@ -3868,7 +3819,6 @@ void RoomObject::DrawPortalFrameGL(QPointer <AssetShader> shader)
                                 renderer->GetDepthMask(),
                                 renderer->GetStencilFunc(),
                                 renderer->GetStencilOp(),
-                                renderer->GetPolyMode(),
                                 renderer->GetColorMask());
         renderer->PushAbstractRenderCommand(a);
 
@@ -3892,7 +3842,6 @@ void RoomObject::DrawPortalFrameGL(QPointer <AssetShader> shader)
                                  renderer->GetDepthMask(),
                                  renderer->GetStencilFunc(),
                                  renderer->GetStencilOp(),
-                                 renderer->GetPolyMode(),
                                  renderer->GetColorMask());
         renderer->PushAbstractRenderCommand(a2);
 
@@ -3916,7 +3865,6 @@ void RoomObject::DrawPortalFrameGL(QPointer <AssetShader> shader)
                                  renderer->GetDepthMask(),
                                  renderer->GetStencilFunc(),
                                  renderer->GetStencilOp(),
-                                 renderer->GetPolyMode(),
                                  renderer->GetColorMask());
         renderer->PushAbstractRenderCommand(a3);
     }
@@ -3942,7 +3890,6 @@ void RoomObject::DrawPortalFrameGL(QPointer <AssetShader> shader)
                                 renderer->GetDepthMask(),
                                 renderer->GetStencilFunc(),
                                 renderer->GetStencilOp(),
-                                renderer->GetPolyMode(),
                                 renderer->GetColorMask());
         renderer->PushAbstractRenderCommand(a);
 
@@ -3966,7 +3913,6 @@ void RoomObject::DrawPortalFrameGL(QPointer <AssetShader> shader)
                                  renderer->GetDepthMask(),
                                  renderer->GetStencilFunc(),
                                  renderer->GetStencilOp(),
-                                 renderer->GetPolyMode(),
                                  renderer->GetColorMask());
         renderer->PushAbstractRenderCommand(a2);
 
@@ -3990,7 +3936,6 @@ void RoomObject::DrawPortalFrameGL(QPointer <AssetShader> shader)
                                  renderer->GetDepthMask(),
                                  renderer->GetStencilFunc(),
                                  renderer->GetStencilOp(),
-                                 renderer->GetPolyMode(),
                                  renderer->GetColorMask());
         renderer->PushAbstractRenderCommand(a3);
     }
@@ -4042,7 +3987,6 @@ void RoomObject::DrawPortalStencilGL(QPointer <AssetShader> shader, const bool d
                                 renderer->GetDepthMask(),
                                 renderer->GetStencilFunc(),
                                 renderer->GetStencilOp(),
-                                PolyMode::FILL,
                                 renderer->GetColorMask());
         renderer->PushAbstractRenderCommand(a);
         if (draw_offset_stencil)
@@ -4066,8 +4010,7 @@ void RoomObject::DrawPortalStencilGL(QPointer <AssetShader> shader, const bool d
                                      DepthFunc::LEQUAL,
                                      renderer->GetDepthMask(),
                                      renderer->GetStencilFunc(),
-                                     renderer->GetStencilOp(),
-                                     PolyMode::FILL,
+                                     renderer->GetStencilOp(),                                     
                                      renderer->GetColorMask());
             renderer->PushAbstractRenderCommand(a2);
             RendererInterface::m_pimpl->SetDefaultFaceCullMode(FaceCullMode::BACK);
@@ -4093,8 +4036,7 @@ void RoomObject::DrawPortalStencilGL(QPointer <AssetShader> shader, const bool d
                                 DepthFunc::LEQUAL,
                                 renderer->GetDepthMask(),
                                 renderer->GetStencilFunc(),
-                                renderer->GetStencilOp(),
-                                PolyMode::FILL,
+                                renderer->GetStencilOp(),                                
                                 renderer->GetColorMask());
         renderer->PushAbstractRenderCommand(a);
         if (draw_offset_stencil)
@@ -4118,8 +4060,7 @@ void RoomObject::DrawPortalStencilGL(QPointer <AssetShader> shader, const bool d
                                      DepthFunc::LEQUAL,
                                      renderer->GetDepthMask(),
                                      renderer->GetStencilFunc(),
-                                     renderer->GetStencilOp(),
-                                     PolyMode::FILL,
+                                     renderer->GetStencilOp(),                                     
                                      renderer->GetColorMask());
             renderer->PushAbstractRenderCommand(a2);
             RendererInterface::m_pimpl->SetDefaultFaceCullMode(FaceCullMode::BACK);

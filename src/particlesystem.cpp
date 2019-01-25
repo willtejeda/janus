@@ -295,11 +295,8 @@ void ParticleSystem::DrawGL(QPointer <AssetShader> shader, const QVector3D eye_p
                             renderer->GetDepthMask(),
                             renderer->GetStencilFunc(),
                             renderer->GetStencilOp(),
-                            renderer->GetPolyMode(),
                             renderer->GetColorMask());
             renderer->PushAbstractRenderCommand(a);
-
-            //shader->SetUseParticleColours(false); //55.10
         }
     }
 }

@@ -443,7 +443,6 @@ void TextGeom::DrawSelectedGL(QPointer <AssetShader> shader)
                                 renderer->GetDepthMask(),
                                 renderer->GetStencilFunc(),
                                 renderer->GetStencilOp(),
-                                renderer->GetPolyMode(),
                                 renderer->GetColorMask());
         renderer->PushAbstractRenderCommand(a);
     }
@@ -502,8 +501,7 @@ void TextGeom::DrawGL(QPointer <AssetShader> shader)
                                 renderer->GetDepthFunc(),
                                 renderer->GetDepthMask(),
                                 renderer->GetStencilFunc(),
-                                renderer->GetStencilOp(),
-                                renderer->GetPolyMode(),
+                                renderer->GetStencilOp(),                                
                                 renderer->GetColorMask());
         renderer->PushAbstractRenderCommand(a);
     }

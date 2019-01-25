@@ -166,7 +166,6 @@ void AssetSkybox::DrawGL(QPointer <AssetShader> shader, const QMatrix4x4 & model
                             renderer->GetDepthMask(),
                             renderer->GetStencilFunc(),
                             renderer->GetStencilOp(),
-                            renderer->GetPolyMode(),
                             renderer->GetColorMask());
     renderer->PushAbstractRenderCommand(a);
 

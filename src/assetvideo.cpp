@@ -121,14 +121,13 @@ void AssetVideo::DrawGL(MediaContext * ctx, QPointer <AssetShader> shader, const
                             renderer->GetDepthMask(),
                             renderer->GetStencilFunc(),
                             renderer->GetStencilOp(),
-                            renderer->GetPolyMode(),
                             renderer->GetColorMask());
     renderer->PushAbstractRenderCommand(a);
 }
 
 void AssetVideo::DrawSelectedGL(QPointer <AssetShader> shader)
 {
-    shader->SetConstColour(QVector4D(0.5f, 1.0f, 0.5f, 1.0f));
+    shader->SetConstColour(QVector4D(0.5f, 1.0f, 0.5f, 0.25f));
     shader->SetChromaKeyColour(QVector4D(0.0f, 0.0f, 0.0f, 0.0f));
     shader->SetUseCubeTextureAll(false);
     shader->SetUseTextureAll(false);
@@ -137,8 +136,6 @@ void AssetVideo::DrawSelectedGL(QPointer <AssetShader> shader)
     shader->SetDiffuse(QVector3D(1.0f, 1.0f, 1.0f));
     shader->SetSpecular(QVector3D(0.04f, 0.04f, 0.04f));
     shader->SetShininess(20.0f);
-
-    RendererInterface::m_pimpl->SetPolyMode(PolyMode::LINE);
 
     shader->UpdateObjectUniforms();
 
@@ -161,12 +158,10 @@ void AssetVideo::DrawSelectedGL(QPointer <AssetShader> shader)
                             renderer->GetDepthMask(),
                             renderer->GetStencilFunc(),
                             renderer->GetStencilOp(),
-                            renderer->GetPolyMode(),
                             renderer->GetColorMask());
     renderer->PushAbstractRenderCommand(a);
 
     shader->SetConstColour(QVector4D(1,1,1,1));
-    RendererInterface::m_pimpl->SetPolyMode(PolyMode::FILL);
 }
 
 TextureHandle* AssetVideo::GetTextureHandle(MediaContext * ctx, const bool left_eye)

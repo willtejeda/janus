@@ -14,20 +14,13 @@ float MathUtil::_PI = 3.14159f;
 float MathUtil::_2_PI = 3.14159f * 2.0f;
 float MathUtil::_PI_OVER_2 = 3.14159f / 2.0f;
 float MathUtil::_PI_OVER_4 = 3.14159f / 4.0f;
-#ifndef __ANDROID__
-    QOpenGLFunctions_4_4_Core * MathUtil::glFuncs = nullptr;
-#else
-    QOpenGLExtraFunctions * MathUtil::glFuncs = nullptr;
-#endif
+
+QOpenGLExtraFunctions * MathUtil::glFuncs = nullptr;
 
 QList <QMatrix4x4> MathUtil::modelmatrix_stack;
 QMatrix4x4 MathUtil::m_roomMatrix;
 QMatrix4x4 MathUtil::projectionmatrix;
 QMatrix4x4 MathUtil::viewmatrix;
-bool MathUtil::m_using_GL44 = false;
-bool MathUtil::m_loop_render = false;
-bool MathUtil::m_capture_frame = false;
-QString MathUtil::m_requested_gl_version = QString("3.3");
 QString MathUtil::m_last_screenshot_path = QString("");
 QStringList MathUtil::error_log_msgs;
 QStringList MathUtil::error_log_msgs_temp;
@@ -329,25 +322,7 @@ bool MathUtil::InitializeGLContext()
 		return false;
     }
 
-	auto const major_version = c->format().majorVersion();
-	auto const minor_version = c->format().minorVersion();
-	bool const is_gl_44_context = (major_version > 4 || (major_version == 4 && minor_version >= 4));
-
-#ifndef __ANDROID__
-    if (is_gl_44_context)
-    {
-        glFuncs = c->versionFunctions<QOpenGLFunctions_4_4_Core>();
-		m_using_GL44 = true;
-	}
-	else
-	{
-        glFuncs = (QOpenGLFunctions_4_4_Core*)c->versionFunctions<QOpenGLFunctions_3_3_Core>();
-        MathUtil::m_requested_gl_version = QString("3.3");
-    }
-#else
     glFuncs = c->extraFunctions();
-    MathUtil::m_requested_gl_version = QString("ES");
-#endif
 
 	if (glFuncs == NULL) {
 //		QMessageBox::critical(NULL, "Error", "Could not obtain required OpenGL context (version 3.3).  Ensure your graphics hardware is capable of supporting OpenGL 3.3, and necessary drivers are installed.");
@@ -355,15 +330,7 @@ bool MathUtil::InitializeGLContext()
 		return false;
 	}
 
-#ifndef __ANDROID__
-    if (!glFuncs->initializeOpenGLFunctions()) {
-//        QMessageBox::critical(NULL, "Error", "Call to initializeOpenGLFunctions() failed.");
-        qDebug() << "MathUtil::InitializeGLContext() - Call to initializeOpenGLFunctions() failed.";
-        return false;
-    }
-#else
     glFuncs->initializeOpenGLFunctions();
-#endif
 
 	// If the debug callback extension is supported we wrangle the function pointer and enable it
 	// This is used to catch GL errors as they occur. By setting a breakpoint in the callback

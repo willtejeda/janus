@@ -289,8 +289,7 @@ private:
     void DoEditsDeletes(QPointer <RoomObject> obj);   
 
     void create_filtered_cubemaps_from_skybox();
-    void remove_intermediate_cubemap_files();
-    void save_cubemap_faces_to_cache(QString p_room_url_md5_string, QVector<QString>& p_file_names);
+    void remove_intermediate_cubemap_files();    
 
     void AddPrimitiveAssetObjects();
 

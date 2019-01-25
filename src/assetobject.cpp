@@ -181,7 +181,6 @@ void AssetObject::DrawGL(QPointer <AssetShader> shader, const QColor col, const 
                                 renderer->GetDepthMask(),
                                 renderer->GetStencilFunc(),
                                 renderer->GetStencilOp(),
-                                renderer->GetPolyMode(),
                                 renderer->GetColorMask());
         renderer->PushAbstractRenderCommand(a);
         MathUtil::PopModelMatrix();

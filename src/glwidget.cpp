@@ -17,19 +17,7 @@ GLWidget::GLWidget()
     take_bookmark = false;
 
 #ifndef __ANDROID__
-    QSurfaceFormat format;
-
-    int major = 4;
-    int minor = 4;
-
-    if (MathUtil::m_requested_gl_version == "3.3")
-    {
-        major = 3;
-        minor = 3;
-    }
-
-    format.setMajorVersion(major);
-    format.setMinorVersion(minor);
+    QSurfaceFormat format;   
     format.setProfile(QSurfaceFormat::CoreProfile);
     format.setRenderableType(QSurfaceFormat::OpenGL);
     format.setSwapBehavior(QSurfaceFormat::TripleBuffer);
@@ -604,7 +592,7 @@ void GLWidget::initializeGL()
     if (MathUtil::InitializeGLContext())
     {
         RendererInterface::m_pimpl = Renderer::GetSingleton();
-        RendererInterface::m_pimpl->Initialize(MathUtil::m_requested_gl_version);
+        RendererInterface::m_pimpl->Initialize();
         SetupFramebuffer();
     }
 }

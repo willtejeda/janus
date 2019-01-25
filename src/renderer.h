@@ -29,7 +29,7 @@ public:
     uint32_t CreateVAO();
     uint32_t DeleteVAO();
 
-    void Initialize(const QString& p_requested_gl_version);
+    void Initialize();
     void InitializeScopes();
     void InitializeState();
     void InitializeLightUBOs();
@@ -98,9 +98,6 @@ public:
     void SetStencilOp(StencilOp p_stencil_op);
     StencilOp GetStencilOp() const;
 
-    void SetPolyMode(PolyMode p_poly_mode);
-    PolyMode GetPolyMode() const;
-
     void SetColorMask(ColorMask p_color_mask);
     ColorMask GetColorMask() const;
 
@@ -112,25 +109,13 @@ public:
 
     void Render();
     void PushAbstractRenderCommand(AbstractRenderCommand& p_object_render_command);
-    void RenderObjects();
-	void RenderObjectsDebug();
-    void ClearObjectRenderQueue();
+    void RenderObjects();	    
 
     void PushLightContainer(LightContainer const * p_lightContainer, StencilReferenceValue p_room_stencil_ref);
 
     void BeginScope(RENDERER::RENDER_SCOPE p_scope);
     void EndCurrentScope();
     RENDERER::RENDER_SCOPE GetCurrentScope();
-
-    bool AreObjectsVisible() const;
-    bool AreBoundingBoxesVisible() const;
-    bool ArePhysicsProxiesVisible() const;
-    bool AreWireframesVisible() const;
-    bool AreNormalsVisible() const;
-    bool AreFramebufferLayersVisible() const;
-    void ToggleImmediateMode();
-
-	void ClearRenderQueues();
 
     QVector<uint64_t> & GetGPUTimeQueryResults();
     QVector<uint64_t> & GetCPUTimeQueryResults();
@@ -188,26 +173,14 @@ private:
 
     void PreRender(QHash<int, QVector<AbstractRenderCommand> > & p_scoped_render_commands, QHash<StencilReferenceValue, LightContainer> & p_scoped_light_containers);
     void PostRender(QHash<int, QVector<AbstractRenderCommand> > & p_scoped_render_commands, QHash<StencilReferenceValue, LightContainer> & p_scoped_light_containers);
-
-    RENDERER::RENDER_SCOPE m_current_scope;
-    std::unique_ptr<AbstractRenderer> m_abstractRenderer;
-    QString m_requested_version_string;
-    // This notation causes the char to act like a bitfield with 6/8 used.
-    // Reading these values will create new unsigned chars with the value
-    // shifted to the correct place so this a nice reduction in size of the class
-    // as well as a possible small perf gain as all the bits we care about are
-    // read into a single register upon reading any one of them.
-    unsigned char m_render_objects : 1;
-    unsigned char m_render_bounding_boxes : 1;
-    unsigned char m_render_physics_proxies : 1;
-    unsigned char m_render_wireframes : 1;
-    unsigned char m_render_normals : 1;
-    unsigned char m_render_framebuffer_layers : 1;
-    bool m_immediate_mode;
-	RendererInterface* m_interface;
-    QVector<AbstractRenderCommand_sort> m_sorted_command_indices;
     void SortRenderCommandsByDistance(QVector<AbstractRenderCommand>& render_command_vector, const bool p_is_transparent);
     void EnableRenderCommandInstancing(const RENDERER::RENDER_SCOPE p_scope);
+
+    RENDERER::RENDER_SCOPE m_current_scope;
+    std::unique_ptr<AbstractRenderer> m_abstractRenderer;    
+
+    QVector<AbstractRenderCommand_sort> m_sorted_command_indices;
+
     int m_collapsed_draws;
     int m_collapsable_draws;
 };

@@ -1111,7 +1111,6 @@ void Geom::DrawGL(QPointer <AssetShader> shader, const QColor col, const bool ov
                                     renderer->GetDepthMask(),
                                     renderer->GetStencilFunc(),
                                     renderer->GetStencilOp(),
-                                    renderer->GetPolyMode(),
                                     renderer->GetColorMask());
 
             const int instance_count = vbo_data.m_instance_transforms.size();

@@ -292,72 +292,6 @@ void Room::SetRoomTemplate(const QString & name)
     props->SetUseLocalAsset(name);
 }
 
-void Room::save_cubemap_faces_to_cache(QString p_room_url_md5_string, QVector<QString>& p_file_names)
-{
-#ifndef __ANDROID__
-    auto gl_tex_id = cubemap->GetTextureHandle();
-
-    if (gl_tex_id != 0 && gl_tex_id != AssetImage::null_cubemap_tex_handle.get())
-    {
-        const QString cache_path = MathUtil::GetCachePath();
-
-        int gl_tex_width;
-        int gl_tex_height;
-        int gl_tex_red_size;
-        int gl_tex_internal_format;
-        int gl_tex_swizzle_mask[4];
-        int gl_max_level;
-        int target_mip_level;
-        gl_tex_swizzle_mask[0] = GL_RED;
-        gl_tex_swizzle_mask[1] = GL_GREEN;
-        gl_tex_swizzle_mask[2] = GL_BLUE;
-        gl_tex_swizzle_mask[3] = GL_ALPHA;
-
-        RendererInterface::m_pimpl->BindTextureHandle(10, gl_tex_id);
-        MathUtil::glFuncs->glGetTexParameteriv(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, &gl_max_level);
-        MathUtil::glFuncs->glGetTexParameteriv(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_SWIZZLE_R, &(gl_tex_swizzle_mask[0]));
-        MathUtil::glFuncs->glGetTexParameteriv(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_SWIZZLE_G, &(gl_tex_swizzle_mask[1]));
-        MathUtil::glFuncs->glGetTexParameteriv(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_SWIZZLE_B, &(gl_tex_swizzle_mask[2]));
-        MathUtil::glFuncs->glGetTexParameteriv(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_SWIZZLE_A, &(gl_tex_swizzle_mask[3]));
-
-        // Chose the texture level that nearest to but at least 256
-        target_mip_level = (gl_max_level < 9) ? 0 : gl_max_level - 8;
-
-        MathUtil::glFuncs->glGetTexLevelParameteriv(GL_TEXTURE_CUBE_MAP_POSITIVE_X, target_mip_level, GL_TEXTURE_WIDTH, &gl_tex_width);
-        MathUtil::glFuncs->glGetTexLevelParameteriv(GL_TEXTURE_CUBE_MAP_POSITIVE_X, target_mip_level, GL_TEXTURE_HEIGHT, &gl_tex_height);
-        MathUtil::glFuncs->glGetTexLevelParameteriv(GL_TEXTURE_CUBE_MAP_POSITIVE_X, target_mip_level, GL_TEXTURE_RED_SIZE, &gl_tex_red_size);
-        MathUtil::glFuncs->glGetTexLevelParameteriv(GL_TEXTURE_CUBE_MAP_POSITIVE_X, target_mip_level, GL_TEXTURE_INTERNAL_FORMAT, &gl_tex_internal_format);
-
-        QByteArray pixel_data = QByteArray();
-        pixel_data.resize(gl_tex_width * gl_tex_height * 3);
-        p_file_names.resize(6);        
-        for(uint i = 0; i < 6; ++i)
-        {
-            MathUtil::glFuncs->glGetTexImage(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, target_mip_level, GL_RGB, GL_UNSIGNED_BYTE, pixel_data.data());
-
-            QImage image = QImage((uchar*)pixel_data.data(), gl_tex_width, gl_tex_height, gl_tex_width * 3, QImage::Format::Format_RGBA8888);
-
-            p_file_names[i] = cache_path + QString("%1_cubemap_face%2.dds").arg(p_room_url_md5_string).arg(QString::number(i));
-
-            QDir path_dir(cache_path);
-            if (!path_dir.exists()) {
-                path_dir.mkpath(".");
-            }
-
-            if(gl_tex_swizzle_mask[0] == GL_BLUE && gl_tex_swizzle_mask[1] == GL_GREEN && gl_tex_swizzle_mask[2] == GL_RED)
-            {
-                QImage rgbSwapped = image.rgbSwapped();
-                rgbSwapped.save(p_file_names[i], "dds");
-            }
-            else
-            {
-                image.save(p_file_names[i],"dds");
-            }
-        }
-    }
-#endif
-}
-
 QString Room::GetSaveFilename() const
 {
     //if the file exists locally, return it's path, otherwise, return a workspaces timestamped filename
@@ -723,95 +657,96 @@ void Room::BindCubemaps(QPointer <AssetShader> shader)
     bool const has_radiance_cubemap = !cubemap_radiance.isNull();
     bool const has_irradiance_cubemap = !cubemap_irradiance.isNull();
 
-#ifndef __ANDROID__
-    // If we have a valid loaded cubemap and either of our radiance and irradiance maps are null
-    // and we haven't already requested cubemap processing then save out the faces of the cubemap and
-    // register them for processing.
-    TextureHandle* gl_tex_id = nullptr;
-    if (has_cubemap)
-    {
-        gl_tex_id = cubemap->GetTextureHandle();
-        qint64 room_url_md5 = MathUtil::hash(props->GetURL());
-        FilteredCubemapManager* cubemap_manager = FilteredCubemapManager::GetSingleton();
-        PROCESSING_STATE current_processing_state = cubemap_manager->GetProcessingState(room_url_md5);
-        bool const has_valid_cubemap = (
-                gl_tex_id != 0
-                && gl_tex_id != AssetImage::null_cubemap_tex_handle.get()
-                && gl_tex_id != AssetImage::null_image_tex_handle.get());
+    //62.2 - not reliable/crashing code
+//#ifndef __ANDROID__
+//    // If we have a valid loaded cubemap and either of our radiance and irradiance maps are null
+//    // and we haven't already requested cubemap processing then save out the faces of the cubemap and
+//    // register them for processing.
+//    TextureHandle* gl_tex_id = nullptr;
+//    if (has_cubemap)
+//    {
+//        gl_tex_id = cubemap->GetTextureHandle();
+//        qint64 room_url_md5 = MathUtil::hash(props->GetURL());
+//        FilteredCubemapManager* cubemap_manager = FilteredCubemapManager::GetSingleton();
+//        PROCESSING_STATE current_processing_state = cubemap_manager->GetProcessingState(room_url_md5);
+//        bool const has_valid_cubemap = (
+//                gl_tex_id != 0
+//                && gl_tex_id != AssetImage::null_cubemap_tex_handle.get()
+//                && gl_tex_id != AssetImage::null_image_tex_handle.get());
 
 
-        if (has_valid_cubemap
-            && (!has_radiance_cubemap || !has_irradiance_cubemap)
-            && current_processing_state == PROCESSING_STATE::INVALID)
-        {            
-            QString room_url_md5_string = QString::number(room_url_md5);
-            QString room_save_filename = GetSaveFilename();
-            bool is_room_local = QFileInfo(room_save_filename).exists();
-            QString room_base_absolute_path = QFileInfo(GetSaveFilename()).absoluteDir().absolutePath();
-            QString const cubemap_base_path = (is_room_local == false) ? MathUtil::GetCachePath(): room_base_absolute_path  + "/" ;
-            QString cubemap_output_path_irradiance = cubemap_base_path + QString("%1_cubemap_irradiance64").arg(room_url_md5_string);
-            QString cubemap_output_path_radiance = cubemap_base_path + QString("%1_cubemap_radiance256").arg(room_url_md5_string);
+//        if (has_valid_cubemap
+//            && (!has_radiance_cubemap || !has_irradiance_cubemap)
+//            && current_processing_state == PROCESSING_STATE::INVALID)
+//        {
+//            QString room_url_md5_string = QString::number(room_url_md5);
+//            QString room_save_filename = GetSaveFilename();
+//            bool is_room_local = QFileInfo(room_save_filename).exists();
+//            QString room_base_absolute_path = QFileInfo(GetSaveFilename()).absoluteDir().absolutePath();
+//            QString const cubemap_base_path = (is_room_local == false) ? MathUtil::GetCachePath(): room_base_absolute_path  + "/" ;
+//            QString cubemap_output_path_irradiance = cubemap_base_path + QString("%1_cubemap_irradiance64").arg(room_url_md5_string);
+//            QString cubemap_output_path_radiance = cubemap_base_path + QString("%1_cubemap_radiance256").arg(room_url_md5_string);
 
-            QVector<QString> file_names;
-            file_names.reserve(2);
+//            QVector<QString> file_names;
+//            file_names.reserve(2);
 
-            //save_cubemap_faces_to_cache(room_url_md5_string, file_names);
+//            //save_cubemap_faces_to_cache(room_url_md5_string, file_names);
 
-            file_names.push_back(cubemap_output_path_irradiance);
-            file_names.push_back(cubemap_output_path_radiance);
-            Cubemaps cubemaps(file_names, gl_tex_id);
-            RendererInterface::m_pimpl->GenerateEnvMapsFromCubemapTextureHandle(cubemaps);
-            cubemap_manager->RegisterForProcessing(room_url_md5, cubemaps);
-        }
-        else if (current_processing_state == PROCESSING_STATE::READY)
-        {
-            const QString cache_path = MathUtil::GetCachePath();
-            qint64 room_url_md5 = MathUtil::hash(props->GetURL());
-            QString room_url_md5_string = QString::number(room_url_md5);
-            QVector <QPointer <AssetImage> > imgs = QVector <QPointer <AssetImage> > (1);
-            QString room_save_filename = GetSaveFilename();
-            bool is_room_local = QFileInfo(room_save_filename).exists();
-            QString room_base_absolute_path = QFileInfo(GetSaveFilename()).absoluteDir().absolutePath();
-            QString cubemap_base_path = (is_room_local == false) ? cache_path : room_base_absolute_path + '/';
+//            file_names.push_back(cubemap_output_path_irradiance);
+//            file_names.push_back(cubemap_output_path_radiance);
+//            Cubemaps cubemaps(file_names, gl_tex_id);
+//            RendererInterface::m_pimpl->GenerateEnvMapsFromCubemapTextureHandle(cubemaps);
+//            cubemap_manager->RegisterForProcessing(room_url_md5, cubemaps);
+//        }
+//        else if (current_processing_state == PROCESSING_STATE::READY)
+//        {
+//            const QString cache_path = MathUtil::GetCachePath();
+//            qint64 room_url_md5 = MathUtil::hash(props->GetURL());
+//            QString room_url_md5_string = QString::number(room_url_md5);
+//            QVector <QPointer <AssetImage> > imgs = QVector <QPointer <AssetImage> > (1);
+//            QString room_save_filename = GetSaveFilename();
+//            bool is_room_local = QFileInfo(room_save_filename).exists();
+//            QString room_base_absolute_path = QFileInfo(GetSaveFilename()).absoluteDir().absolutePath();
+//            QString cubemap_base_path = (is_room_local == false) ? cache_path : room_base_absolute_path + '/';
 
-            cubemap_base_path = QUrl::fromLocalFile(cubemap_base_path).toString();
+//            cubemap_base_path = QUrl::fromLocalFile(cubemap_base_path).toString();
 
-            const QString rad_src = QString("./%1_cubemap_radiance256.dds").arg(room_url_md5_string);
-            const QString irrad_src = QString("./%1_cubemap_irradiance64.dds").arg(room_url_md5_string);
-//            qDebug() << "Room::BindCubemaps cubemap_base_path" << cubemap_base_path << rad_src << irrad_src;
+//            const QString rad_src = QString("./%1_cubemap_radiance256.dds").arg(room_url_md5_string);
+//            const QString irrad_src = QString("./%1_cubemap_irradiance64.dds").arg(room_url_md5_string);
+////            qDebug() << "Room::BindCubemaps cubemap_base_path" << cubemap_base_path << rad_src << irrad_src;
 
-            QPointer<AssetImage> radiance_image = new AssetImage();
-            radiance_image->SetSrc(cubemap_base_path, rad_src);
-            radiance_image->GetProperties()->SetTexClamp(true);
-            radiance_image->GetProperties()->SetTexMipmap(true);
-            radiance_image->GetProperties()->SetID("__CUBEMAP_RADIANCE");
-            radiance_image->GetProperties()->SetSaveToMarkup(false); //60.0 - always add Asset to Room (so it links the texture), but do mark it for not-write-to-markup
+//            QPointer<AssetImage> radiance_image = new AssetImage();
+//            radiance_image->SetSrc(cubemap_base_path, rad_src);
+//            radiance_image->GetProperties()->SetTexClamp(true);
+//            radiance_image->GetProperties()->SetTexMipmap(true);
+//            radiance_image->GetProperties()->SetID("__CUBEMAP_RADIANCE");
+//            radiance_image->GetProperties()->SetSaveToMarkup(false); //60.0 - always add Asset to Room (so it links the texture), but do mark it for not-write-to-markup
 
-            AddAssetImage(radiance_image);
-            imgs[0] = GetAssetImage(radiance_image->GetProperties()->GetID());
+//            AddAssetImage(radiance_image);
+//            imgs[0] = GetAssetImage(radiance_image->GetProperties()->GetID());
 
-            cubemap_radiance = new AssetSkybox();
-            cubemap_radiance->SetAssetImages(imgs);
+//            cubemap_radiance = new AssetSkybox();
+//            cubemap_radiance->SetAssetImages(imgs);
 
-            QPointer<AssetImage> irradiance_image = new AssetImage();
-            irradiance_image->SetSrc(cubemap_base_path, irrad_src);
-            irradiance_image->GetProperties()->SetTexClamp(true);
-            irradiance_image->GetProperties()->SetTexMipmap(true);
-            irradiance_image->GetProperties()->SetID("__CUBEMAP_IRRADIANCE");
-            irradiance_image->GetProperties()->SetSaveToMarkup(false); //60.0 - always add Asset to Room (so it links the texture), but do mark it for not-write-to-markup
+//            QPointer<AssetImage> irradiance_image = new AssetImage();
+//            irradiance_image->SetSrc(cubemap_base_path, irrad_src);
+//            irradiance_image->GetProperties()->SetTexClamp(true);
+//            irradiance_image->GetProperties()->SetTexMipmap(true);
+//            irradiance_image->GetProperties()->SetID("__CUBEMAP_IRRADIANCE");
+//            irradiance_image->GetProperties()->SetSaveToMarkup(false); //60.0 - always add Asset to Room (so it links the texture), but do mark it for not-write-to-markup
 
-            AddAssetImage(irradiance_image);
-            imgs[0] = GetAssetImage(irradiance_image->GetProperties()->GetID());
+//            AddAssetImage(irradiance_image);
+//            imgs[0] = GetAssetImage(irradiance_image->GetProperties()->GetID());
 
-            cubemap_irradiance = new AssetSkybox();
-            cubemap_irradiance->SetAssetImages(imgs);
+//            cubemap_irradiance = new AssetSkybox();
+//            cubemap_irradiance->SetAssetImages(imgs);
 
-            // If room is not local this call will queue the filtered cubemap files for deletion.
-            // We keep the files for local rooms as we've just added them as AssetImages in the room markup.
-            cubemap_manager->RemoveFromProcessing(room_url_md5, !is_room_local);
-        }
-    }
-#endif
+//            // If room is not local this call will queue the filtered cubemap files for deletion.
+//            // We keep the files for local rooms as we've just added them as AssetImages in the room markup.
+//            cubemap_manager->RemoveFromProcessing(room_url_md5, !is_room_local);
+//        }
+//    }
+//#endif
 
     if (has_radiance_cubemap)
     {

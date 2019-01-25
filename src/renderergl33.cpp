@@ -7,8 +7,7 @@ RendererGL33::RendererGL33() :
       m_main_fbo(0),
       m_is_initialized(false),
       m_hmd_initialized(false),
-      m_capture_frame(false),      
-      m_fps_timer(nullptr),
+      m_capture_frame(false),            
       m_frame_time(0),
       m_screenshot_pbo_pending(false),
       m_screenshot_pbo(0),
@@ -28,13 +27,8 @@ void RendererGL33::Initialize()
     PostConstructorInitialize();
     m_meshes_pending_deletion.reserve(1024);
 
-#ifdef __ANDROID__
-    m_name = QString("OpenGL ES 3.1");
-#else
-    m_name = QString("OpenGL 3.3");
-#endif
-
     InitializeGLContext(QOpenGLContext::currentContext());
+    m_name = QString((char *)(m_gl_funcs->glGetString(GL_VERSION)));
 
     // Object Shader
     QString default_object_vertex_shader_path("assets/shaders/vertex.txt");
@@ -133,11 +127,7 @@ void RendererGL33::CompileAndLinkShaderProgram2(std::shared_ptr<ProgramHandle> *
 #endif
     {
         UpgradeShaderSource(*p_vertex_shader, true);
-#ifdef __ANDROID__
         const char * shader_data = p_vertex_shader->data();
-#else
-        GLchar * shader_data = p_vertex_shader->data();
-#endif
         GLint shader_data_size = p_vertex_shader->size();
         MathUtil::glFuncs->glShaderSource(vertex_shader_id, 1, &shader_data, &shader_data_size);
         MathUtil::glFuncs->glCompileShader(vertex_shader_id);
@@ -163,11 +153,7 @@ void RendererGL33::CompileAndLinkShaderProgram2(std::shared_ptr<ProgramHandle> *
         default_object_vertex_shader_file.close();
 
         UpgradeShaderSource(default_object_vertex_shader_bytes, true);
-#ifdef __ANDROID__
         const char * shader_data = default_object_vertex_shader_bytes.data();
-#else
-        GLchar * shader_data = default_object_vertex_shader_bytes.data();
-#endif
         GLint shader_data_size = default_object_vertex_shader_bytes.size();
         MathUtil::glFuncs->glShaderSource(vertex_shader_id, 1, &shader_data, &shader_data_size);
         MathUtil::glFuncs->glCompileShader(vertex_shader_id);
@@ -191,11 +177,7 @@ void RendererGL33::CompileAndLinkShaderProgram2(std::shared_ptr<ProgramHandle> *
 #endif
     {
         UpgradeShaderSource(*p_fragment_shader, false);
-#ifdef __ANDROID__
         const char * shader_data = p_fragment_shader->data();
-#else
-        GLchar * shader_data = p_fragment_shader->data();
-#endif
         GLint shader_data_size = p_fragment_shader->size();
         MathUtil::glFuncs->glShaderSource(fragment_shader_id, 1, &shader_data, &shader_data_size);
         MathUtil::glFuncs->glCompileShader(fragment_shader_id);
@@ -218,11 +200,7 @@ void RendererGL33::CompileAndLinkShaderProgram2(std::shared_ptr<ProgramHandle> *
         QByteArray default_object_fragment_shader_bytes = MathUtil::LoadAssetFile(default_object_fragment_shader_path);
 
         UpgradeShaderSource(default_object_fragment_shader_bytes, false);
-#ifdef __ANDROID__
         const char * shader_data = default_object_fragment_shader_bytes.data();
-#else
-        GLchar * shader_data = default_object_fragment_shader_bytes.data();
-#endif
         GLint shader_data_size = default_object_fragment_shader_bytes.size();
         MathUtil::glFuncs->glShaderSource(fragment_shader_id, 1, &shader_data, &shader_data_size);
         MathUtil::glFuncs->glCompileShader(fragment_shader_id);
@@ -543,11 +521,7 @@ void RendererGL33::UpdatePerObjectData(QHash<int, QVector<AbstractRenderCommand>
 
 void RendererGL33::InitializeGLContext(QOpenGLContext * p_gl_context)
 {
-//    qDebug("RendererGL33RenderThread::InitializeGLContext");  
-    m_fps_timer = new QTimer();
-    QObject::connect(m_fps_timer, SIGNAL(timeout()), this, SLOT(PrintFPS()));
-    m_fps_timer->start(500);
-
+    qDebug("RendererGL33RenderThread::InitializeGLContext");
     m_gl_context = p_gl_context;
 
     m_gl_surface = new QOffscreenSurface();
@@ -556,21 +530,16 @@ void RendererGL33::InitializeGLContext(QOpenGLContext * p_gl_context)
     m_gl_surface->create();
 
     m_gl_context->makeCurrent(m_gl_surface);
-
-#ifndef __ANDROID__
-    m_gl_funcs = m_gl_context->versionFunctions<QOpenGLFunctions_3_3_Core>();
-#else
     m_gl_funcs = m_gl_context->extraFunctions();
-#endif
 
     // Create FBO to use for attaching main-thread FBO textures to for blitting
     m_main_fbo = 0;
     MathUtil::glFuncs->glGenFramebuffers(1, &m_main_fbo);
 
-#ifdef WIN32
-    SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
-#endif
-    QThread::currentThread()->setPriority(QThread::TimeCriticalPriority);
+//#ifdef WIN32
+//    SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
+//#endif
+//    QThread::currentThread()->setPriority(QThread::TimeCriticalPriority);
 
     m_gl_context->makeCurrent(m_gl_surface);
 
@@ -788,30 +757,6 @@ void RendererGL33::SaveScreenshot()
     }
 }
 
-
-void RendererGL33::PrintFPS()
-{
-    if (m_GPUTimeQueryResults.size() != 0)
-    {
-        uint64_t sum_frame_time = 0;
-        for (uint64_t frame_time_gpu : m_GPUTimeQueryResults)
-        {
-            sum_frame_time += static_cast<uint64_t>(frame_time_gpu);
-        }
-
-        uint64_t sum_cpu_time = 0;
-        for (uint64_t frame_time_cpu : m_CPUTimeQueryResults)
-        {
-            sum_cpu_time += static_cast<uint64_t>(frame_time_cpu);
-        }
-
-        sum_frame_time /= m_GPUTimeQueryResults.size();
-        sum_cpu_time /= m_CPUTimeQueryResults.size();
-
-//        qDebug() << "GPUFPS: " << 1000000000.0 / static_cast<double>(sum_frame_time) << "CPUFPS: " << 1000000000.0 / static_cast<double>(sum_cpu_time);
-    }
-}
-
 void RendererGL33::RenderEqui()
 {
     uint32_t const cube_cross_width = m_window_width;
@@ -904,8 +849,7 @@ void RendererGL33::RenderEqui()
                                        DepthFunc::ALWAYS,
                                        DepthMask::DEPTH_WRITES_DISABLED,
                                        StencilFunc(StencilTestFuncion::ALWAYS, StencilReferenceValue(0), StencilMask(0xffffffff)),
-                                       StencilOp(StencilOpAction::KEEP, StencilOpAction::KEEP, StencilOpAction::KEEP),
-                                       PolyMode::FILL,
+                                       StencilOp(StencilOpAction::KEEP, StencilOpAction::KEEP, StencilOpAction::KEEP),                                       
                                        ColorMask::COLOR_WRITES_ENABLED));
 
     // Do the second pass of rendering to convert cubemap to equi

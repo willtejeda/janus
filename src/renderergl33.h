@@ -40,9 +40,6 @@ public:
     void CreateMeshHandle(std::shared_ptr<MeshHandle> * p_handle, VertexAttributeLayout p_layout);
     void DecoupledRender();       
 
-public slots:
-    void PrintFPS();
-
 private:
 
     //renderthread
@@ -52,11 +49,8 @@ private:
 
     QOffscreenSurface *  m_gl_surface;
     QOpenGLContext * m_gl_context;
-#ifndef __ANDROID__
-    QOpenGLFunctions_3_3_Core * m_gl_funcs;
-#else
     QOpenGLExtraFunctions * m_gl_funcs;    
-#endif
+
     GLuint m_main_fbo;
     std::shared_ptr<TextureHandle> m_equi_cubemap_handle;
     uint32_t m_equi_cubemap_face_size;    
@@ -64,7 +58,6 @@ private:
     bool m_hmd_initialized;
     bool m_capture_frame;
 
-    QTimer* m_fps_timer;
     qint64  m_frame_time;
     bool m_screenshot_pbo_pending;
     GLuint m_screenshot_pbo;
