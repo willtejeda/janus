@@ -1992,25 +1992,33 @@ void Geom::CalculateFinalPoses()
 //                               * Rotation * PostRotation * RotationPivotInverse * ScalingOffset
 //                               * ScalingPivot * Scaling * ScalingPivotInverse
 //             where multiply is right to left.
+
+
+#ifdef __linux__
+            const bool apply_translate = true;
+#else
+            const bool apply_translate = false;
+#endif
+
             bool xform_anim = false;
             if (geom->anims.contains(node_name+"_$assimpfbx$_translation"))
             {
-                DoLocalTransformation(geom->anims[node_name+"_$assimpfbx$_translation"], nodeTransform, true);
+                DoLocalTransformation(geom->anims[node_name+"_$assimpfbx$_translation"], nodeTransform, apply_translate);
                 xform_anim = true;
             }
             if (geom->anims.contains(node_name+"_$assimpfbx$_prerotation"))
             {
-                DoLocalTransformation(geom->anims[node_name+"_$assimpfbx$_prerotation"], nodeTransform, true);
+                DoLocalTransformation(geom->anims[node_name+"_$assimpfbx$_prerotation"], nodeTransform, apply_translate);
                 xform_anim = true;
             }
             if (geom->anims.contains(node_name+"_$assimpfbx$_rotation"))
             {
-                DoLocalTransformation(geom->anims[node_name+"_$assimpfbx$_rotation"], nodeTransform, true);
+                DoLocalTransformation(geom->anims[node_name+"_$assimpfbx$_rotation"], nodeTransform, apply_translate);
                 xform_anim = true;
             }
             if (geom->anims.contains(node_name))
             {               
-                DoLocalTransformation(geom->anims[node_name], nodeTransform, true);
+                DoLocalTransformation(geom->anims[node_name], nodeTransform, apply_translate);
                 xform_anim = true;
             }
 
