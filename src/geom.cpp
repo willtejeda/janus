@@ -1995,22 +1995,22 @@ void Geom::CalculateFinalPoses()
             bool xform_anim = false;
             if (geom->anims.contains(node_name+"_$assimpfbx$_translation"))
             {
-                DoLocalTransformation(geom->anims[node_name+"_$assimpfbx$_translation"], nodeTransform, false);
+                DoLocalTransformation(geom->anims[node_name+"_$assimpfbx$_translation"], nodeTransform, true);
                 xform_anim = true;
             }
             if (geom->anims.contains(node_name+"_$assimpfbx$_prerotation"))
             {
-                DoLocalTransformation(geom->anims[node_name+"_$assimpfbx$_prerotation"], nodeTransform, false);
+                DoLocalTransformation(geom->anims[node_name+"_$assimpfbx$_prerotation"], nodeTransform, true);
                 xform_anim = true;
             }
             if (geom->anims.contains(node_name+"_$assimpfbx$_rotation"))
             {
-                DoLocalTransformation(geom->anims[node_name+"_$assimpfbx$_rotation"], nodeTransform, false);
+                DoLocalTransformation(geom->anims[node_name+"_$assimpfbx$_rotation"], nodeTransform, true);
                 xform_anim = true;
             }
             if (geom->anims.contains(node_name))
             {               
-                DoLocalTransformation(geom->anims[node_name], nodeTransform, false);
+                DoLocalTransformation(geom->anims[node_name], nodeTransform, true);
                 xform_anim = true;
             }
 
