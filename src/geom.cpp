@@ -806,7 +806,7 @@ void Geom::Update()
             for (int j=0; j<mat.textures.size(); ++j) {
                 QString s = mat.textures[j].filename.trimmed();
                 s = s.replace("\\", "/");
-                s = s.replace("%5C", "/");
+                s = s.replace("%5C", "/");               
 
                 // Search embedded textures for a filename match
                 QString s3(mat.textures[j].filename_unresolved);
@@ -818,6 +818,17 @@ void Geom::Update()
                 }
 
                 int tex_index = -1;
+#ifdef __linux__
+                //62.3 - hacky fix for Assimp where it uses a special asterisk indexing scheme
+                //    for texture assignment specifically for Linux
+//                qDebug() << "Geom::Update()" << path << s << s3 << scene->mNumTextures;
+                if (s3.left(1) == "*") {
+                    const int t_ind = s3.mid(1).toInt();
+                    if (t_ind >= 0 && t_ind <scene->mNumTextures) {
+                        tex_index = t_ind;
+                    }
+                }
+#else
                 for (unsigned int k=0; k<scene->mNumTextures; ++k) {
                     QString s2(scene->mTextures[k]->mFilename.C_Str());
                     if (!s3.isEmpty() && s2.contains(s3)) {
@@ -825,9 +836,9 @@ void Geom::Update()
                         break;
                     }
                 }
+#endif
 
                 if (tex_index >= 0) {
-
 //                    qDebug() << "Geom::Update() * test" << ok << tex_index << scene->mNumTextures << s+"."+QString(scene->mTextures[tex_index]->achFormatHint);
                     aiTexture * t = scene->mTextures[tex_index];
                     unsigned int size_data = 0;
@@ -859,7 +870,6 @@ void Geom::Update()
                     new_img->GetProperties()->SetTexColorspace((j == 0 || j == 1 || j == 5 || j == 6 || j == 8) ? tex_colorspace : "linear");
                     new_img->SetSrc(path, s+"."+QString(scene->mTextures[tex_index]->achFormatHint));
                     new_img->CreateFromData(mat.textures[j].ba);
-//                    qDebug() << "TEXTURE1!" << path << s+"."+QString(scene->mTextures[tex_index]->achFormatHint);
                     mat.textures[j].img = new_img;
 
                 }
@@ -874,7 +884,6 @@ void Geom::Update()
                     new_img->GetProperties()->SetTexColorspace((j == 0 || j == 1 || j == 5 || j == 6 || j == 8) ? tex_colorspace : "linear");
                     new_img->SetSrc(s, s);
                     new_img->Load();
-//                    qDebug() << "TEXTURE2!" << s;
                     mat.textures[j].img = new_img;
                 }
             }
