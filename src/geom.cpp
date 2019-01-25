@@ -720,11 +720,11 @@ void Geom::Load()
         | aiProcess_JoinIdenticalVertices
         | aiProcess_SplitLargeMeshes
         | aiProcess_ValidateDataStructure
-        | aiProcess_OptimizeGraph // SLOW
+//        | aiProcess_OptimizeGraph // SLOW
         //| aiProcess_OptimizeMeshes // SLOW
-        | aiProcess_RemoveRedundantMaterials // SLOW
-        | aiProcess_ImproveCacheLocality // SLOW
-        | aiProcess_FindInstances // SLOWW
+//        | aiProcess_RemoveRedundantMaterials // SLOW
+//        | aiProcess_ImproveCacheLocality // SLOW
+//        | aiProcess_FindInstances // SLOWW
             ;
 
     //59.4 - catch exceptions in assimp
@@ -1217,13 +1217,6 @@ QString Geom::GetProcessedNodeName(const QString s)
     if (n.contains(":")) {
         n = n.right(n.length() - n.lastIndexOf(":") - 1);
     }
-//    if (n.contains("_$assimpfbx$_rotation")) {
-//        n.remove("_$assimpfbx$_rotation");
-//    }
-//    if (n.contains("_$")) { //fixes bug with assimp-generated joint names like "righthandpinky3_$assimpfbx$_prerotation"
-//        n = n.left(n.indexOf("_$"));
-//    }
-//    qDebug() << s << n;
     return n;
 }
 
@@ -1257,12 +1250,12 @@ void Geom::PrepareVBOs()
     /* draw all meshes assigned to this node */
     //iterate through everything
     QVector<aiNode*> nodes_to_process;
-    nodes_to_process.reserve(1024);
+    nodes_to_process.reserve(512);
     QVector<QMatrix4x4> nodes_parent_xforms;
-    nodes_parent_xforms.reserve(1024);
+    nodes_parent_xforms.reserve(512);
     QVector<int> node_depth;
-    node_depth.reserve(1024);
-    node_list.reserve(1024);
+    node_depth.reserve(512);
+    node_list.reserve(512);
 
     if (scene->mRootNode)
     {
@@ -1297,14 +1290,6 @@ void Geom::PrepareVBOs()
             const QString node_name = GetProcessedNodeName(nd->mName.C_Str());
             bone_to_node[node_name] = node_list.size();
             node_list.push_back(nd);
-
-//            if (base_path.contains("elvis")) {
-//                QString s;
-//                for (int i=0; i<n_depth; ++i) {
-//                    s += " ";
-//                }
-//                qDebug() << (s + node_name);
-//            }
         }
 
         //add the children to process list
@@ -1328,7 +1313,6 @@ void Geom::PrepareVBOs()
     //on second pass, process meshes
     while (!nodes_to_process.empty())
     {
-
         aiNode * nd = nodes_to_process.back();
         nodes_to_process.pop_back();
 
@@ -1346,10 +1330,8 @@ void Geom::PrepareVBOs()
             const aiMesh * mesh = scene->mMeshes[nd->mMeshes[n]];
             const aiMaterial * mtl = scene->mMaterials[mesh->mMaterialIndex];
 
-			if (mesh->mPrimitiveTypes != aiPrimitiveType_TRIANGLE)
-			{
-				// Skip meshes that are not triangulated as we do not support rendering
-				// them currently
+            if (mesh->mPrimitiveTypes != aiPrimitiveType_TRIANGLE) {
+                // Skip meshes that are not triangulated as we do not support rendering them currently
 				continue;
 			}
 
@@ -1425,39 +1407,18 @@ void Geom::PrepareVBOs()
                 // Vertex attributes
                 for (uint32_t vertex_index = 0; vertex_index < num_verts; ++vertex_index)
                 {
-/*#ifdef __ANDROID__
-                    // Vertex position
-                    vbo_data.m_positions.push_back(half_float::half(mesh->mVertices[vertex_index].x));
-                    vbo_data.m_positions.push_back(half_float::half(mesh->mVertices[vertex_index].y));
-                    vbo_data.m_positions.push_back(half_float::half(mesh->mVertices[vertex_index].z));
-                    vbo_data.m_positions.push_back(half_float::half(1.0f));
-
-                    // Vertex normal
-                    vbo_data.m_normals.push_back(half_float::half(mesh->mNormals[vertex_index].x));
-                    vbo_data.m_normals.push_back(half_float::half(mesh->mNormals[vertex_index].y));
-                    vbo_data.m_normals.push_back(half_float::half(mesh->mNormals[vertex_index].z));
-                    vbo_data.m_normals.push_back(half_float::half(0.0f));
-#else*/
                     // Vertex position
                     vbo_data.m_positions.push_back(float(mesh->mVertices[vertex_index].x));
                     vbo_data.m_positions.push_back(float(mesh->mVertices[vertex_index].y));
                     vbo_data.m_positions.push_back(float(mesh->mVertices[vertex_index].z));
                     vbo_data.m_positions.push_back(float(1.0f));
 
-                    /*// AABB calculation
-                    vbo_data.m_aabb_min[0] = mesh->mVertices[vertex_index].x > vbo_data.m_aabb_min[0] ? vbo_data.m_aabb_min[0] : mesh->mVertices[vertex_index].x;
-                    vbo_data.m_aabb_max[0] = mesh->mVertices[vertex_index].x < vbo_data.m_aabb_max[0] ? vbo_data.m_aabb_max[0] : mesh->mVertices[vertex_index].x;
-                    vbo_data.m_aabb_min[1] = mesh->mVertices[vertex_index].y > vbo_data.m_aabb_min[1] ? vbo_data.m_aabb_min[1] : mesh->mVertices[vertex_index].y;
-                    vbo_data.m_aabb_max[1] = mesh->mVertices[vertex_index].y < vbo_data.m_aabb_max[1] ? vbo_data.m_aabb_max[1] : mesh->mVertices[vertex_index].y;
-                    vbo_data.m_aabb_min[2] = mesh->mVertices[vertex_index].z > vbo_data.m_aabb_min[2] ? vbo_data.m_aabb_min[2] : mesh->mVertices[vertex_index].z;
-                    vbo_data.m_aabb_max[2] = mesh->mVertices[vertex_index].z < vbo_data.m_aabb_max[2] ? vbo_data.m_aabb_max[2] : mesh->mVertices[vertex_index].z;*/
-
                     // Vertex normal
                     vbo_data.m_normals.push_back(float(mesh->mNormals[vertex_index].x));
                     vbo_data.m_normals.push_back(float(mesh->mNormals[vertex_index].y));
                     vbo_data.m_normals.push_back(float(mesh->mNormals[vertex_index].z));
                     vbo_data.m_normals.push_back(float(0.0f));
-//#endif
+
                     // Vertex UV0
                     float UVs_0_x = 0.0f;
                     float UVs_0_y = 0.0f;
@@ -1467,13 +1428,9 @@ void Geom::PrepareVBOs()
                         UVs_0_y = mesh->mTextureCoords[0][vertex_index].y;
                     }
 
-/*#ifdef __ANDROID__
-                    vbo_data.m_tex_coords.push_back(half_float::half(UVs_0_x));
-                    vbo_data.m_tex_coords.push_back(half_float::half(UVs_0_y));
-#else*/
                     vbo_data.m_tex_coords.push_back(float(UVs_0_x));
                     vbo_data.m_tex_coords.push_back(float(UVs_0_y));
-//#endif
+
                     // Vertex UV1s
                     float UVs_1_x = UVs_0_x;
                     float UVs_1_y = UVs_0_y;
@@ -1483,13 +1440,9 @@ void Geom::PrepareVBOs()
                         UVs_1_y = mesh->mTextureCoords[1][vertex_index].y;
                     }
 
-/*#ifdef __ANDROID__
-                    vbo_data.m_tex_coords.push_back(half_float::half(UVs_1_x));
-                    vbo_data.m_tex_coords.push_back(half_float::half(UVs_1_y));
-#else*/
                     vbo_data.m_tex_coords.push_back(float(UVs_1_x));
                     vbo_data.m_tex_coords.push_back(float(UVs_1_y));
-//#endif
+
                     // Vertex colors
                     float colors[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
                     if (mesh->mColors[0] != nullptr)
@@ -1501,17 +1454,10 @@ void Geom::PrepareVBOs()
                     }
 
                     // assosiate colors with alpha for correct blending
-/*#ifdef __ANDROID__
-                    vbo_data.m_colors.push_back(half_float::half(colors[0] * colors[3]));
-                    vbo_data.m_colors.push_back(half_float::half(colors[1] * colors[3]));
-                    vbo_data.m_colors.push_back(half_float::half(colors[2] * colors[3]));
-                    vbo_data.m_colors.push_back(half_float::half(colors[3]));
-#else*/
                     vbo_data.m_colors.push_back(float(colors[0] * colors[3]));
                     vbo_data.m_colors.push_back(float(colors[1] * colors[3]));
                     vbo_data.m_colors.push_back(float(colors[2] * colors[3]));
                     vbo_data.m_colors.push_back(float(colors[3]));
-//#endif
                 } // for (uint32_t vertex_index = 0; vertex_index < num_verts; ++vertex_index)
 
                 // Construct Physics Triangles
@@ -1589,15 +1535,6 @@ void Geom::PrepareVBOs()
                     uint8_t indices[4] = {0xff, 0xff, 0xff, 0xff};
                     float weights[4] = {0.0f, 0.0f, 0.0f, 0.0f};
 
-                    /*if (bone_count == 2)
-                    {
-                        qDebug() << "2 bone vertex";
-                        for (uint32_t bone_index = 0; bone_index < bone_count; ++bone_index)
-                        {
-                            qDebug() << bones[bone_index].bone;
-                        }
-                    }*/
-
                     for (uint32_t bone_index = 0; bone_index < bone_count; ++bone_index)
                     {
                         indices[bone_index] = bones[bone_index].bone_index;
@@ -1605,22 +1542,6 @@ void Geom::PrepareVBOs()
                         sum_weight += bones[bone_index].weight;
                     }
 
-/*#ifdef __ANDROID__
-                    if (sum_weight == 0.0f)
-                    {
-                        vbo_data.m_skel_anim_weights.push_back(half_float::half(0.0f));
-                        vbo_data.m_skel_anim_weights.push_back(half_float::half(0.0f));
-                        vbo_data.m_skel_anim_weights.push_back(half_float::half(0.0f));
-                        vbo_data.m_skel_anim_weights.push_back(half_float::half(0.0f));
-                    }
-                    else
-                    {
-                        vbo_data.m_skel_anim_weights.push_back(half_float::half(weights[0] / sum_weight));
-                        vbo_data.m_skel_anim_weights.push_back(half_float::half(weights[1] / sum_weight));
-                        vbo_data.m_skel_anim_weights.push_back(half_float::half(weights[2] / sum_weight));
-                        vbo_data.m_skel_anim_weights.push_back(half_float::half(weights[3] / sum_weight));
-                    }
-#else*/
                     if (sum_weight == 0.0f)
                     {
                         vbo_data.m_skel_anim_weights.push_back(float(0.0f));
@@ -1635,7 +1556,6 @@ void Geom::PrepareVBOs()
                         vbo_data.m_skel_anim_weights.push_back(float(weights[2] / sum_weight));
                         vbo_data.m_skel_anim_weights.push_back(float(weights[3] / sum_weight));
                     }
-//#endif
 
                     vbo_data.m_skel_anim_indices.push_back(indices[0]);
                     vbo_data.m_skel_anim_indices.push_back(indices[1]);
