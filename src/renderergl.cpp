@@ -1,34 +1,46 @@
-#include "renderergl33.h"
+#include "renderergl.h"
 
-RendererGL33::RendererGL33() :
+RendererGL::RendererGL() :
       m_gl_surface(nullptr),
       m_gl_context(nullptr),
       m_gl_funcs(nullptr),
       m_main_fbo(0),
       m_is_initialized(false),
-      m_hmd_initialized(false),
-      m_capture_frame(false),            
-      m_frame_time(0),
+      m_hmd_initialized(false),          
       m_screenshot_pbo_pending(false),
-      m_screenshot_pbo(0),
-      m_frame_vector_sorted(false)
+      m_screenshot_pbo(0)
 {
-    qDebug() << "RendererGL33::RendererGL33()";
+    qDebug() << "RendererGL::RendererGL()";
 }
 
-RendererGL33::~RendererGL33()
+RendererGL::~RendererGL()
 {
 
 }
 
-void RendererGL33::Initialize()
+void RendererGL::Initialize()
 {
-//    qDebug() << "RendererGL33_LoadingThread::Initialize()";    
     PostConstructorInitialize();
-    m_meshes_pending_deletion.reserve(1024);
+    m_meshes_pending_deletion.reserve(512);
 
     InitializeGLContext(QOpenGLContext::currentContext());
+
+    /*
+    The GL_VERSION and GL_SHADING_LANGUAGE_VERSION strings begin with a version number. The version number uses one of these forms:
+    major_number.minor_number major_number.minor_number.release_number
+    Vendor-specific information may follow the version number. Its format depends on the implementation, but a space always separates the version number and the vendor-specific information.
+    All strings are null-terminated.
+    */
     m_name = QString((char *)(m_gl_funcs->glGetString(GL_VERSION)));
+
+    // Store minor/major GL version used
+    const QStringList s = m_name.split(".");
+    if (s.size() >= 2) {
+        m_major_version = s[0].toInt();
+        m_minor_version = s[1].toInt();
+    }
+
+    qDebug() << "RendererGL::Initialize() - GL_VERSION" << m_name << "major" << m_major_version << "minor" << m_minor_version;
 
     // Object Shader
     QString default_object_vertex_shader_path("assets/shaders/vertex.txt");
@@ -82,31 +94,31 @@ void RendererGL33::Initialize()
                                                           &default_equi_fragment_shader_bytes, default_equi_fragment_shader_path);
 }
 
-void RendererGL33::PreRender(QHash<int, QVector<AbstractRenderCommand> > * p_scoped_render_commands, QHash<StencilReferenceValue, LightContainer> * p_scoped_light_containers)
+void RendererGL::PreRender(QHash<int, QVector<AbstractRenderCommand> > * p_scoped_render_commands, QHash<StencilReferenceValue, LightContainer> * p_scoped_light_containers)
 {
     Q_UNUSED(p_scoped_light_containers)
     UpdatePerObjectData(p_scoped_render_commands);
 }
 
-void RendererGL33::PostRender(QHash<int, QVector<AbstractRenderCommand> > * p_scoped_render_commands, QHash<StencilReferenceValue, LightContainer> * p_scoped_light_containers)
+void RendererGL::PostRender(QHash<int, QVector<AbstractRenderCommand> > * p_scoped_render_commands, QHash<StencilReferenceValue, LightContainer> * p_scoped_light_containers)
 {
     Q_UNUSED(p_scoped_render_commands)
     Q_UNUSED(p_scoped_light_containers)
 }
 
-std::shared_ptr<ProgramHandle> RendererGL33::CompileAndLinkShaderProgram(QByteArray * p_vertex_shader, QString p_vertex_shader_path, QByteArray * p_fragment_shader, QString p_fragment_shader_path)
+std::shared_ptr<ProgramHandle> RendererGL::CompileAndLinkShaderProgram(QByteArray * p_vertex_shader, QString p_vertex_shader_path, QByteArray * p_fragment_shader, QString p_fragment_shader_path)
 {
-//    qDebug() << "RendererGL33_LoadingThread::CompileAndLinkShaderProgram" << this;
+//    qDebug() << "RendererGL_LoadingThread::CompileAndLinkShaderProgram" << this;
     std::shared_ptr<ProgramHandle> handle_id = nullptr;
     CompileAndLinkShaderProgram2(&handle_id, p_vertex_shader, p_vertex_shader_path, p_fragment_shader, p_fragment_shader_path, &m_uniform_locs);
     return handle_id;
 }
 
-void RendererGL33::CompileAndLinkShaderProgram2(std::shared_ptr<ProgramHandle> * p_abstract_program, QByteArray * p_vertex_shader,
+void RendererGL::CompileAndLinkShaderProgram2(std::shared_ptr<ProgramHandle> * p_abstract_program, QByteArray * p_vertex_shader,
                                                             QString p_vertex_shader_path, QByteArray * p_fragment_shader, QString p_fragment_shader_path,
                                                             QVector<QVector<GLint>> *p_map)
 {
-//    qDebug() << "RendererGL33_LoadingThread::CompileAndLinkShaderProgram2";
+//    qDebug() << "RendererGL_LoadingThread::CompileAndLinkShaderProgram2";
     GLuint program_id;
     *p_abstract_program = CreateProgramHandle(&program_id);
 
@@ -217,7 +229,7 @@ void RendererGL33::CompileAndLinkShaderProgram2(std::shared_ptr<ProgramHandle> *
         }
     }
 
-//    qDebug() << "RendererGL33_LoadingThread::CompileAndLinkShaderProgram2" << shader_failed << vertex_empty << fragment_empty;
+//    qDebug() << "RendererGL_LoadingThread::CompileAndLinkShaderProgram2" << shader_failed << vertex_empty << fragment_empty;
 
     if (!shader_failed && (!vertex_empty || !fragment_empty))
     {
@@ -270,7 +282,7 @@ void RendererGL33::CompileAndLinkShaderProgram2(std::shared_ptr<ProgramHandle> *
     }
 }
 
-void RendererGL33::CreateMeshHandleForGeomVBOData(GeomVBOData * p_VBO_data)
+void RendererGL::CreateMeshHandleForGeomVBOData(GeomVBOData * p_VBO_data)
 {
     int32_t float_type = GL_FLOAT;
     int32_t float_size = sizeof(float);
@@ -357,19 +369,19 @@ void RendererGL33::CreateMeshHandleForGeomVBOData(GeomVBOData * p_VBO_data)
     }
 }
 
-std::shared_ptr<MeshHandle> RendererGL33::CreateMeshHandle(VertexAttributeLayout p_layout)
+std::shared_ptr<MeshHandle> RendererGL::CreateMeshHandle(VertexAttributeLayout p_layout)
 {
     std::shared_ptr<MeshHandle> handle_id = nullptr;
     CreateMeshHandle(&handle_id, p_layout);
     return handle_id;
 }
 
-void RendererGL33::InitializeGLObjects()
+void RendererGL::InitializeGLObjects()
 {
     AbstractRenderer::InitializeGLObjects();
 }
 
-void RendererGL33::Render(QHash<int, QVector<AbstractRenderCommand>> * p_scoped_render_commands,
+void RendererGL::Render(QHash<int, QVector<AbstractRenderCommand>> * p_scoped_render_commands,
                           QHash<StencilReferenceValue, LightContainer> * p_scoped_light_containers)
 {
     Q_UNUSED(p_scoped_render_commands);
@@ -379,7 +391,7 @@ void RendererGL33::Render(QHash<int, QVector<AbstractRenderCommand>> * p_scoped_
     DecoupledRender();
 }
 
-void RendererGL33::CreateMeshHandle(std::shared_ptr<MeshHandle> *p_handle, VertexAttributeLayout p_layout)
+void RendererGL::CreateMeshHandle(std::shared_ptr<MeshHandle> *p_handle, VertexAttributeLayout p_layout)
 {
     // Calling CreateMeshHandle here will cause the VAO to be created on the render-thread's GL Context, any attempt to bind a
     // VAO obtained from the MeshHandles stored in GeomVBOData on the main-thread will cause wierd behaviour
@@ -389,7 +401,7 @@ void RendererGL33::CreateMeshHandle(std::shared_ptr<MeshHandle> *p_handle, Verte
     *p_handle = AbstractRenderer::CreateMeshHandle(p_layout, VAO_id);
 }
 
-void RendererGL33::UpgradeShaderSource(QByteArray & p_shader_source, bool p_is_vertex_shader)
+void RendererGL::UpgradeShaderSource(QByteArray & p_shader_source, bool p_is_vertex_shader)
 {
 #ifdef __ANDROID__
     p_shader_source.replace("uniform lowp vec4 iUseSkelAnim;",  "uniform lowp vec4 iUseFlags;");
@@ -420,7 +432,7 @@ void RendererGL33::UpgradeShaderSource(QByteArray & p_shader_source, bool p_is_v
     }  
 }
 
-void RendererGL33::UpdatePerObjectData(QHash<int, QVector<AbstractRenderCommand>> * p_scoped_render_commands)
+void RendererGL::UpdatePerObjectData(QHash<int, QVector<AbstractRenderCommand>> * p_scoped_render_commands)
 {
     QMatrix4x4 temp_matrix;
     QMatrix4x4 model_matrix;
@@ -519,9 +531,9 @@ void RendererGL33::UpdatePerObjectData(QHash<int, QVector<AbstractRenderCommand>
     }
 }
 
-void RendererGL33::InitializeGLContext(QOpenGLContext * p_gl_context)
+void RendererGL::InitializeGLContext(QOpenGLContext * p_gl_context)
 {
-    qDebug("RendererGL33RenderThread::InitializeGLContext");
+    qDebug("RendererGL::InitializeGLContext");
     m_gl_context = p_gl_context;
 
     m_gl_surface = new QOffscreenSurface();
@@ -536,11 +548,6 @@ void RendererGL33::InitializeGLContext(QOpenGLContext * p_gl_context)
     m_main_fbo = 0;
     MathUtil::glFuncs->glGenFramebuffers(1, &m_main_fbo);
 
-//#ifdef WIN32
-//    SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
-//#endif
-//    QThread::currentThread()->setPriority(QThread::TimeCriticalPriority);
-
     m_gl_context->makeCurrent(m_gl_surface);
 
 #if !defined(__APPLE__) && !defined(__ANDROID__)
@@ -551,14 +558,14 @@ void RendererGL33::InitializeGLContext(QOpenGLContext * p_gl_context)
 
         if (glDebugMessageCallbackARB != NULL)
         {
-            qDebug() << "DEBUG OUTPUT SUPPORTED";
+            qDebug() << "RendererGL::InitializeGLContext - DEBUG OUTPUT SUPPORTED";
 
             glDebugMessageCallbackARB((GLDEBUGPROCARB)&MathUtil::DebugCallback, NULL);
             m_gl_funcs->glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
         }
         else
         {
-            qDebug() << "DEBUG OUTPUT NOT SUPPORTED!";
+            qDebug() << "RendererGL::InitializeGLContext - DEBUG OUTPUT NOT SUPPORTED!";
         }
     }
 #elif __ANDROID__
@@ -569,14 +576,14 @@ void RendererGL33::InitializeGLContext(QOpenGLContext * p_gl_context)
 
         if (glDebugMessageCallbackKHR != NULL)
         {
-            qDebug() << "DEBUG OUTPUT SUPPORTED";
+            qDebug() << "RendererGL::InitializeGLContext - DEBUG OUTPUT SUPPORTED";
 
             glDebugMessageCallbackKHR((GLDEBUGPROCKHR)&MathUtil::DebugCallback, NULL);
             m_gl_funcs->glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_KHR);
         }
         else
         {
-            qDebug() << "DEBUG OUTPUT NOT SUPPORTED!";
+            qDebug() << "RendererGL::InitializeGLContext - DEBUG OUTPUT NOT SUPPORTED!";
         }
     }
 #endif
@@ -584,7 +591,7 @@ void RendererGL33::InitializeGLContext(QOpenGLContext * p_gl_context)
     m_is_initialized = true;
 }
 
-void RendererGL33::DecoupledRender()
+void RendererGL::DecoupledRender()
 {    
     if (m_is_initialized)
     {        
@@ -604,7 +611,6 @@ void RendererGL33::DecoupledRender()
         {
             m_rendering_index = m_completed_submission_index.exchange(m_rendering_index);
             m_current_frame_id = m_submitted_frame_id;
-            m_frame_vector_sorted = false;
 
             // Clean up mesh handles that are pending deletion, we wait until the next unique frame
             // so that we don't delete objects that are in use for the previous one
@@ -615,7 +621,7 @@ void RendererGL33::DecoupledRender()
         }
 
         const bool do_VR = (m_hmd_manager != nullptr && m_hmd_manager->GetEnabled() == true);
-//        qDebug() << "RendererGL33::DecoupledRender()" << m_is_initialized << m_shutting_down;
+//        qDebug() << "RendererGL::DecoupledRender()" << m_is_initialized << m_shutting_down;
 
         StartFrame();
         auto texture_size = (m_hmd_manager != nullptr && m_hmd_manager->GetEnabled() == true)
@@ -724,7 +730,7 @@ void RendererGL33::DecoupledRender()
     }
 }
 
-void RendererGL33::SaveScreenshot()
+void RendererGL::SaveScreenshot()
 {
     if (m_screenshot_pbo_pending == false)
     {
@@ -757,7 +763,7 @@ void RendererGL33::SaveScreenshot()
     }
 }
 
-void RendererGL33::RenderEqui()
+void RendererGL::RenderEqui()
 {
     uint32_t const cube_cross_width = m_window_width;
     uint32_t const cube_cross_height = m_window_height;
@@ -834,7 +840,6 @@ void RendererGL33::RenderEqui()
     post_process_commands[(int)RENDERER::RENDER_SCOPE::POST_PROCESS].push_back(
                 AbstractRenderCommand(PrimitiveType::TRIANGLES,
                                        6,
-                                       1,
                                        0,
                                        0,
                                        0,

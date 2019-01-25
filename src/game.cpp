@@ -707,7 +707,6 @@ void Game::DrawFadingGL()
         RendererInterface * renderer = RendererInterface::m_pimpl;
         AbstractRenderCommand a(PrimitiveType::TRIANGLES,
                                 renderer->GetTexturedCube2PrimCount(),
-                                1,
                                 0,
                                 0,
                                 0,
@@ -3285,7 +3284,6 @@ void Game::DrawOverlaysGL()
         renderer->BindTextureHandle(0, perf_logger.GetFrameSamplesTextureHandle());
         AbstractRenderCommand a(PrimitiveType::TRIANGLES,
                                 renderer->GetPlanePrimCount(),
-                                1,
                                 0,
                                 0,
                                 0,

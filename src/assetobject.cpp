@@ -165,7 +165,6 @@ void AssetObject::DrawGL(QPointer <AssetShader> shader, const QColor col, const 
         shader->UpdateObjectUniforms();
         AbstractRenderCommand a(PrimitiveType::TRIANGLES,
                                 renderer->GetTexturedCube3PrimCount(),
-                                1,
                                 0,
                                 0,
                                 0,

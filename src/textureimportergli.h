@@ -7,7 +7,7 @@
 
 #include "contentimporter.h"
 
-#include "renderergl33.h"
+#include "renderergl.h"
 #include "assetimagedata.h"
 #define gli glm
 #include "gli/gli.hpp"

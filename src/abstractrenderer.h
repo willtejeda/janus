@@ -241,7 +241,9 @@ public:
 // Interface
     virtual void Initialize() = 0;
     void InitializeHMDManager(QPointer<AbstractHMDManager> p_hmd_manager);
-    virtual QString GetRendererName();
+    virtual QString GetRendererName() const;
+    virtual int GetRendererMajorVersion() const;
+    virtual int GetRendererMinorVersion() const;
     virtual void Render(QHash<int, QVector<AbstractRenderCommand>> * p_scoped_render_commands,
                         QHash<StencilReferenceValue, LightContainer> * p_scoped_light_containers) = 0;
     virtual void PreRender(QHash<int, QVector<AbstractRenderCommand> > * p_scoped_render_commands, QHash<StencilReferenceValue, LightContainer> * p_scoped_light_containers) = 0;
@@ -770,6 +772,8 @@ protected:
     GLuint64 m_GPUTimeAvg;
     int64_t m_frame_counter;
     QString m_name;
+    int m_major_version;
+    int m_minor_version;
 
     friend class Renderer;
     QVector<AssetShader_Object> m_sequntialTestData;

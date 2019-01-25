@@ -105,7 +105,6 @@ void AssetVideo::DrawGL(MediaContext * ctx, QPointer <AssetShader> shader, const
 
     AbstractRenderCommand a(PrimitiveType::TRIANGLES,
                             renderer->GetTexturedCubePrimCount(),
-                            1,
                             0,
                             0,
                             0,
@@ -142,7 +141,6 @@ void AssetVideo::DrawSelectedGL(QPointer <AssetShader> shader)
     RendererInterface * renderer = RendererInterface::m_pimpl;
     AbstractRenderCommand a(PrimitiveType::TRIANGLES,
                             renderer->GetTexturedCubePrimCount(),
-                            1,
                             0,
                             0,
                             0,

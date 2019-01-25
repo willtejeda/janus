@@ -377,7 +377,6 @@ void AssetImage::DrawSelectedGL(QPointer <AssetShader> shader)
     RendererInterface * renderer = RendererInterface::m_pimpl;
     AbstractRenderCommand a(PrimitiveType::TRIANGLES,
                             renderer->GetTexturedCubePrimCount(),
-                            1,
                             0,
                             0,
                             0,
@@ -425,7 +424,6 @@ void AssetImage::DrawImageGL(QPointer <AssetShader> shader, const bool left_eye)
 
     AbstractRenderCommand a(PrimitiveType::TRIANGLES,
             renderer->GetTexturedCubePrimCount(),
-            1,
             0,
             0,
             0,

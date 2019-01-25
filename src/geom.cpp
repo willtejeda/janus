@@ -1095,7 +1095,6 @@ void Geom::DrawGL(QPointer <AssetShader> shader, const QColor col, const bool ov
 
             AbstractRenderCommand base_command(PrimitiveType::TRIANGLES,
                                     vbo_data.GetIndexCount(),
-                                    1,
                                     0,
                                     0,
                                     0,

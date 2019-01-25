@@ -279,7 +279,6 @@ void ParticleSystem::DrawGL(QPointer <AssetShader> shader, const QVector3D eye_p
 
             AbstractRenderCommand a(PrimitiveType::TRIANGLES,
                             indice_count,
-                            1,
                             0,
                             0,
                             0,

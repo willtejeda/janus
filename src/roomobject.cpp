@@ -2153,7 +2153,6 @@ void RoomObject::DrawGL(QPointer <AssetShader> shader, const bool left_eye, cons
             RendererInterface * renderer = RendererInterface::m_pimpl;
             AbstractRenderCommand a(PrimitiveType::TRIANGLES,
                                     renderer->GetPlanePrimCount(),
-                                    1,
                                     0,
                                     0,
                                     0,
@@ -3543,7 +3542,6 @@ void RoomObject::DrawPortalGL(QPointer <AssetShader> shader)
         RendererInterface * renderer = RendererInterface::m_pimpl;
         AbstractRenderCommand a(PrimitiveType::TRIANGLES,
                                 renderer->GetTexturedCubePrimCount(),
-                                1,
                                 0,
                                 0,
                                 0,
@@ -3649,7 +3647,6 @@ void RoomObject::DrawPortalBackGL(QPointer <AssetShader> shader) const
         RendererInterface * renderer = RendererInterface::m_pimpl;
         AbstractRenderCommand a(PrimitiveType::TRIANGLE_FAN,
                                 renderer->GetDiscPrimCount(),
-                                1,
                                 0,
                                 0,
                                 0,
@@ -3672,7 +3669,6 @@ void RoomObject::DrawPortalBackGL(QPointer <AssetShader> shader) const
         RendererInterface * renderer = RendererInterface::m_pimpl;
         AbstractRenderCommand a(PrimitiveType::TRIANGLES,
                                 renderer->GetPlanePrimCount(),
-                                1,
                                 0,
                                 0,
                                 0,
@@ -3732,7 +3728,6 @@ void RoomObject::DrawPortalInsideGL(QPointer <AssetShader> shader) const
         RendererInterface * renderer = RendererInterface::m_pimpl;
         AbstractRenderCommand a(PrimitiveType::TRIANGLE_FAN,
                                 renderer->GetDiscPrimCount(),
-                                1,
                                 0,
                                 0,
                                 0,
@@ -3755,7 +3750,6 @@ void RoomObject::DrawPortalInsideGL(QPointer <AssetShader> shader) const
         RendererInterface * renderer = RendererInterface::m_pimpl;
         AbstractRenderCommand a(PrimitiveType::TRIANGLES,
                                 renderer->GetPlanePrimCount(),
-                                1,
                                 0,
                                 0,
                                 0,
@@ -3803,7 +3797,6 @@ void RoomObject::DrawPortalFrameGL(QPointer <AssetShader> shader)
         RendererInterface * renderer = RendererInterface::m_pimpl;
         AbstractRenderCommand a(PrimitiveType::TRIANGLES,
                                 renderer->GetConePrimCount(),
-                                1,
                                 0,
                                 0,
                                 0,
@@ -3826,7 +3819,6 @@ void RoomObject::DrawPortalFrameGL(QPointer <AssetShader> shader)
         shader->UpdateObjectUniforms();
         AbstractRenderCommand a2(PrimitiveType::TRIANGLES,
                                  renderer->GetConePrimCount(),
-                                 1,
                                  0,
                                  0,
                                  0,
@@ -3849,7 +3841,6 @@ void RoomObject::DrawPortalFrameGL(QPointer <AssetShader> shader)
         shader->UpdateObjectUniforms();
         AbstractRenderCommand a3(PrimitiveType::TRIANGLES,
                                  renderer->GetConePrimCount(),
-                                 1,
                                  0,
                                  0,
                                  0,
@@ -3874,7 +3865,6 @@ void RoomObject::DrawPortalFrameGL(QPointer <AssetShader> shader)
         RendererInterface * renderer = RendererInterface::m_pimpl;
         AbstractRenderCommand a(PrimitiveType::TRIANGLES,
                                 renderer->GetPyramidPrimCount(),
-                                1,
                                 0,
                                 0,
                                 0,
@@ -3897,7 +3887,6 @@ void RoomObject::DrawPortalFrameGL(QPointer <AssetShader> shader)
         shader->UpdateObjectUniforms();
         AbstractRenderCommand a2(PrimitiveType::TRIANGLES,
                                  renderer->GetPyramidPrimCount(),
-                                 1,
                                  0,
                                  0,
                                  0,
@@ -3920,7 +3909,6 @@ void RoomObject::DrawPortalFrameGL(QPointer <AssetShader> shader)
         shader->UpdateObjectUniforms();
         AbstractRenderCommand a3(PrimitiveType::TRIANGLES,
                                  renderer->GetPyramidPrimCount(),
-                                 1,
                                  0,
                                  0,
                                  0,
@@ -3971,7 +3959,6 @@ void RoomObject::DrawPortalStencilGL(QPointer <AssetShader> shader, const bool d
         RendererInterface * renderer = RendererInterface::m_pimpl;
         AbstractRenderCommand a(PrimitiveType::TRIANGLE_FAN,
                                 renderer->GetDiscPrimCount(),
-                                1,
                                 0,
                                 0,
                                 0,
@@ -3995,7 +3982,6 @@ void RoomObject::DrawPortalStencilGL(QPointer <AssetShader> shader, const bool d
             RendererInterface * renderer = RendererInterface::m_pimpl;
             AbstractRenderCommand a2(PrimitiveType::TRIANGLES,
                                      renderer->GetPortalStencilCylinderPrimCount(),
-                                     1,
                                      0,
                                      0,
                                      0,
@@ -4021,7 +4007,6 @@ void RoomObject::DrawPortalStencilGL(QPointer <AssetShader> shader, const bool d
         RendererInterface * renderer = RendererInterface::m_pimpl;
         AbstractRenderCommand a(PrimitiveType::TRIANGLES,
                                 renderer->GetPlanePrimCount(),
-                                1,
                                 0,
                                 0,
                                 0,
@@ -4045,7 +4030,6 @@ void RoomObject::DrawPortalStencilGL(QPointer <AssetShader> shader, const bool d
             RendererInterface * renderer = RendererInterface::m_pimpl;
             AbstractRenderCommand a2(PrimitiveType::TRIANGLES,
                                      renderer->GetPortalStencilCubePrimCount(),
-                                     1,
                                      0,
                                      0,
                                      0,

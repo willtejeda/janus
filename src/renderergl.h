@@ -1,5 +1,5 @@
-#ifndef RENDERERGL33
-#define RENDERERGL33
+#ifndef RENDERERGL
+#define RENDERERGL
 
 #include <QObject>
 #include <QImage>
@@ -11,12 +11,12 @@
 #include "abstractrenderer.h"
 #include "jniutil.h"
 
-class RendererGL33 : public QObject, public AbstractRenderer
+class RendererGL : public QObject, public AbstractRenderer
 {
     Q_OBJECT
 public:
-    RendererGL33();
-    virtual ~RendererGL33();
+    RendererGL();
+    virtual ~RendererGL();
     virtual void Initialize();
     virtual void Render(QHash<int, QVector<AbstractRenderCommand>> * p_scoped_render_commands,
                         QHash<StencilReferenceValue, LightContainer> * p_scoped_light_containers);
@@ -56,13 +56,9 @@ private:
     uint32_t m_equi_cubemap_face_size;    
     bool m_is_initialized;
     bool m_hmd_initialized;
-    bool m_capture_frame;
 
-    qint64  m_frame_time;
     bool m_screenshot_pbo_pending;
     GLuint m_screenshot_pbo;
-    bool m_frame_vector_sorted;
-    QVector<AbstractRenderCommand_sort> m_sorted_command_indices;    
 };
 
-#endif // RENDERERGL33
+#endif // RENDERERGL

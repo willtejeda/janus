@@ -6,8 +6,7 @@ AbstractRenderCommand::AbstractRenderCommand()
       m_camera_id(0),
       m_mesh_handle(nullptr),
       m_primitive_type(PrimitiveType::TRIANGLES),
-      m_primitive_count(0),
-      m_instance_count(0),
+      m_primitive_count(0),      
       m_first_index(0),
       m_base_vertex(0),
       m_base_instance(0),
@@ -29,7 +28,6 @@ AbstractRenderCommand::AbstractRenderCommand()
 // Constructor
 AbstractRenderCommand::AbstractRenderCommand(PrimitiveType p_primitive_type,
     GLuint p_primitive_count,
-    GLuint p_instance_count,
     GLuint p_first_index,
     GLuint p_base_vertex,
     GLuint p_base_instance,
@@ -51,7 +49,6 @@ AbstractRenderCommand::AbstractRenderCommand(PrimitiveType p_primitive_type,
     m_mesh_handle(p_mesh_handle),
     m_primitive_type(p_primitive_type),
 	m_primitive_count(p_primitive_count),
-	m_instance_count(p_instance_count),
 	m_first_index(p_first_index),
 	m_base_vertex(p_base_vertex),
 	m_base_instance(p_base_instance),	    
@@ -77,7 +74,6 @@ AbstractRenderCommand::AbstractRenderCommand(const AbstractRenderCommand& p_copy
     m_camera_id(p_copy.m_camera_id),
     m_primitive_type(p_copy.m_primitive_type),
 	m_primitive_count(p_copy.m_primitive_count),
-	m_instance_count(p_copy.m_instance_count),
 	m_first_index(p_copy.m_first_index),
 	m_base_vertex(p_copy.m_base_vertex),
     m_base_instance(p_copy.m_base_instance),
@@ -139,7 +135,6 @@ AbstractRenderCommand::AbstractRenderCommand(AbstractRenderCommand&& p_move) :
     m_mesh_handle(std::move(p_move.m_mesh_handle)),
     m_primitive_type(std::move(p_move.m_primitive_type)),
 	m_primitive_count(std::move(p_move.m_primitive_count)),
-	m_instance_count(std::move(p_move.m_instance_count)),
 	m_first_index(std::move(p_move.m_first_index)),
 	m_base_vertex(std::move(p_move.m_base_vertex)),
 	m_base_instance(std::move(p_move.m_base_instance)),	
@@ -164,7 +159,6 @@ AbstractRenderCommand& AbstractRenderCommand::operator=(const AbstractRenderComm
 {
 	m_primitive_type = p_copy.m_primitive_type;
 	m_primitive_count = p_copy.m_primitive_count;
-	m_instance_count = p_copy.m_instance_count;
 	m_first_index = p_copy.m_first_index;
 	m_base_vertex = p_copy.m_base_vertex;
 	m_base_instance = p_copy.m_base_instance;
@@ -217,7 +211,6 @@ AbstractRenderCommand& AbstractRenderCommand::operator=(AbstractRenderCommand&& 
 {
 	m_primitive_type = std::move(p_move.m_primitive_type);
 	m_primitive_count = std::move(p_move.m_primitive_count);
-	m_instance_count = std::move(p_move.m_instance_count);
 	m_first_index = std::move(p_move.m_first_index);
 	m_base_vertex = std::move(p_move.m_base_vertex);
 	m_base_instance = std::move(p_move.m_base_instance);
@@ -239,43 +232,6 @@ AbstractRenderCommand& AbstractRenderCommand::operator=(AbstractRenderCommand&& 
 	return *this;
 }
 
-bool AbstractRenderCommand::IsInstancableWith(const AbstractRenderCommand& p_copy) const
-{
-    // For now we only instance identical model + material pairs
-    // This could be extended to instance same model with different materials, as long as the bound
-    // textures are the same. Or with bindless textures, could also instance varied textures.
-    bool is_instancable = (
-          (m_shader == p_copy.m_shader)
-        & (m_stencil_func == p_copy.m_stencil_func)
-        & (m_mesh_handle == p_copy.m_mesh_handle)
-        & (m_active_face_cull_mode == p_copy.m_active_face_cull_mode)
-        & (m_object_uniforms.iUseFlags[0] == 0.0f)
-        & (p_copy.m_object_uniforms.iUseFlags[0] == 0.0f)
-		);
-
-    // For each texture slot
-    for (int i = 0; i < 16; ++i)
-    {
-        // If these materials use this texture slot
-        if (m_material_uniforms.iUseTexture[i] != 0.0f
-             && p_copy.m_material_uniforms.iUseTexture[i] != 0.0f)
-        {
-            // They are not instancable if they have different textures bound to this slot
-            bool const sameTex = m_texture_set.GetTextureHandleRef(i)->m_UUID.m_UUID == p_copy.m_texture_set.GetTextureHandleRef(i)->m_UUID.m_UUID;
-            is_instancable = (sameTex) ? is_instancable : false;
-
-            if (i == 0)
-            {
-                // They are not instancable if the base object uses 3D Textures
-                bool const tex3D = m_texture_set.GetTextureHandleRef(i)->m_UUID.m_UUID == m_texture_set.GetTextureHandleRef(i, false)->m_UUID.m_UUID;
-                is_instancable = (!tex3D) ? is_instancable : false;
-            }
-        }
-    }
-
-	return is_instancable;
-}
-
 // Destuctor
 AbstractRenderCommand::~AbstractRenderCommand()
 {
@@ -285,11 +241,6 @@ AbstractRenderCommand::~AbstractRenderCommand()
 GLuint AbstractRenderCommand::GetPrimitiveCount() const
 {
 	return m_primitive_count;
-}
-
-GLuint AbstractRenderCommand::GetInstanceCount() const
-{
-	return m_instance_count;
 }
 
 GLuint AbstractRenderCommand::GetFirstIndex() const
@@ -350,16 +301,6 @@ StencilOp AbstractRenderCommand::GetStencilOp() const
 ColorMask AbstractRenderCommand::GetColorMask() const
 {
 	return m_color_mask;
-}
-
-void AbstractRenderCommand::IncrementInstanceCount(GLuint p_instance_count /* = 1 */)
-{
-	m_instance_count += p_instance_count;
-}
-
-void AbstractRenderCommand::SetInstanceCount(GLuint p_instance_count)
-{
-	m_instance_count = p_instance_count;
 }
 
 VirtualCamera::VirtualCamera() :

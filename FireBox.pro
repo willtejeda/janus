@@ -126,7 +126,7 @@ SOURCES += \
     src/player.cpp \
     src/propertieswindow.cpp \
     src/renderer.cpp \
-    src/renderergl33.cpp \
+    src/renderergl.cpp \
     src/rendererinterface.cpp \    
     src/room.cpp \
     src/roomobject.cpp \
@@ -200,7 +200,7 @@ HEADERS += \
     src/player.h \
     src/propertieswindow.h \
     src/renderer.h \
-    src/renderergl33.h \
+    src/renderergl.h \
     src/rendererinterface.h \    
     src/room.h \
     src/roomobject.h \

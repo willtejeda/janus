@@ -35,6 +35,8 @@ AbstractRenderer::AbstractRenderer()
       m_GPUTimeMax(0),
       m_GPUTimeAvg(0),
       m_frame_counter(0),
+      m_major_version(0),
+      m_minor_version(0),
       m_texture_UUID(1),
       m_mesh_UUID(1),
       m_buffer_UUID(1),
@@ -102,9 +104,19 @@ void AbstractRenderer::InitializeHMDManager(QPointer<AbstractHMDManager> p_hmd_m
     m_hmd_manager = p_hmd_manager;
 }
 
-QString AbstractRenderer::GetRendererName()
+QString AbstractRenderer::GetRendererName() const
 {
     return m_name;
+}
+
+int AbstractRenderer::GetRendererMajorVersion() const
+{
+    return m_major_version;
+}
+
+int AbstractRenderer::GetRendererMinorVersion() const
+{
+    return m_minor_version;
 }
 
 void AbstractRenderer::RequestScreenShot(uint32_t const p_width, uint32_t const p_height, uint32_t const p_sample_count, bool const p_is_equi, uint64_t p_frame_index)

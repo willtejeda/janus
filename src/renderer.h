@@ -9,7 +9,7 @@
 #include <algorithm>
 #include "rendererinterface.h"
 #include "assetimagedata.h"
-#include "renderergl33.h"
+#include "renderergl.h"
 #ifdef __ANDROID__
 #include "jniutil.h"
 #endif
@@ -122,7 +122,10 @@ public:
 
     int64_t GetFrameCounter();
     int GetNumTextures() const;
-    QString GetRendererName();
+
+    QString GetRendererName() const;
+    int GetRendererMajorVersion() const;
+    int GetRendererMinorVersion() const;
 
     std::shared_ptr<MeshHandle> GetSkyboxCubeVAO();
     GLuint GetSkyboxCubePrimCount() const;
@@ -173,16 +176,11 @@ private:
 
     void PreRender(QHash<int, QVector<AbstractRenderCommand> > & p_scoped_render_commands, QHash<StencilReferenceValue, LightContainer> & p_scoped_light_containers);
     void PostRender(QHash<int, QVector<AbstractRenderCommand> > & p_scoped_render_commands, QHash<StencilReferenceValue, LightContainer> & p_scoped_light_containers);
-    void SortRenderCommandsByDistance(QVector<AbstractRenderCommand>& render_command_vector, const bool p_is_transparent);
-    void EnableRenderCommandInstancing(const RENDERER::RENDER_SCOPE p_scope);
+    void SortRenderCommandsByDistance(QVector<AbstractRenderCommand>& render_command_vector, const bool p_is_transparent);    
 
     RENDERER::RENDER_SCOPE m_current_scope;
     std::unique_ptr<AbstractRenderer> m_abstractRenderer;    
-
     QVector<AbstractRenderCommand_sort> m_sorted_command_indices;
-
-    int m_collapsed_draws;
-    int m_collapsable_draws;
 };
 
 #endif // RENDERER_H

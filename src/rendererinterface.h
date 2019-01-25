@@ -1080,7 +1080,6 @@ public:
 	AbstractRenderCommand();
 	AbstractRenderCommand(PrimitiveType p_primitive_type,
 		GLuint p_primitive_count,
-		GLuint p_instance_count,
 		GLuint p_first_index,
 		GLuint p_base_vertex,
 		GLuint p_base_instance,
@@ -1106,11 +1105,8 @@ public:
 	AbstractRenderCommand& operator=(const AbstractRenderCommand& p_copy);
 	AbstractRenderCommand& operator=(AbstractRenderCommand&& p_move);
 
-	bool IsInstancableWith(AbstractRenderCommand const & p_copy) const;
-
 	// Accessors    
 	GLuint GetPrimitiveCount() const;
-	GLuint GetInstanceCount() const;
 	GLuint GetFirstIndex() const;
 	GLuint GetBaseVertex() const;
 	FaceCullMode GetFaceCullMode() const;
@@ -1126,7 +1122,6 @@ public:
 
     ProgramHandle* GetShaderRef();
     void SetShader(ProgramHandle* p_shader);
-	void IncrementInstanceCount(GLuint p_num_instances = 1);
 
 	inline PrimitiveType GetPrimitiveType() const
 	{
@@ -1198,8 +1193,6 @@ public:
 		m_depth_mask = p_depth_mask;
 	}
 
-	void SetInstanceCount(GLuint p_instance_count);
-
     TextureHandle::ALPHA_TYPE GetAlphaType() const
     {
         return (m_material_uniforms.iUseTexture[0] == 1.0f)
@@ -1248,7 +1241,6 @@ private:
 	// Data required for MultiDrawIndirect
 	PrimitiveType m_primitive_type;
 	GLuint m_primitive_count;
-	GLuint m_instance_count;
 	GLuint m_first_index;
 	GLuint m_base_vertex;
 	GLuint m_base_instance;
@@ -1566,7 +1558,9 @@ public:
 
     virtual int64_t GetFrameCounter() = 0;
     virtual int GetNumTextures() const = 0;
-	virtual QString GetRendererName() = 0;
+    virtual QString GetRendererName() const = 0;
+    virtual int GetRendererMajorVersion() const = 0;
+    virtual int GetRendererMinorVersion() const = 0;
 
     virtual std::shared_ptr<MeshHandle> GetSkyboxCubeVAO() = 0;
     virtual GLuint GetSkyboxCubePrimCount() const = 0;

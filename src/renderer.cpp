@@ -20,24 +20,25 @@ inline void Renderer::InitializeScopes()
     // There are two vectors for each scope.
     m_abstractRenderer->m_scoped_render_commands_cache.resize(3);
     const int cache_size = m_abstractRenderer->m_scoped_render_commands_cache.size();
+    const int cmd_vec_size = 512;
 
     for (int cache_index = 0; cache_index < cache_size; ++cache_index)
     {
-        m_abstractRenderer->m_scoped_render_commands_cache[cache_index][(int)RENDERER::RENDER_SCOPE::CURRENT_ROOM_PORTAL_STENCILS].reserve(1024);
-        m_abstractRenderer->m_scoped_render_commands_cache[cache_index][(int)RENDERER::RENDER_SCOPE::CHILD_ROOM_SKYBOX].reserve(1024);
-        m_abstractRenderer->m_scoped_render_commands_cache[cache_index][(int)RENDERER::RENDER_SCOPE::CURRENT_ROOM_OBJECTS_OPAQUE].reserve(1024);
-        m_abstractRenderer->m_scoped_render_commands_cache[cache_index][(int)RENDERER::RENDER_SCOPE::CURRENT_ROOM_OBJECTS_CUTOUT].reserve(1024);
-        m_abstractRenderer->m_scoped_render_commands_cache[cache_index][(int)RENDERER::RENDER_SCOPE::CURRENT_ROOM_OBJECTS_BLENDED].reserve(1024);
-        m_abstractRenderer->m_scoped_render_commands_cache[cache_index][(int)RENDERER::RENDER_SCOPE::CHILD_ROOM_SKYBOX].reserve(1024);
-        m_abstractRenderer->m_scoped_render_commands_cache[cache_index][(int)RENDERER::RENDER_SCOPE::CHILD_ROOM_OBJECTS_OPAQUE].reserve(1024);
-        m_abstractRenderer->m_scoped_render_commands_cache[cache_index][(int)RENDERER::RENDER_SCOPE::CHILD_ROOM_OBJECTS_CUTOUT].reserve(1024);
-        m_abstractRenderer->m_scoped_render_commands_cache[cache_index][(int)RENDERER::RENDER_SCOPE::CHILD_ROOM_OBJECTS_BLENDED].reserve(1024);
-        m_abstractRenderer->m_scoped_render_commands_cache[cache_index][(int)RENDERER::RENDER_SCOPE::CURRENT_ROOM_PORTAL_DEPTH_REFRESH].reserve(1024);
-        m_abstractRenderer->m_scoped_render_commands_cache[cache_index][(int)RENDERER::RENDER_SCOPE::CURRENT_ROOM_PORTAL_DECORATIONS].reserve(1024);
-        m_abstractRenderer->m_scoped_render_commands_cache[cache_index][(int)RENDERER::RENDER_SCOPE::MENU].reserve(1024);
-        m_abstractRenderer->m_scoped_render_commands_cache[cache_index][(int)RENDERER::RENDER_SCOPE::AVATARS].reserve(1024);
-        m_abstractRenderer->m_scoped_render_commands_cache[cache_index][(int)RENDERER::RENDER_SCOPE::CURSOR].reserve(1024);
-        m_abstractRenderer->m_scoped_render_commands_cache[cache_index][(int)RENDERER::RENDER_SCOPE::OVERLAYS].reserve(1024);
+        m_abstractRenderer->m_scoped_render_commands_cache[cache_index][(int)RENDERER::RENDER_SCOPE::CURRENT_ROOM_PORTAL_STENCILS].reserve(cmd_vec_size);
+        m_abstractRenderer->m_scoped_render_commands_cache[cache_index][(int)RENDERER::RENDER_SCOPE::CHILD_ROOM_SKYBOX].reserve(cmd_vec_size);
+        m_abstractRenderer->m_scoped_render_commands_cache[cache_index][(int)RENDERER::RENDER_SCOPE::CURRENT_ROOM_OBJECTS_OPAQUE].reserve(cmd_vec_size);
+        m_abstractRenderer->m_scoped_render_commands_cache[cache_index][(int)RENDERER::RENDER_SCOPE::CURRENT_ROOM_OBJECTS_CUTOUT].reserve(cmd_vec_size);
+        m_abstractRenderer->m_scoped_render_commands_cache[cache_index][(int)RENDERER::RENDER_SCOPE::CURRENT_ROOM_OBJECTS_BLENDED].reserve(cmd_vec_size);
+        m_abstractRenderer->m_scoped_render_commands_cache[cache_index][(int)RENDERER::RENDER_SCOPE::CHILD_ROOM_SKYBOX].reserve(cmd_vec_size);
+        m_abstractRenderer->m_scoped_render_commands_cache[cache_index][(int)RENDERER::RENDER_SCOPE::CHILD_ROOM_OBJECTS_OPAQUE].reserve(cmd_vec_size);
+        m_abstractRenderer->m_scoped_render_commands_cache[cache_index][(int)RENDERER::RENDER_SCOPE::CHILD_ROOM_OBJECTS_CUTOUT].reserve(cmd_vec_size);
+        m_abstractRenderer->m_scoped_render_commands_cache[cache_index][(int)RENDERER::RENDER_SCOPE::CHILD_ROOM_OBJECTS_BLENDED].reserve(cmd_vec_size);
+        m_abstractRenderer->m_scoped_render_commands_cache[cache_index][(int)RENDERER::RENDER_SCOPE::CURRENT_ROOM_PORTAL_DEPTH_REFRESH].reserve(cmd_vec_size);
+        m_abstractRenderer->m_scoped_render_commands_cache[cache_index][(int)RENDERER::RENDER_SCOPE::CURRENT_ROOM_PORTAL_DECORATIONS].reserve(cmd_vec_size);
+        m_abstractRenderer->m_scoped_render_commands_cache[cache_index][(int)RENDERER::RENDER_SCOPE::MENU].reserve(cmd_vec_size);
+        m_abstractRenderer->m_scoped_render_commands_cache[cache_index][(int)RENDERER::RENDER_SCOPE::AVATARS].reserve(cmd_vec_size);
+        m_abstractRenderer->m_scoped_render_commands_cache[cache_index][(int)RENDERER::RENDER_SCOPE::CURSOR].reserve(cmd_vec_size);
+        m_abstractRenderer->m_scoped_render_commands_cache[cache_index][(int)RENDERER::RENDER_SCOPE::OVERLAYS].reserve(cmd_vec_size);
     }
 
     m_abstractRenderer->m_scoped_light_containers_cache.resize(3);
@@ -45,7 +46,7 @@ inline void Renderer::InitializeScopes()
 
 void Renderer::Initialize()
 {
-    m_abstractRenderer = std::unique_ptr<AbstractRenderer>(new RendererGL33());
+    m_abstractRenderer = std::unique_ptr<AbstractRenderer>(new RendererGL());
 
     InitializeScopes();
     m_abstractRenderer->Initialize();    
@@ -330,34 +331,6 @@ void Renderer::BindTextureHandle(uint32_t p_slot_index, TextureHandle* p_id)
     m_abstractRenderer->BindTextureHandle(&(m_abstractRenderer->m_texture_handle_to_GL_ID), p_slot_index, p_id);
 }
 
-void Renderer::EnableRenderCommandInstancing(RENDERER::RENDER_SCOPE const p_scope)
-{
-    QVector<AbstractRenderCommand>& render_command_vector = m_abstractRenderer->m_scoped_render_commands_cache[m_abstractRenderer->m_current_submission_index][static_cast<int>(p_scope)];
-    AbstractRenderCommand * previous_unique_command = nullptr;
-
-    const int command_count = render_command_vector.size();
-    const int camera_count = m_abstractRenderer->m_scoped_cameras_cache[m_abstractRenderer->m_rendering_index][static_cast<int>(p_scope)].size();
-    for (int command_index = 0; command_index < command_count; command_index += camera_count)
-    {
-        AbstractRenderCommand & base_render_command = render_command_vector[command_index];
-
-        // Update misc data, currently using this for objectID instanceID is added to this to fetch right eye matrices
-        if (previous_unique_command != nullptr
-            && previous_unique_command->IsInstancableWith(base_render_command)
-           )
-        {
-            previous_unique_command->IncrementInstanceCount();
-            ++m_collapsed_draws;
-        }
-        else
-        {
-            // We didn't find a batchable command or we're the first command so store this command as the unique_command
-            previous_unique_command = &base_render_command;
-        }
-        ++m_collapsable_draws;
-    }
-}
-
 uint64_t Renderer::GetLastSubmittedFrameID()
 {
     return m_abstractRenderer->m_submitted_frame_id;
@@ -374,22 +347,6 @@ void Renderer::SubmitFrame()
     //SortRenderCommandsByDistance(m_abstractRenderer->m_scoped_render_commands_cache[m_abstractRenderer->m_current_submission_index][static_cast<int>(RENDERER::RENDER_SCOPE::CHILD_ROOM_OBJECTS_CUTOUT)], false);
     SortRenderCommandsByDistance(m_abstractRenderer->m_scoped_render_commands_cache[m_abstractRenderer->m_current_submission_index][static_cast<int>(RENDERER::RENDER_SCOPE::CHILD_ROOM_OBJECTS_BLENDED)], true);
 
-    // If we are on GL 4.4 collapse instancable draws into single draws
-    if (m_abstractRenderer->GetRendererName().contains("4.4"))
-    {
-        //m_collapsed_draws = 0;
-        //m_collapsable_draws = 0;
-        EnableRenderCommandInstancing(RENDERER::RENDER_SCOPE::CURRENT_ROOM_OBJECTS_OPAQUE);
-        /*EnableRenderCommandInstancing(RENDERER::RENDER_SCOPE::CURRENT_ROOM_OBJECTS_CUTOUT);
-        EnableRenderCommandInstancing(RENDERER::RENDER_SCOPE::CURRENT_ROOM_OBJECTS_BLENDED);
-        EnableRenderCommandInstancing(RENDERER::RENDER_SCOPE::CURRENT_ROOM_PORTAL_DECORATIONS);
-        EnableRenderCommandInstancing(RENDERER::RENDER_SCOPE::CHILD_ROOM_OBJECTS_OPAQUE);
-        EnableRenderCommandInstancing(RENDERER::RENDER_SCOPE::CHILD_ROOM_OBJECTS_CUTOUT);
-        EnableRenderCommandInstancing(RENDERER::RENDER_SCOPE::CHILD_ROOM_OBJECTS_BLENDED);*/
-
-        //qDebug() << "CollapsableDraws:" << m_collapsable_draws << "CollapsedDraws:" << m_collapsed_draws;
-    }
-
     // Swap our submission indices round
     m_abstractRenderer->m_current_submission_index = m_abstractRenderer->m_completed_submission_index.exchange(m_abstractRenderer->m_current_submission_index);
     m_abstractRenderer->m_submitted_frame_id++;
@@ -402,8 +359,7 @@ void Renderer::SubmitFrame()
     {
         m_abstractRenderer->m_scoped_render_commands_cache[m_abstractRenderer->m_current_submission_index][static_cast<int>(scope)].erase(
                     m_abstractRenderer->m_scoped_render_commands_cache[m_abstractRenderer->m_current_submission_index][static_cast<int>(scope)].begin(),
-                    m_abstractRenderer->m_scoped_render_commands_cache[m_abstractRenderer->m_current_submission_index][static_cast<int>(scope)].end()
-                );
+                    m_abstractRenderer->m_scoped_render_commands_cache[m_abstractRenderer->m_current_submission_index][static_cast<int>(scope)].end());
     }
 }
 
@@ -683,9 +639,19 @@ int Renderer::GetNumTextures() const
     return (m_abstractRenderer ? m_abstractRenderer->GetNumTextures() : 0);
 }
 
-QString Renderer::GetRendererName()
+QString Renderer::GetRendererName() const
 {
     return (m_abstractRenderer ? m_abstractRenderer->GetRendererName() : QString());
+}
+
+int Renderer::GetRendererMajorVersion() const
+{
+    return (m_abstractRenderer ? m_abstractRenderer->GetRendererMajorVersion() : 0);
+}
+
+int Renderer::GetRendererMinorVersion() const
+{
+    return (m_abstractRenderer ? m_abstractRenderer->GetRendererMinorVersion() : 0);
 }
 
 std::shared_ptr<MeshHandle> Renderer::GetSkyboxCubeVAO()

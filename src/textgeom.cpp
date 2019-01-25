@@ -427,7 +427,6 @@ void TextGeom::DrawSelectedGL(QPointer <AssetShader> shader)
         RendererInterface * renderer = RendererInterface::m_pimpl;
         AbstractRenderCommand a(PrimitiveType::TRIANGLES,
                                 texts[j].glyph_count * 6,
-                                1,
                                 0,
                                 0,
                                 0,
@@ -486,7 +485,6 @@ void TextGeom::DrawGL(QPointer <AssetShader> shader)
         RendererInterface * renderer = RendererInterface::m_pimpl;
         AbstractRenderCommand a(PrimitiveType::TRIANGLES,
                                 texts[j].glyph_count * 6,
-                                1,
                                 0,
                                 0,
                                 0,

@@ -150,7 +150,6 @@ void AssetSkybox::DrawGL(QPointer <AssetShader> shader, const QMatrix4x4 & model
 
     AbstractRenderCommand a(PrimitiveType::TRIANGLES,
                             renderer->GetSkyboxCubePrimCount(),
-                            1,
                             0,
                             0,
                             0,
