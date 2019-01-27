@@ -43,6 +43,11 @@ DOMNode::DOMNode(QObject *parent) : QObject(parent)
     collision_scale = new ScriptableVector(1, 1, 1, this);
     collision_radius = 0.0f;
     collision_response = true;
+    collision_friction = 0.5f; // Roughly concrete
+    collision_rollingfriction = 0.01f; // Roughly concrete
+    collision_restitution = 0.85f; // Roughly concrete
+    collision_angulardamping = 0.1f; // Emulate Air friction
+    collision_lineardamping = 0.15f; // Emulate Air friction
     collision_static = true;
     collision_trigger = false;
     collision_ccdmotionthreshold = 1.0f;
@@ -584,6 +589,21 @@ void DOMNode::SetProperties(const QVariantMap & d)
     if (d.contains("collision_scale")) {
         SetCollisionScale(MathUtil::GetVectorFromQVariant(d["collision_scale"]));
     }
+    if (d.contains("collision_friction")) {
+        SetCollisionFriction(d["collision_friction"].toFloat());
+    }
+    if (d.contains("collision_rollingfriction")) {
+        SetCollisionRollingFriction(d["collision_rollingfriction"].toFloat());
+    }
+    if (d.contains("collision_restitution")) {
+        SetCollisionRestitution(d["collision_restitution"].toFloat());
+    }
+    if (d.contains("collision_angulardamping")) {
+        SetCollisionAngularDamping(d["collision_angulardamping"].toFloat());
+    }
+    if (d.contains("collision_lineardamping")) {
+        SetCollisionLinearDamping(d["collision_lineardamping"].toFloat());
+    }
     if (d.contains("draw_layer")) {
         SetDrawLayer(d["draw_layer"].toInt());
     }
@@ -657,9 +677,13 @@ void DOMNode::Copy(QPointer <DOMNode> p)
     body_id = p->body_id;
     head_id = p->head_id;
 
-
     collision_id = p->collision_id;
     collision_radius = p->collision_radius;
+    collision_friction = p->collision_friction;
+    collision_rollingfriction = p->collision_rollingfriction;
+    collision_restitution = p->collision_restitution;
+    collision_angulardamping = p->collision_angulardamping;
+    collision_lineardamping = p->collision_lineardamping;
     collision_pos->Copy(p->collision_pos);
     collision_scale->Copy(p->collision_scale);
     collision_static = p->collision_static;
@@ -1782,6 +1806,31 @@ void DOMNode::SetAnimSpeed(const float f)
 void DOMNode::SetCollisionResponse(const bool b)
 {
     collision_response = b;
+}
+
+void DOMNode::SetCollisionFriction(const float f)
+{
+    collision_friction = f;
+}
+
+void DOMNode::SetCollisionRollingFriction(const float f)
+{
+    collision_rollingfriction = f;
+}
+
+void DOMNode::SetCollisionRestitution(const float f)
+{
+    collision_restitution = f;
+}
+
+void DOMNode::SetCollisionAngularDamping(const float f)
+{
+    collision_angulardamping = f;
+}
+
+void DOMNode::SetCollisionLinearDamping(const float f)
+{
+    collision_lineardamping = f;
 }
 
 void DOMNode::SetLighting(const bool b)

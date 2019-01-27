@@ -350,10 +350,6 @@ void RoomPhysics::UpdateToRigidBody(QPointer <Player> player)
         //basis vectors, point (this will be changed to be xdir, ydir, zdir, pos)
         btRigidBody * rb = rigidBodies["__player"];
 
-//        btMotionState * motionState = rb->getMotionState();
-//        motionState->setWorldTransform(btTransform(btBasis, btP));
-//        rb->setLinearVelocity(btVector3(v.x(), v.y(), v.z()));
-//        rb->setMotionState(motionState);
         if (rb->getMotionState()) {
             delete rb->getMotionState();
         }
@@ -788,12 +784,8 @@ void RoomPhysics::AddPlayerShape(const QPointer <Player> player)
         rigidBodies["__player"]->setLinearVelocity(btVector3(v.x(), v.y(), v.z()));
         rigidBodies["__player"]->setSleepingThresholds(0.0f, 0.0f); //never sleep the player collision capsule, so it's always hitting stuff
         rigidBodies["__player"]->setAngularFactor(0.0f); //no need for rotations
-        //rigidBodies["__player"]->setRestitution(0.0f);
 
         rigidBodyJSIDs[rigidBodies["__player"]] = "__player";
-//        rigidBodies["__player"]->setFriction(2.0f); //slows player quickly once moving (con: makes ramps/bumps difficult to glide over)
-//        rigidBodies["__player"]->setCcdMotionThreshold(0.0f); //continuous collision (prevents player going through meshes when fast)
-//        rigidBodies["__player"]->setCcdSweptSphereRadius(1.0f);
 
         dynamicsWorld->addRigidBody(rigidBodies["__player"], COL_PLAYER, COL_WALL);
     }
@@ -829,22 +821,14 @@ void RoomPhysics::AddShape(const QPointer <RoomObject> o, btCollisionShape * sha
     //mass (note mass of 0 means infinte, immovable), motionstate, shape, inertia    
     btRigidBody::btRigidBodyConstructionInfo rigidBodyConstructInfo(btMass, motionStates[j], shape, btInertia);
 //    rigidBodyConstructInfo.m_additionalDamping = true; //56.0 - prevent jitter
-    rigidBodyConstructInfo.m_friction = 0.5f; // Roughly concrete
-    rigidBodyConstructInfo.m_rollingFriction = 0.01f; // Roughly concrete
-    rigidBodyConstructInfo.m_restitution = 0.85f; // Roughly concrete
-    rigidBodyConstructInfo.m_angularDamping = 0.1f; // Emulate Air friction
-    rigidBodyConstructInfo.m_linearDamping = 0.15f; // Emulate Air friction
+    rigidBodyConstructInfo.m_friction = o->GetProperties()->GetCollisionFriction();
+    rigidBodyConstructInfo.m_rollingFriction = o->GetProperties()->GetCollisionRollingFriction();
+    rigidBodyConstructInfo.m_restitution = o->GetProperties()->GetCollisionRestitution();
+    rigidBodyConstructInfo.m_angularDamping = o->GetProperties()->GetCollisionAngularDamping();
+    rigidBodyConstructInfo.m_linearDamping = o->GetProperties()->GetCollisionLinearDamping();
 
     rigidBodies[j] = new btRigidBody(rigidBodyConstructInfo);
-
     rigidBodies[j]->setLinearVelocity(btVector3(v.x(), v.y(), v.z()));
-//    rigidBodies[j]->setRestitution(0.0f);
-//    rigidBodies[j]->setFriction(0.5f);
-//    rigidBodies[j]->setDamping(0.05f, 0.05f);
-//    rigidBodies[j]->setAngularFactor(0.5f);
-//    rigidBodies[j]->setCollisionFlags(rigidBodies[j]->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
-//    rigidBodies[j]->setCollisionFlags(rigidBodies[j]->getCollisionFlags() | btCollisionObject::CF_STATIC_OBJECT);
-//    rigidBodies[j]->setCollisionFlags(rigidBodies[j]->getCollisionFlags() | btCollisionObject::CO_GHOST_OBJECT);
 
     if (o->GetProperties()->GetCollisionTrigger()) {
         rigidBodies[j]->setCollisionFlags(rigidBodies[j]->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);

@@ -3094,16 +3094,31 @@ QString RoomObject::GetXMLCode(const bool show_defaults) const
     }
     if (t == TYPE_OBJECT && ((show_defaults) || props->GetCollisionPos()->toQVector3D() != QVector3D(0,0,0))) {
         code_str += " collision_pos=" + MathUtil::GetVectorAsString(props->GetCollisionPos()->toQVector3D());
-    }
+    }    
     if (t == TYPE_OBJECT && ((show_defaults) || props->GetCollisionScale()->toQVector3D() != QVector3D(1,1,1))) {
         code_str += " collision_scale=" + MathUtil::GetVectorAsString(props->GetCollisionScale()->toQVector3D());
+    }
+    if (t == TYPE_OBJECT && ((show_defaults) || props->GetCollisionFriction() != 0.5f)) {
+        code_str += " collision_friction=" + MathUtil::GetFloatAsString(props->GetCollisionFriction());
+    }
+    if (t == TYPE_OBJECT && ((show_defaults) || props->GetCollisionRollingFriction() != 0.01f)) {
+        code_str += " collision_rollingfriction=" + MathUtil::GetFloatAsString(props->GetCollisionRollingFriction());
+    }
+    if (t == TYPE_OBJECT && ((show_defaults) || props->GetCollisionRestitution() != 0.85f)) {
+        code_str += " collision_restitution=" + MathUtil::GetFloatAsString(props->GetCollisionRestitution());
+    }
+    if (t == TYPE_OBJECT && ((show_defaults) || props->GetCollisionAngularDamping() != 0.1f)) {
+        code_str += " collision_angulardamping=" + MathUtil::GetFloatAsString(props->GetCollisionAngularDamping());
+    }
+    if (t == TYPE_OBJECT && ((show_defaults) || props->GetCollisionLinearDamping() != 0.15f)) {
+        code_str += " collision_lineardamping=" + MathUtil::GetFloatAsString(props->GetCollisionLinearDamping());
     }
     if (t == TYPE_OBJECT && ((show_defaults) || props->GetDrawLayer() != 0)) {
         code_str += " draw_layer=" + MathUtil::GetIntAsString(props->GetDrawLayer());
     }
     if (t == TYPE_LINK && ((show_defaults) || props->GetSwallow())) {
         code_str += " swallow=" + MathUtil::GetBoolAsString(props->GetSwallow());
-    }
+    }   
 
     //add text stuff if there is any in the middle
     switch (t) {
@@ -3422,6 +3437,21 @@ QVariantMap RoomObject::GetJSONCode(const bool show_defaults) const
     }
     if (t == TYPE_OBJECT && (show_defaults || props->GetCollisionScale()->toQVector3D() != QVector3D(1,1,1))) {
         m["collision_scale"] = MathUtil::GetVectorAsString(props->GetCollisionScale()->toQVector3D(), false);
+    }
+    if (t == TYPE_OBJECT && ((show_defaults) || props->GetCollisionFriction() != 0.5f)) {
+        m["collision_friction"] = props->GetCollisionFriction();
+    }
+    if (t == TYPE_OBJECT && ((show_defaults) || props->GetCollisionRollingFriction() != 0.01f)) {
+        m["collision_rollingfriction"] = props->GetCollisionRollingFriction();
+    }
+    if (t == TYPE_OBJECT && ((show_defaults) || props->GetCollisionRestitution() != 0.85f)) {
+        m["collision_restitution"] = props->GetCollisionRestitution();
+    }
+    if (t == TYPE_OBJECT && ((show_defaults) || props->GetCollisionAngularDamping() != 0.1f)) {
+        m["collision_angulardamping"] = props->GetCollisionAngularDamping();
+    }
+    if (t == TYPE_OBJECT && ((show_defaults) || props->GetCollisionLinearDamping() != 0.15f)) {
+        m["collision_lineardamping"] = props->GetCollisionLinearDamping();
     }
     if (t == TYPE_OBJECT && (show_defaults || props->GetBoneID().length() > 0)) {
         m["bone_id"] = props->GetBoneID();

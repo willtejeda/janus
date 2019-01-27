@@ -86,6 +86,11 @@ class DOMNode : public QObject, protected QScriptable
 
     //Collision related
     Q_PROPERTY(QString collision_id READ GetCollisionID WRITE SetCollisionID)
+    Q_PROPERTY(float collision_friction READ GetCollisionFriction WRITE SetCollisionFriction)
+    Q_PROPERTY(float collision_rollingfriction READ GetCollisionRollingFriction WRITE SetCollisionRollingFriction)
+    Q_PROPERTY(float collision_restitution READ GetCollisionRestitution WRITE SetCollisionRestitution)
+    Q_PROPERTY(float collision_angulardamping READ GetCollisionAngularDamping WRITE SetCollisionAngularDamping)
+    Q_PROPERTY(float collision_lineardamping READ GetCollisionLinearDamping WRITE SetCollisionLinearDamping)
     Q_PROPERTY(ScriptableVector * collision_pos READ GetCollisionPos WRITE SetCollisionPos)
     Q_PROPERTY(ScriptableVector * collision_scale READ GetCollisionScale WRITE SetCollisionScale)
 
@@ -368,6 +373,21 @@ public:
 
     void SetCollisionResponse(const bool b);
     inline bool GetCollisionResponse() const { return collision_response; }
+
+    void SetCollisionFriction(const float f);
+    inline float GetCollisionFriction() const { return collision_friction; }
+
+    void SetCollisionRollingFriction(const float f);
+    inline float GetCollisionRollingFriction() const { return collision_rollingfriction; }
+
+    void SetCollisionRestitution(const float f);
+    inline float GetCollisionRestitution() const { return collision_restitution; }
+
+    void SetCollisionAngularDamping(const float f);
+    inline float GetCollisionAngularDamping() const { return collision_angulardamping; }
+
+    void SetCollisionLinearDamping(const float f);
+    inline float GetCollisionLinearDamping() const { return collision_lineardamping; }
 
     void SetCollisionPos(ScriptableVector *&p);
     void SetCollisionPos(const QVector3D & p);
@@ -1031,6 +1051,11 @@ protected:
     float collision_ccdsweptsphereradius;
     float collision_radius;
     bool collision_response;
+    float collision_friction;
+    float collision_rollingfriction;
+    float collision_restitution;
+    float collision_angulardamping;
+    float collision_lineardamping;
     ScriptableVector * collision_pos;
     ScriptableVector * collision_scale;
 
