@@ -148,9 +148,6 @@ public:
     void SetResetPlayer(const bool b);
     bool GetResetPlayer();
 
-    void SetResetPlayerReason(const QString & s);
-    QString GetResetPlayerReason();   
-
     void SetPartyMode(const bool b);
     bool GetPartyMode() const;
 

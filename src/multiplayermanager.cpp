@@ -1338,7 +1338,7 @@ void MultiPlayerManager::LoadAvatarData(const bool load_userid)
         user_ghost->SetHeadAvatarPos(QVector3D(0, 0, 0));  
         user_ghost->SetGhostAssetObjects(asset_obj_list);        
         user_ghost->GetChildObjects().clear();
-        user_ghost->GetProperties()->SetLighting(true);
+        user_ghost->GetProperties()->SetLighting(true);        
 
         UpdateAvatarData();
         SaveAvatarData();
