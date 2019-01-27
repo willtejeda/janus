@@ -3052,7 +3052,7 @@ void Game::UpdateOverlays()
                 info_text_geom.AddText(QString(" collision_id=\"") + obj->GetProperties()->GetCollisionID() + "\"", QColor(0,255,0));
             }
             else if (state == JVR_STATE_UNIT_COLLISIONSCALE) {
-                info_text_geom.AddText(QString(" collision_scale=\"") + MathUtil::GetVectorAsString(obj->GetProperties()->GetCollisionScale()->toQVector3D()) + "\"", QColor(0,255,0));
+                info_text_geom.AddText(QString(" collision_scale=") + MathUtil::GetVectorAsString(obj->GetProperties()->GetCollisionScale()->toQVector3D()), QColor(0,255,0));
             }
             else if (state == JVR_STATE_UNIT_LIGHTING) {
                 info_text_geom.AddText(QString(" lighting=") + MathUtil::GetBoolAsString(obj->GetProperties()->GetLighting()), QColor(0,255,0));
