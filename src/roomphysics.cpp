@@ -804,7 +804,7 @@ void RoomPhysics::SetLinearVelocity(const QPointer <RoomObject> o, QVector3D v)
 void RoomPhysics::AddShape(const QPointer <RoomObject> o, btCollisionShape * shape, const btScalar btMass, const btVector3 btInertia, short group, short mask)
 {
     const QString j = o->GetProperties()->GetJSID();
-    const QVector3D p = o->GetPos() + o->GetProperties()->GetCollisionPos();
+    const QVector3D p = o->GetPos() + o->GetProperties()->GetCollisionPos()->toQVector3D();
     const QVector3D x = o->GetXDir();
     const QVector3D y = o->GetYDir();
     const QVector3D z = o->GetZDir();
