@@ -341,6 +341,12 @@ Assimp::IOStream * GeomIOSystem::Open(const char *pFile)
 
     // Wait if webasset is null, hasn't started, or has started and is running and not loaded or with error
 //    qDebug() << "GeomIOSystem::Open started" << this;
+
+    QTime load_time;
+    load_time.start();
+
+    float load_progress = 0.0f;
+
     while (!shutting_down) //release 60.0 - shutting down, it is critical we exit these loops, otherwise active threads do not allow the application to exit cleanly
     {
         QPointer <WebAsset> w = s->GetWebAsset();
@@ -353,6 +359,16 @@ Assimp::IOStream * GeomIOSystem::Open(const char *pFile)
             }
             if (w->GetFinished()) {
                 break;
+            }
+            //62.5 - abort this loop waiting if we get no download progress in 5 seconds
+            if (load_time.elapsed() > 5000) {
+                const float cur_progress = w->GetProgress();
+                if (load_progress == cur_progress) {
+                    qDebug() << "GeomIOSystem::Open (" << this << ") aborted wait for: " << base_path.toString() << pFile;
+                    break;
+                }
+                load_progress = cur_progress;
+                load_time.restart();
             }
         }
         QThread::yieldCurrentThread();

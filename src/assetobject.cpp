@@ -102,7 +102,7 @@ void AssetObject::Load()
     }
 
     geom->SetPath(props->GetSrcURL());
-    if ((!props->GetSrcURL().isEmpty() || geom->GetHasMeshData()) && !geom->GetStarted()) {
+    if ((!props->GetSrcURL().isEmpty() || geom->GetHasMeshData()) && !geom->GetStarted()) {        
         QtConcurrent::run(geom.data(), &Geom::Load);
     }
     else {
@@ -127,7 +127,8 @@ bool AssetObject::UpdateGL()
 void AssetObject::Update()
 {
     if (geom) {
-        if ((!props->GetSrcURL().isEmpty() || geom->GetHasMeshData()) && !geom->GetStarted()) {
+        if ((!props->GetSrcURL().isEmpty() || geom->GetHasMeshData()) && !geom->GetStarted() && !GetStarted()) {
+            SetStarted(true);
             QtConcurrent::run(geom.data(), &Geom::Load);
         }
         geom->Update();
