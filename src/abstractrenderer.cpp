@@ -1832,7 +1832,7 @@ void AbstractRenderer::RenderObjectsNaiveDecoupled(const RENDERER::RENDER_SCOPE 
         m_update_GPU_state = false;
     }
 
-    /*if (p_scope == RENDERER::RENDER_SCOPE::CURRENT_ROOM_OBJECTS_CUTOUT
+    if (p_scope == RENDERER::RENDER_SCOPE::CURRENT_ROOM_OBJECTS_CUTOUT
         || p_scope == RENDERER::RENDER_SCOPE::CHILD_ROOM_OBJECTS_CUTOUT)
     {
         MathUtil::glFuncs->glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE);
@@ -1842,7 +1842,7 @@ void AbstractRenderer::RenderObjectsNaiveDecoupled(const RENDERER::RENDER_SCOPE 
     {
         MathUtil::glFuncs->glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE);
         MathUtil::glFuncs->glDisable(GL_SAMPLE_ALPHA_TO_ONE);
-    }*/
+    }
 
     if (camera_count_this_scope == 0)
     {
@@ -1875,7 +1875,7 @@ void AbstractRenderer::RenderObjectsNaiveDecoupled(const RENDERER::RENDER_SCOPE 
     m_active_texture_slot_render = 0;
     MathUtil::glFuncs->glActiveTexture(GL_TEXTURE0);
 
-    /*if (p_scope == RENDERER::RENDER_SCOPE::CURRENT_ROOM_OBJECTS_CUTOUT
+    if (p_scope == RENDERER::RENDER_SCOPE::CURRENT_ROOM_OBJECTS_CUTOUT
         || p_scope == RENDERER::RENDER_SCOPE::CHILD_ROOM_OBJECTS_CUTOUT)
     {
         // This allows cutout alpha using the hashed-alpha test
@@ -1888,7 +1888,7 @@ void AbstractRenderer::RenderObjectsNaiveDecoupled(const RENDERER::RENDER_SCOPE 
     {
         MathUtil::glFuncs->glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE);
         //MathUtil::glFuncs->glDisable(GL_SAMPLE_ALPHA_TO_ONE);
-    }*/
+    }
 
     // If we have at least one command to draw in this scope
     if (cmd_count != 0)
