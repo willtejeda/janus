@@ -266,11 +266,13 @@ void MathUtil::Initialize()
         geom_extensions.push_back("ply");
         geom_extensions.push_back("fbx");
         geom_extensions.push_back("gltf");
+        geom_extensions.push_back("glb");
         geom_extensions.push_back("obj.gz");
         geom_extensions.push_back("dae.gz");
         geom_extensions.push_back("ply.gz");
         geom_extensions.push_back("fbx.gz");
         geom_extensions.push_back("gltf.gz");
+        geom_extensions.push_back("glb.gz");
     }
 
     if (vid_extensions.isEmpty()) {
