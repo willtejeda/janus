@@ -110,9 +110,10 @@ GeomIOStream::~GeomIOStream()
 //    qDebug() << "GeomIOStream::~GeomIOStream()" << this << url;
 }
 
-void GeomIOStream::SetData(QByteArray & b)
+void GeomIOStream::SetData(const QByteArray & b)
 {
-    buffer = new QBuffer(&b);
+    ba = b;
+    buffer = new QBuffer(&ba);
     buffer->open(QBuffer::ReadOnly);
 }
 
@@ -144,53 +145,53 @@ size_t GeomIOStream::FileSize() const
 
 void GeomIOStream::Flush()
 {
-    //no-op, we use this for reading only
+    //no-op, we use this for reading only    
 }
 
 size_t GeomIOStream::Read(void *pvBuffer, size_t pSize, size_t pCount)
 {
-    qint64 read_count = buffer->read((char *)pvBuffer, pSize * pCount);
-    if (read_count >= 0) {
-        return read_count;
+    if (pSize <= 0 || pCount <= 0) {
+        return 0;
+    }
+
+    const qint64 buf_pos = buffer->pos();
+    const qint64 read_count = buffer->read((char *)pvBuffer, pSize * pCount);
+//    if (url.toString().contains("skysphere")) {
+//        qDebug() << this << " did a read with" << pSize << pCount << "bufpos" << buf_pos << "bufsize" << buffer->size() << "and read_count" << read_count << url;
+//    }
+    if (read_count > 0) {
+        return read_count / pSize;
     }
     else {
-        return -1;
+        return 0;
     }
 }
 
 aiReturn GeomIOStream::Seek(size_t pOffset, aiOrigin pOrigin)
 {
-    bool ret_val = true;
-    size_t buffersize = buffer->size();
-    switch (pOrigin) {
-    case aiOrigin_SET:
-        if (pOffset > buffersize)
-        {
-            buffer->seek(buffersize - 1);
-            break;
-        }
-        ret_val = buffer->seek(pOffset);
-        break;
-    case aiOrigin_CUR:
-        if (buffer->pos() + pOffset > buffersize)
-        {
-            buffer->seek(buffersize - 1);
-            break;
-        }
-        ret_val = buffer->seek(buffer->pos() + pOffset);
-        break;
-    case aiOrigin_END:
-        if (pOffset > buffersize)
-        {
-            buffer->seek(buffersize - 1);
-            break;
-        }
-        ret_val = buffer->seek(buffer->size() - pOffset);
-        break;
-    default:
-        break;
+    const qint64 buf_pos = buffer->pos();
+    const size_t buffersize = buffer->size();
+
+    qint64 new_pos = pOffset;
+    if (pOrigin == aiOrigin_CUR) {
+        new_pos += buf_pos;
     }
-    return ((ret_val) ?  aiReturn_SUCCESS : aiReturn_FAILURE);
+    else if (pOrigin == aiOrigin_END) {
+        new_pos += buffersize;
+    }
+
+    const bool ret_val = buffer->seek(new_pos);
+
+//    const qint64 buf_pos2 = buffer->pos();
+//    if (url.toString().contains("skysphere")) {
+//        qDebug() << this << " did a seek with" << pOffset << pOrigin << "bufpos" << buf_pos << "bufsize" << buffersize << "bufpos2" << buf_pos2 << "retval" << ret_val;
+//    }
+
+//    if (new_pos >= 0 && new_pos < buffersize) {
+    if (ret_val) {
+        return aiReturn_SUCCESS;
+    }
+    return aiReturn_FAILURE;
 }
 
 size_t GeomIOStream::Tell() const
@@ -206,11 +207,16 @@ size_t GeomIOStream::Write(const void *pvBuffer, size_t pSize, size_t pCount)
 void GeomIOStream::Close()
 {
     if (buffer) {
+//        if (url.toString().contains("skysphere")) {
+//            qDebug() << this << " did a close on buffer of size" << buffer->size();
+//        }
         if (buffer->isOpen()) {
             buffer->close();
         }
         delete buffer;
         buffer = NULL;
+
+        ba.clear();
     }
 }
 
@@ -397,6 +403,7 @@ Assimp::IOStream * GeomIOSystem::Open(const char *pFile)
         }
 
         s->SetData(data_cache[u_str]);
+//        s->SetData(w->GetData());
         return s;
     }
     else

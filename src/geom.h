@@ -149,7 +149,7 @@ public:
     GeomIOStream();
     ~GeomIOStream();
 
-    void SetData(QByteArray & b);
+    void SetData(const QByteArray & b);
     void SetUrl(QUrl u);
     QUrl GetUrl() const;
 
@@ -166,6 +166,7 @@ public:
 
 private:
 
+    QByteArray ba;
     QBuffer * buffer;
     QUrl url;
     QPointer <WebAsset> webasset;
