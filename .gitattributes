@@ -1,3 +1,4 @@
 *.so filter=lfs diff=lfs merge=lfs -text
 dependencies filter=lfs diff=lfs merge=lfs -text
 resources filter=lfs diff=lfs merge=lfs -text
+*.so.4 filter=lfs diff=lfs merge=lfs -text
