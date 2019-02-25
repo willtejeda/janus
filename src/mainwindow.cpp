@@ -14,7 +14,7 @@ MainWindow::MainWindow()
     : cur_screen(0),
       fullscreened(false)
 {
-    SettingsManager::LoadSettings();   
+    SettingsManager::LoadSettings();
 
     //set application-wide font
     const QString font_path = MathUtil::GetApplicationPath() + "assets/fonts/OpenSans-Regular.ttf";

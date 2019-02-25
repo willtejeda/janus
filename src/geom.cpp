@@ -1097,7 +1097,7 @@ void Geom::DrawGL(QPointer <AssetShader> shader, const QColor col, const bool ov
         //iterate over and activate all textures
         if (!override_texture)
         {
-            shader->SetUseTextureAll(false);
+//            shader->SetUseTextureAll(false);
 
             for (int j=0; j<textures.size(); ++j)
             {
@@ -1155,6 +1155,18 @@ void Geom::DrawGL(QPointer <AssetShader> shader, const QColor col, const bool ov
                 MathUtil::PopModelMatrix();
                 base_command.SetObjectUniforms(shader->GetObjectUniforms());
                 renderer->PushAbstractRenderCommand(base_command);
+            }
+        }
+
+        //iterate over and deactivate all textures
+        if (!override_texture)
+        {
+            for (int j=0; j<textures.size(); ++j)
+            {
+                QPointer <AssetImage> a = textures[j].img;
+                if (a) {
+                    shader->SetUseTexture(j, false);
+                }
             }
         }
 

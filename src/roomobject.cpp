@@ -2382,7 +2382,8 @@ void RoomObject::DrawGL(QPointer <AssetShader> shader, const bool left_eye, cons
             shader->SetUseTexture(8, true, assetimage_lmap->GetIsHDR());
             QVector4D lmapScale = props->GetLightmapScale()->toQVector4D();
             shader->SetLightmapScale(lmapScale);
-            override_texture = true;
+            //62.7 - we do not want to do a texture override just because we have a lightmap
+//            override_texture = true;
         }
 
         MathUtil::PushModelMatrix();
