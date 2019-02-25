@@ -3119,6 +3119,12 @@ QString RoomObject::GetXMLCode(const bool show_defaults) const
     if (t == TYPE_LINK && ((show_defaults) || props->GetSwallow())) {
         code_str += " swallow=" + MathUtil::GetBoolAsString(props->GetSwallow());
     }   
+    if (!props->GetLightmapID().isEmpty()) {
+        code_str += " lmap_id=" + MathUtil::GetStringAsString(props->GetLightmapID());
+    }
+    if (props->GetLightmapScale()->toQVector4D() != QVector4D(1,1,0,0)) {
+        code_str += " lmap_sca=" + MathUtil::GetVector4AsString(props->GetLightmapScale()->toQVector4D());
+    }
 
     //add text stuff if there is any in the middle
     switch (t) {
@@ -3458,6 +3464,12 @@ QVariantMap RoomObject::GetJSONCode(const bool show_defaults) const
     }
     if (t == TYPE_OBJECT && (show_defaults || props->GetDrawLayer() != 0)) {
         m["draw_layer"] = props->GetDrawLayer();
+    }
+    if (!props->GetLightmapID().isEmpty()) {
+        m["lmap_id"] = props->GetLightmapID();
+    }
+    if (props->GetLightmapScale()->toQVector4D() != QVector4D(1,1,0,0)) {
+        m["lmap_sca"] = props->GetLightmapScale()->toQVector4D();
     }
 
     //add text stuff if there is any in the middle

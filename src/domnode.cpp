@@ -676,6 +676,8 @@ void DOMNode::Copy(QPointer <DOMNode> p)
     lighting = p->lighting;
     body_id = p->body_id;
     head_id = p->head_id;
+    lightmap_id = p->lightmap_id;
+    lightmap_scale->Copy(p->lightmap_scale);
 
     collision_id = p->collision_id;
     collision_radius = p->collision_radius;
