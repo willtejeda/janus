@@ -37,9 +37,14 @@ AssetWindow::AssetWindow(Game* g) :
     remove_asset_pushbutton.setText("Remove Asset");
     remove_asset_pushbutton.setMaximumHeight(30);
 
+    asset_palette_slider.setRange(64,256);
+    asset_palette_slider.setValue(128);
+    asset_palette_slider.setOrientation(Qt::Horizontal);
+
 //    QWidget * w = new QWidget(this);
     QGridLayout * v = new QGridLayout();
     v->addWidget(&load_asset_palette,0,0);
+    v->addWidget(&asset_palette_slider,0,1);
     v->addWidget(&asset_browser,1,0,1,2);
     v->addWidget(&add_asset_pushbutton,2,0);
     v->addWidget(&remove_asset_pushbutton,2,1);
@@ -58,6 +63,7 @@ AssetWindow::AssetWindow(Game* g) :
     connect(&load_asset_palette, SIGNAL(clicked(bool)), this, SLOT(LoadAssetPalette()));
     connect(&add_asset_pushbutton, SIGNAL(clicked(bool)), this, SLOT(AddAsset()));
     connect(&remove_asset_pushbutton, SIGNAL(clicked(bool)), this, SLOT(RemoveAsset()));
+    connect(&asset_palette_slider, SIGNAL(sliderReleased()), this, SLOT(GenerateAssetPaletteView()));
 }
 
 void AssetWindow::Update()
@@ -116,19 +122,26 @@ void AssetWindow::Update()
         }
 
         if (loaded_all) {
-            asset_browser_thumbs_processed = true;
-            QVariantMap data = asset_palette["data"].toMap();
-            QVariantList assets = data["assets"].toList();
-            QString code = "<html><head></head><body>";
-            for (int i=0; i<assets.size(); ++i) {
-                QVariantMap m = assets[i].toMap();
-                //code += "<table><tr><td>" + m["name"].toString() + "</td></tr><tr><td><img width=128 src=\"data:image/png;base64," + asset_browser_thumbs[i]->GetData().toBase64() + "\" /></td></tr></table>";
-                code += "<a href=\"" + asset_browser_urls[i] + "\">";
-                code += "<img width=128 src=\"data:image/png;base64," + asset_browser_thumbs[i]->GetData().toBase64() + "\" />";
-                code += "</a>";
-            }
-            asset_browser.setHtml(code);
+            asset_browser_thumbs_processed = true;            
+            GenerateAssetPaletteView();
         }
+    }
+}
+
+void AssetWindow::GenerateAssetPaletteView()
+{
+    if (asset_browser_thumbs_processed) {
+        QVariantMap data = asset_palette["data"].toMap();
+        QVariantList assets = data["assets"].toList();
+        QString code = "<html><head></head><body>";
+        for (int i=0; i<assets.size(); ++i) {
+            QVariantMap m = assets[i].toMap();
+            //code += "<table><tr><td>" + m["name"].toString() + "</td></tr><tr><td><img width=128 src=\"data:image/png;base64," + asset_browser_thumbs[i]->GetData().toBase64() + "\" /></td></tr></table>";
+            code += "<a href=\"" + asset_browser_urls[i] + "\">";
+            code += "<img width=" + QString::number(asset_palette_slider.value()) + " src=\"data:image/png;base64," + asset_browser_thumbs[i]->GetData().toBase64() + "\" />";
+            code += "</a>";
+        }
+        asset_browser.setHtml(code);
     }
 }
 

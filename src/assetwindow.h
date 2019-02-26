@@ -25,9 +25,11 @@ public slots:
     void AddAsset();
     void AddAssetGivenPath(QString path);
     void RemoveAsset();
+    void GenerateAssetPaletteView();
 
-private:
+private:   
 
+    QSlider asset_palette_slider;
     QPushButton load_asset_palette;
     QVariantMap asset_palette;
     QTextBrowser asset_browser;
