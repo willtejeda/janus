@@ -45,6 +45,11 @@ QString Asset::GetXMLCode() const
     if (props->GetVertexSrc().length() > 0) {
         s += " vertex_src=\"" + props->GetVertexSrc() + "\"";
     }
+    for (unsigned int i=0; i<ASSETSHADER_NUM_TEXTURES; ++i) {
+        if (!props->GetTex(i).isEmpty()) {
+            s += " tex"+QString::number(i)+"=\"" + props->GetTex(i) + "\"";
+        }
+    }
     if (props->GetMTL().length() > 0) {
         s += " mtl=\"" + props->GetMTL() + "\"";
     }

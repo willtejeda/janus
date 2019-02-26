@@ -605,6 +605,9 @@ public:
     void SetTexColorspace(const QString s);
     inline QString GetTexColorspace() const { return tex_colorspace; }
 
+    void SetTex(const QString s, int i);
+    inline QString GetTex(const int i) const { return tex[i]; }
+
     void SetMTL(const QString s);
     inline QString GetMTL() const { return mtl; }
 
@@ -913,6 +916,7 @@ protected:
     bool tex_compress;
     QString tex_alpha;
     QString tex_colorspace;
+    QVector <QString> tex;
     QString mtl;
 
     int sample_rate;

@@ -202,6 +202,7 @@ public:
 
     QPointer <Asset> CreateAssetFromURL(const QString url);
     void DragAndDropFromWebsurface(const QString drop_or_pin, const int cursor_index);
+    void DragAndDropAssetObject(const QString id, const int i); //from asset palette in AssetWindow
     void DragAndDrop(const QString url_str, const QString drop_or_pin, const int i);
     void UpdateDragAndDropPosition(QPointer <RoomObject> o, const int cursor_index);
 

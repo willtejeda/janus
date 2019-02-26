@@ -5,6 +5,7 @@
 #include <QtWidgets>
 
 #include "game.h"
+#include "webasset.h"
 
 class AssetWindow : public QWidget
 {
@@ -19,11 +20,20 @@ public:
 
 public slots:
 
+    void AssetBrowserClick(QUrl u);
+    void LoadAssetPalette();
     void AddAsset();
     void AddAssetGivenPath(QString path);
     void RemoveAsset();
 
 private:
+
+    QPushButton load_asset_palette;
+    QVariantMap asset_palette;
+    QTextBrowser asset_browser;
+    bool asset_browser_thumbs_processed;
+    QList <QString> asset_browser_urls;
+    QList <WebAsset *> asset_browser_thumbs;
 
     QPushButton add_asset_pushbutton;
     QPushButton remove_asset_pushbutton;

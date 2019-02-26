@@ -5181,6 +5181,79 @@ void Game::UpdateDragAndDropPosition(QPointer <RoomObject> o, const int cursor_i
     o->GetProperties()->SetSync(true);
 }
 
+//drag and drop an already-defined asset in the scene
+void Game::DragAndDropAssetObject(const QString id, const int i)
+{
+//    qDebug() << "Game::DragAndDrop" << url_str << drop_or_pin << i;
+    QPointer <Room> r = env->GetCurRoom();
+    //drag+drop
+    if (r->GetProperties()->GetLocked()) {
+        MathUtil::ErrorLog("Warning: cannot do drag and drop, room.locked=true");
+        return;
+    }
+
+    QPointer <AssetObject> a = r->GetAssetObject(id);
+    if (a.isNull()) {
+        MathUtil::ErrorLog("Warning: cannot do drag and drop, assetobject with id does not exist: " + id);
+        return;
+    }
+
+    ClearSelection(i);
+
+    QPointer <RoomObject> new_object = new RoomObject();
+    new_object->GetProperties()->SetJSID(GetGlobalUUID());
+
+    new_object->SetType(TYPE_OBJECT);
+    new_object->GetProperties()->SetID(id);
+    new_object->GetProperties()->SetCollisionID(id);
+    new_object->SetRescaleOnLoad(false); //rescale object to unit diam on load
+    selected[i] = r->AddRoomObject(new_object);
+
+    UpdateDragAndDropPosition(new_object, i);
+
+    //qDebug() << "drag" << new_object->GetJSID() << new_object->GetOriginalURL() << new_object->GetWebSurfaceID() << new_object->GetUUID();
+
+    //remove focus on websurface and initiate drag and drop
+    if (controller_manager->GetUsingSpatiallyTrackedControllers()) {
+        player->SetCursorObject(selected[i], i);
+        StartOpSpatialControllerEdit(i);
+    }
+    else {
+        mouse_move_accum = QPointF(0,0);
+
+        state = JVR_STATE_DRAGDROP; //59.0 - @alu requested cursor raycasting for initial placement
+        dragdrop_xform.setToIdentity();
+
+        r->SetSelected(selected[i], true);
+        player->SetCursorObject(selected[i], i);
+
+        r->GetPhysics()->RemoveRigidBody(new_object);
+        r->GetPhysics()->AddRigidBody(new_object, COL_WALL, COL_WALL);
+
+        new_object->Update(player->GetDeltaTime());
+
+        websurface_selected[i] = new_object->GetAssetWebSurface();
+        if (websurface_selected[i]) {
+            websurface_selected[i]->SetURL(websurface_selected[i]->GetProperties()->GetSrc());
+        }
+        video_selected[i] = new_object->GetAssetVideo();
+
+        //qDebug() << video_selected[i]->GetFullURL();
+        //qDebug() << websurface_selected[i]->GetFullURL();
+    }
+
+    new_object->GetProperties()->SetSync(true);
+
+    if (new_object->GetAssetSound()){
+        //new_object->GetAssetSound()->SetSrc(url_str, url_str);
+        new_object->GetAssetSound()->Play(new_object->GetMediaContext());
+    }
+    if (new_object->GetAssetVideo()){
+        //new_object->GetAssetVideo()->SetSrc(url_str, url_str);
+        new_object->GetAssetVideo()->Play(new_object->GetMediaContext());
+    }
+}
+
 void Game::DragAndDrop(const QString url_str, const QString drop_or_pin, const int i)
 {
 //    qDebug() << "Game::DragAndDrop" << url_str << drop_or_pin << i;

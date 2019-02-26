@@ -180,6 +180,7 @@ public:
     ~GeomIOSystem();
 
     void SetGZipped(const bool b);
+    void SetFakeExtensionAdded(const bool b);
     void SetBasePath(QUrl u);
     void 	Close (Assimp::IOStream *pFile);
     bool 	ComparePaths (const char *one, const char *second) const;
@@ -205,6 +206,7 @@ private:
     Assimp::IOStream * Open(const char *pFile);
 
     bool gzipped;
+    bool fake_extension_added;
     QUrl base_path;
     QList <QPointer <GeomIOStream> > streams;
 

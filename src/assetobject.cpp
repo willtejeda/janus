@@ -78,6 +78,7 @@ void AssetObject::SetTextureFile(const QString & tex, const unsigned int index)
     //qDebug() << "AssetObject::SetTextureFile() - URL" << tex;
     if (index < ASSETSHADER_NUM_TEXTURES && tex.length() > 0) {
         geom->SetUsesTexFile(true);
+        props->SetTex(tex, index);
         tex_url_str[index] = QUrl(props->GetBaseURL()).resolved(tex).toString();
     }
 }

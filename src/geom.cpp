@@ -221,7 +221,8 @@ void GeomIOStream::Close()
 }
 
 GeomIOSystem::GeomIOSystem() :
-    gzipped(false)
+    gzipped(false),
+    fake_extension_added(false)
 {
 
 }
@@ -234,6 +235,11 @@ GeomIOSystem::~GeomIOSystem()
 void GeomIOSystem::SetGZipped(const bool b)
 {
     gzipped = b;
+}
+
+void GeomIOSystem::SetFakeExtensionAdded(const bool b)
+{
+    fake_extension_added = b;
 }
 
 void GeomIOSystem::SetBasePath(QUrl u)
@@ -308,6 +314,10 @@ Assimp::IOStream * GeomIOSystem::Open(const char *pFile)
     }
     else if (gzipped && base_path.toString().right(p.length()) == p) {
         u = base_path.resolved(QUrl(p+".gz"));
+    }
+    else if (fake_extension_added && p.right(4) == ".glb") {
+        u = base_path.resolved(QUrl(p.left(p.length()-4)));
+//        qDebug() << "ACTUALLY USING" << u << pFile;
     }
     else if (p.lastIndexOf("http://", -1, Qt::CaseInsensitive) > 0) {
         p = p.right(p.length()-p.lastIndexOf("http://", -1, Qt::CaseInsensitive));
@@ -385,11 +395,14 @@ Assimp::IOStream * GeomIOSystem::Open(const char *pFile)
     QPointer <WebAsset> w = s->GetWebAsset();
     if (w && w->GetLoaded() && !w->GetError()) {
         //59.9 - do not allow redirects where extension string changes (e.g. to html pages which will cause assimp to crash)
+        //62.7 - however, this causes extension-less geometry not to load at all
 //        qDebug() << QString(pFile) << w->GetURL().toString();
-        if (w->GetRedirected() && QString(pFile).right(4) != w->GetURL().toString().right(4)) {
-            w->ClearData();
-        }
-        else if (u_str.right(7).toLower().contains(".obj") && !mtl_file_path.isEmpty()) {
+//        if (w->GetRedirected() && QString(pFile).right(4) != w->GetURL().toString().right(4)) {
+//            qDebug() << "REDIRECT" << pFile << w->GetURL().toString();
+//            w->ClearData();
+//        }
+//        else if (u_str.right(7).toLower().contains(".obj") && !mtl_file_path.isEmpty()) {
+        if (u_str.right(7).toLower().contains(".obj") && !mtl_file_path.isEmpty()) {
             //61.0 mtllib override
             QByteArray b = w->GetData();
             if (!b.left(1000).contains("mtllib ")) {
@@ -399,6 +412,7 @@ Assimp::IOStream * GeomIOSystem::Open(const char *pFile)
 
         //cache the data if fetched again
         if (!data_cache.contains(u_str)) {
+//            qDebug() << " newdata" << w->GetData().size() << " bytes for " << u_str;
             data_cache[u_str] = w->GetData();
         }
 
@@ -727,8 +741,16 @@ void Geom::Load()
         gzipped = true;
     }
 
+    //62.7 - necessary to give assimp a .glb filename hint, when they store files without extension/MIME data
+    bool fake_extension = false;
+    if (path.contains("content.decentraland.today/contents")) {
+        p = p + ".glb"; //
+        fake_extension = true;
+    }
+
     if (iosystem) {
         iosystem->SetGZipped(gzipped);
+        iosystem->SetFakeExtensionAdded(fake_extension);
         iosystem->SetBasePath(QUrl(p));
         importer.SetIOHandler(iosystem);
     }
@@ -1268,6 +1290,8 @@ QString Geom::GetProcessedNodeName(const QString s)
 
 void Geom::PrepareVBOs()
 {
+    const bool decentraland_model = path.contains("content.decentraland.today/contents");
+
 //    qDebug() << "Geom::PrepareVBOs()" << scene << ready;
     if (scene == NULL)
     {
@@ -1361,12 +1385,17 @@ void Geom::PrepareVBOs()
     {
         aiNode * nd = nodes_to_process.back();
         nodes_to_process.pop_back();
+//        qDebug() << "mName" << mesh->mName.C_Str() << n;
+        //62.7 - ad-hoc code to ignore nodes with name "_collider"
+        if (decentraland_model && QString(nd->mName.C_Str()).contains("_collider")) {
+            continue;
+        }
 
         const QMatrix4x4 m_p = nodes_parent_xforms.back();
         nodes_parent_xforms.pop_back();
 
         const QMatrix4x4 m3 = aiToQMatrix4x4(nd->mTransformation);
-        const QMatrix4x4 m = m_p * m3;
+        const QMatrix4x4 m = m_p * m3;       
 
         //process meshes
 //        qDebug() << "Geom::PrepareVBOs()" << nd->mNumMeshes;
@@ -1374,12 +1403,12 @@ void Geom::PrepareVBOs()
         {
 
             const aiMesh * mesh = scene->mMeshes[nd->mMeshes[n]];
-            const aiMaterial * mtl = scene->mMaterials[mesh->mMaterialIndex];
+            const aiMaterial * mtl = scene->mMaterials[mesh->mMaterialIndex];                      
 
             if (mesh->mPrimitiveTypes != aiPrimitiveType_TRIANGLE) {
                 // Skip meshes that are not triangulated as we do not support rendering them currently
 				continue;
-			}
+			}                        
 
             //material processing
             aiString mat_name2;

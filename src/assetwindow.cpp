@@ -4,6 +4,7 @@ AssetWindow::AssetWindow(Game* g) :
     game(g),
     update(true)
 {
+    asset_browser_thumbs_processed = true;
 
 //    table_widget.setSelectionMode(QAbstractItemView::SingleSelection);
 //    table_widget.setSelectionMode(QAbstractItemView::ExtendedSelection);
@@ -28,6 +29,8 @@ AssetWindow::AssetWindow(Game* g) :
     table_widget.horizontalHeader()->setStretchLastSection(true);
     table_widget.setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
+    load_asset_palette.setText("Load Asset Palette");
+
     add_asset_pushbutton.setText("Add Asset");
     add_asset_pushbutton.setMaximumHeight(30);
 
@@ -36,14 +39,23 @@ AssetWindow::AssetWindow(Game* g) :
 
 //    QWidget * w = new QWidget(this);
     QGridLayout * v = new QGridLayout();
-    v->addWidget(&add_asset_pushbutton,0,0);
-    v->addWidget(&remove_asset_pushbutton,0,1);
-    v->addWidget(&table_widget,1,0,1,2);
+    v->addWidget(&load_asset_palette,0,0);
+    v->addWidget(&asset_browser,1,0,1,2);
+    v->addWidget(&add_asset_pushbutton,2,0);
+    v->addWidget(&remove_asset_pushbutton,2,1);
+    v->addWidget(&table_widget,3,0,1,2);
     v->setSpacing(0);
     v->setMargin(1);
 
     setLayout(v);
 
+    asset_browser.setAcceptDrops(false);
+    asset_browser.setReadOnly(true);
+    asset_browser.setOpenLinks(false);
+    asset_browser.setAcceptRichText(false);
+
+    connect(&asset_browser, SIGNAL(anchorClicked(QUrl)), this, SLOT(AssetBrowserClick(QUrl)));
+    connect(&load_asset_palette, SIGNAL(clicked(bool)), this, SLOT(LoadAssetPalette()));
     connect(&add_asset_pushbutton, SIGNAL(clicked(bool)), this, SLOT(AddAsset()));
     connect(&remove_asset_pushbutton, SIGNAL(clicked(bool)), this, SLOT(RemoveAsset()));
 }
@@ -89,6 +101,35 @@ void AssetWindow::Update()
             table_widget.setSortingEnabled(true);
         }
     }
+
+    //build browser table with base64 encoded images
+    if (!asset_browser_thumbs_processed) {
+        bool loaded_all = true;
+        for (int i=0; i<asset_browser_thumbs.size(); ++i) {
+            if (asset_browser_thumbs[i] == nullptr) {
+                continue;
+            }
+            if (!asset_browser_thumbs[i]->GetLoaded() && !asset_browser_thumbs[i]->GetError()) {
+                loaded_all = false;
+//                qDebug() << "still waiting on" << asset_browser_thumbs[i]->GetURL();
+            }
+        }
+
+        if (loaded_all) {
+            asset_browser_thumbs_processed = true;
+            QVariantMap data = asset_palette["data"].toMap();
+            QVariantList assets = data["assets"].toList();
+            QString code = "<html><head></head><body>";
+            for (int i=0; i<assets.size(); ++i) {
+                QVariantMap m = assets[i].toMap();
+                //code += "<table><tr><td>" + m["name"].toString() + "</td></tr><tr><td><img width=256 src=\"data:image/png;base64," + asset_browser_thumbs[i]->GetData().toBase64() + "\" /></td></tr></table>";
+                code += "<a href=\"" + asset_browser_urls[i] + "\">";
+                code += "<img width=256 src=\"data:image/png;base64," + asset_browser_thumbs[i]->GetData().toBase64() + "\" />";
+                code += "</a>";
+            }
+            asset_browser.setHtml(code);
+        }
+    }
 }
 
 void AssetWindow::keyReleaseEvent(QKeyEvent * e)
@@ -99,6 +140,83 @@ void AssetWindow::keyReleaseEvent(QKeyEvent * e)
         RemoveAsset();
     }
         break;
+    }
+}
+
+void AssetWindow::AssetBrowserClick(QUrl u)
+{
+    //drag and drop a known asset
+    game->DragAndDropAssetObject(u.toString(), 0);
+}
+
+void AssetWindow::LoadAssetPalette()
+{
+    const QString filename = QFileDialog::getOpenFileName(this, "Load Asset Palette", MathUtil::GetWorkspacePath(), "*.json");
+    if (!filename.isNull()) {
+        QFile f(filename);
+        if (!f.open(QIODevice::ReadOnly)) {
+            return;
+        }
+
+        QByteArray ba = f.readAll();
+        f.close();
+
+        asset_palette = QJsonDocument::fromJson(ba).toVariant().toMap();
+        QVariantMap data = asset_palette["data"].toMap();
+        QVariantList assets = data["assets"].toList();
+
+        for (int i=0; i<asset_browser_thumbs.size(); ++i) {
+            delete asset_browser_thumbs[i];
+        }
+        asset_browser_thumbs.clear();
+        asset_browser_urls.clear();
+
+        asset_browser_thumbs_processed = false;
+
+        for (int i=0; i<assets.size(); ++i) {
+            QVariantMap m = assets[i].toMap();
+            QVariantMap c = m["contents"].toMap();
+
+            const QString u = m["url"].toString();
+
+            QPointer <AssetObject> ao = new AssetObject();
+
+            //set the texture
+            for (QVariantMap::const_iterator iter = c.begin(); iter != c.end(); ++iter) {
+                if (iter.key().right(9) == "file1.png") {
+//                    qDebug() << "SETTING TEXTURE FILE!" << "https://content.decentraland.today/contents/" + iter.value().toString();
+                    ao->SetTextureFile("https://content.decentraland.today/contents/" + iter.value().toString(), 0);
+                }
+            }
+
+            //set the ID to URL
+            ao->GetProperties()->SetID(u);
+
+            //set the geometry
+            for (QVariantMap::const_iterator iter = c.begin(); iter != c.end(); ++iter) {
+//                qDebug() << iter.key() << iter.value();
+                if (iter.key() == u) {
+                    ao->SetSrc("https://content.decentraland.today/contents/" + iter.value().toString(),
+                               "https://content.decentraland.today/contents/" + iter.value().toString());
+                }
+            }
+
+//            ao->Load();
+
+            //add this asset data to the room (the .glb, and the other texture)
+            if (cur_room) {
+                cur_room->AddAssetObject(ao);
+            }
+
+            //get the thumbnail
+            WebAsset * w = new WebAsset();
+            w->Load(m["thumbnail"].toString());
+            asset_browser_thumbs.push_back(w);
+            asset_browser_urls.push_back(u);
+        }
+
+        asset_browser.setText("Loading asset palette...");
+
     }
 }
 

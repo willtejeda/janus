@@ -102,6 +102,7 @@ DOMNode::DOMNode(QObject *parent) : QObject(parent)
     swallow = false;
 
     //assets
+    tex.resize(ASSETSHADER_MAX_TEXTURE_UNITS);
     tex_alpha = "undefined";
     tex_colorspace = "sRGB";
     tex_clamp = false;
@@ -2130,6 +2131,11 @@ void DOMNode::SetTexAlpha(const QString s)
 void DOMNode::SetTexColorspace(const QString s)
 {
     tex_colorspace = s;
+}
+
+void DOMNode::SetTex(const QString s, int i)
+{
+    tex[i] = s;
 }
 
 void DOMNode::SetMTL(const QString s)
