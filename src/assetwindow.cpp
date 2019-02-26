@@ -122,9 +122,9 @@ void AssetWindow::Update()
             QString code = "<html><head></head><body>";
             for (int i=0; i<assets.size(); ++i) {
                 QVariantMap m = assets[i].toMap();
-                //code += "<table><tr><td>" + m["name"].toString() + "</td></tr><tr><td><img width=256 src=\"data:image/png;base64," + asset_browser_thumbs[i]->GetData().toBase64() + "\" /></td></tr></table>";
+                //code += "<table><tr><td>" + m["name"].toString() + "</td></tr><tr><td><img width=128 src=\"data:image/png;base64," + asset_browser_thumbs[i]->GetData().toBase64() + "\" /></td></tr></table>";
                 code += "<a href=\"" + asset_browser_urls[i] + "\">";
-                code += "<img width=256 src=\"data:image/png;base64," + asset_browser_thumbs[i]->GetData().toBase64() + "\" />";
+                code += "<img width=128 src=\"data:image/png;base64," + asset_browser_thumbs[i]->GetData().toBase64() + "\" />";
                 code += "</a>";
             }
             asset_browser.setHtml(code);
@@ -183,7 +183,7 @@ void AssetWindow::LoadAssetPalette()
 
             //set the texture
             for (QVariantMap::const_iterator iter = c.begin(); iter != c.end(); ++iter) {
-                if (iter.key().right(9) == "file1.png") {
+                if (iter.key().right(4) == ".png" && iter.key().right(13) != "thumbnail.png") {
 //                    qDebug() << "SETTING TEXTURE FILE!" << "https://content.decentraland.today/contents/" + iter.value().toString();
                     ao->SetTextureFile("https://content.decentraland.today/contents/" + iter.value().toString(), 0);
                 }

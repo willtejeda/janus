@@ -5156,9 +5156,9 @@ void Game::UpdateDragAndDropPosition(QPointer <RoomObject> o, const int cursor_i
     }
 
     if (o->GetType() == TYPE_OBJECT && o->GetProperties()->GetID() != "plane") { //make objects upright
-        xform.setColumn(0, player->GetCursorXDir(cursor_index));
+        xform.setColumn(0, player->GetCursorYDir(cursor_index));
         xform.setColumn(1, player->GetCursorZDir(cursor_index));
-        xform.setColumn(2, -player->GetCursorYDir(cursor_index));
+        xform.setColumn(2, -player->GetCursorXDir(cursor_index));
     }
     else if (o->GetType() == TYPE_LINK) {
         xform.setColumn(0, player->GetCursorXDir(cursor_index));
