@@ -177,235 +177,167 @@ void TextGeom::CreateVBO()
         bool position_buffer_dirty = false;
         bool texcoord_buffer_dirty = false;
 
-        texts[text_index].glyph_count = glyph_count;
-
         // Skip empty lines
         if (glyph_count == 0) {
             continue;
         }
 
-        // If text hasn't changed from last frame, use reuse last frames mesh
-        if (text_index < last_texts.size() &&
-                texts[text_index].text == last_texts[text_index].text &&
-                texts[text_index].col == last_texts[text_index].col && //59.7 bugfix - allow colour variation to update mesh
-                last_texts[text_index].m_mesh_handle)
-        {
-            // No need to update as we are just redrawing the last frame's text for this line.
-            texts[text_index] = last_texts[text_index];
-            continue;
-        }
+        position_buffer_dirty = true;
+        texcoord_buffer_dirty = true;
+        index_buffer_dirty = true;
+        texts[text_index].m_positions.resize(glyph_count * vertices_per_glyph * 4);
+        texts[text_index].m_texcoords.resize(glyph_count * vertices_per_glyph * 2);
+        texts[text_index].m_indices.resize(glyph_count * indices_per_glyph);
 
-        // Reuse the previous mesh handle if it's valid
-        if (text_index < last_texts.size() && last_texts[text_index].m_mesh_handle)
-        {
-            texts[text_index].m_mesh_handle = last_texts[text_index].m_mesh_handle;
-
-            // Reuse the previous buffers if they are big enough to hold the new text
-            if (last_texts[text_index].glyph_count >= texts[text_index].glyph_count
-                    && last_texts[text_index].m_mesh_handle != nullptr)
-            {
-                texcoord_buffer_dirty = true;
-                texts[text_index].m_position_handle = last_texts[text_index].m_position_handle;
-                texts[text_index].m_texcoord_handle = last_texts[text_index].m_texcoord_handle;
-                texts[text_index].m_index_handle = last_texts[text_index].m_index_handle;
-                texts[text_index].m_texcoords.resize(glyph_count * vertices_per_glyph * 2);
-            }
-            else
-            {
-                position_buffer_dirty = true;
-                texcoord_buffer_dirty = true;
-                index_buffer_dirty = true;
-                texts[text_index].m_positions.resize(glyph_count * vertices_per_glyph * 4);
-                texts[text_index].m_texcoords.resize(glyph_count * vertices_per_glyph * 2);
-                texts[text_index].m_indices.resize(glyph_count * indices_per_glyph);
-            }
-        }
-        else
-        {
-            position_buffer_dirty = true;
-            texcoord_buffer_dirty = true;
-            index_buffer_dirty = true;
-            texts[text_index].m_positions.resize(glyph_count * vertices_per_glyph * 4);
-            texts[text_index].m_texcoords.resize(glyph_count * vertices_per_glyph * 2);
-            texts[text_index].m_indices.resize(glyph_count * indices_per_glyph);
-        }
-
+        //set index data
         for (int32_t glyph_index = 0; glyph_index < glyph_count; ++glyph_index)
         {
-            if (index_buffer_dirty == true)
-            {
-                uint32_t const index_offset = glyph_index * 6;
-                uint32_t const index_vert_offset = glyph_index * vertices_per_glyph;
-                texts[text_index].m_indices[index_offset + 0] = index_vert_offset + 0;
-                texts[text_index].m_indices[index_offset + 1] = index_vert_offset + 1;
-                texts[text_index].m_indices[index_offset + 2] = index_vert_offset + 2;
-                texts[text_index].m_indices[index_offset + 3] = index_vert_offset + 0;
-                texts[text_index].m_indices[index_offset + 4] = index_vert_offset + 2;
-                texts[text_index].m_indices[index_offset + 5] = index_vert_offset + 3;
-            }
+            uint32_t const index_offset = glyph_index * 6;
+            uint32_t const index_vert_offset = glyph_index * vertices_per_glyph;
+            texts[text_index].m_indices[index_offset + 0] = index_vert_offset + 0;
+            texts[text_index].m_indices[index_offset + 1] = index_vert_offset + 1;
+            texts[text_index].m_indices[index_offset + 2] = index_vert_offset + 2;
+            texts[text_index].m_indices[index_offset + 3] = index_vert_offset + 0;
+            texts[text_index].m_indices[index_offset + 4] = index_vert_offset + 2;
+            texts[text_index].m_indices[index_offset + 5] = index_vert_offset + 3;
         }
 
-        if (position_buffer_dirty)
+        //set vertex data
+        for (int32_t glyph_index = 0; glyph_index < glyph_count; ++glyph_index)
         {
-            for (int32_t glyph_index = 0; glyph_index < glyph_count; ++glyph_index)
+            for (uint32_t vert_index = 0; vert_index < vertices_per_glyph; ++vert_index)
             {
-                for (uint32_t vert_index = 0; vert_index < vertices_per_glyph; ++vert_index)
+                const uint32_t base_vertex = glyph_index * vertices_per_glyph;
+                const float yMin = (-float(text_index)-0.5f) * height;
+                const float yMax = (-float(text_index)+0.5f) * height;
+
+                const uint32_t position_base = base_vertex * elements_per_position;
+                const uint32_t position_offset = vert_index * elements_per_position + position_base;
+
+                switch (vert_index)
                 {
-                    uint32_t const base_vertex = glyph_index * vertices_per_glyph;
-                    float const yMin = (-float(text_index)-0.5f) * height;
-                    float const yMax = (-float(text_index)+0.5f) * height;
-
-                    uint32_t const position_base = base_vertex * elements_per_position;
-                    uint32_t const position_offset = vert_index * elements_per_position + position_base;
-
-                    switch (vert_index)
-                    {
-                    case 0:
-                        texts[text_index].m_positions[position_offset + 0] = float(glyph_index);
-                        texts[text_index].m_positions[position_offset + 1] = float(yMax);
-                        texts[text_index].m_positions[position_offset + 2] = float(0);
-                        texts[text_index].m_positions[position_offset + 3] = float(1);
-                        break;
-                    case 1:
-                        texts[text_index].m_positions[position_offset + 0] = float(glyph_index);
-                        texts[text_index].m_positions[position_offset + 1] = float(yMin);
-                        texts[text_index].m_positions[position_offset + 2] = float(0);
-                        texts[text_index].m_positions[position_offset + 3] = float(1);
-                        break;
-                    case 2:
-                        texts[text_index].m_positions[position_offset + 0] = float(glyph_index + 1);
-                        texts[text_index].m_positions[position_offset + 1] = float(yMin);
-                        texts[text_index].m_positions[position_offset + 2] = float(0);
-                        texts[text_index].m_positions[position_offset + 3] = float(1);
-                        break;
-                    case 3:
-                        texts[text_index].m_positions[position_offset + 0] = float(glyph_index + 1);
-                        texts[text_index].m_positions[position_offset + 1] = float(yMax);
-                        texts[text_index].m_positions[position_offset + 2] = float(0);
-                        texts[text_index].m_positions[position_offset + 3] = float(1);
-                        break;
-                    default:
-                        break;
-                    }
+                case 0:
+                    texts[text_index].m_positions[position_offset + 0] = float(glyph_index);
+                    texts[text_index].m_positions[position_offset + 1] = float(yMax);
+                    texts[text_index].m_positions[position_offset + 2] = float(0);
+                    texts[text_index].m_positions[position_offset + 3] = float(1);
+                    break;
+                case 1:
+                    texts[text_index].m_positions[position_offset + 0] = float(glyph_index);
+                    texts[text_index].m_positions[position_offset + 1] = float(yMin);
+                    texts[text_index].m_positions[position_offset + 2] = float(0);
+                    texts[text_index].m_positions[position_offset + 3] = float(1);
+                    break;
+                case 2:
+                    texts[text_index].m_positions[position_offset + 0] = float(glyph_index + 1);
+                    texts[text_index].m_positions[position_offset + 1] = float(yMin);
+                    texts[text_index].m_positions[position_offset + 2] = float(0);
+                    texts[text_index].m_positions[position_offset + 3] = float(1);
+                    break;
+                case 3:
+                    texts[text_index].m_positions[position_offset + 0] = float(glyph_index + 1);
+                    texts[text_index].m_positions[position_offset + 1] = float(yMax);
+                    texts[text_index].m_positions[position_offset + 2] = float(0);
+                    texts[text_index].m_positions[position_offset + 3] = float(1);
+                    break;
+                default:
+                    break;
                 }
             }
         }
 
-        if (texcoord_buffer_dirty)
+
+        //set texcoord data
+        for (int32_t glyph_index = 0; glyph_index < glyph_count; ++glyph_index)
         {
-            for (int32_t glyph_index = 0; glyph_index < glyph_count; ++glyph_index)
+            uint8_t const glyph_code = eachline[glyph_index];
+            uint8_t const glyph_x = glyph_code % 16;
+            uint8_t const glyph_y = (glyph_code - glyph_x) / 16;
+            float const space = 0.02f;
+            float const tx1 = float(glyph_x) / 16.0f;
+            float const tx2 = float(glyph_x+1) / 16.0f - space;
+            float const ty1 = float(16-(glyph_y+1)) / 16.0f - space  * 0.7f;
+            float const ty2 = float(16-glyph_y) / 16.0f - space * 0.8f;
+
+            for (uint32_t vert_index = 0; vert_index < vertices_per_glyph; ++vert_index)
             {
-                uint8_t const glyph_code = eachline[glyph_index];
-                uint8_t const glyph_x = glyph_code % 16;
-                uint8_t const glyph_y = (glyph_code - glyph_x) / 16;
-                float const space = 0.02f;
-                float const tx1 = float(glyph_x) / 16.0f;
-                float const tx2 = float(glyph_x+1) / 16.0f - space;
-                float const ty1 = float(16-(glyph_y+1)) / 16.0f - space  * 0.7f;
-                float const ty2 = float(16-glyph_y) / 16.0f - space * 0.8f;
+                uint32_t const base_vertex = glyph_index * vertices_per_glyph;
+                uint32_t const texcoord_base = base_vertex * elements_per_texcoord;
+                uint32_t const texcoord_offset = vert_index * elements_per_texcoord + texcoord_base;
 
-                for (uint32_t vert_index = 0; vert_index < vertices_per_glyph; ++vert_index)
+                switch (vert_index)
                 {
-                    uint32_t const base_vertex = glyph_index * vertices_per_glyph;
-
-                    uint32_t const texcoord_base = base_vertex * elements_per_texcoord;
-                    uint32_t const texcoord_offset = vert_index * elements_per_texcoord + texcoord_base;
-
-                    switch (vert_index)
-                    {
-                    case 0:
-                        texts[text_index].m_texcoords[texcoord_offset + 0] = float(tx1);
-                        texts[text_index].m_texcoords[texcoord_offset + 1] = float(ty2);
-                        break;
-                    case 1:
-                        texts[text_index].m_texcoords[texcoord_offset + 0] = float(tx1);
-                        texts[text_index].m_texcoords[texcoord_offset + 1] = float(ty1);
-                        break;
-                    case 2:
-                        texts[text_index].m_texcoords[texcoord_offset + 0] = float(tx2);
-                        texts[text_index].m_texcoords[texcoord_offset + 1] = float(ty1);
-                        break;
-                    case 3:
-                        texts[text_index].m_texcoords[texcoord_offset + 0] = float(tx2);
-                        texts[text_index].m_texcoords[texcoord_offset + 1] = float(ty2);
-                        break;
-                    default:
-                        break;
-                    }
+                case 0:
+                    texts[text_index].m_texcoords[texcoord_offset + 0] = float(tx1);
+                    texts[text_index].m_texcoords[texcoord_offset + 1] = float(ty2);
+                    break;
+                case 1:
+                    texts[text_index].m_texcoords[texcoord_offset + 0] = float(tx1);
+                    texts[text_index].m_texcoords[texcoord_offset + 1] = float(ty1);
+                    break;
+                case 2:
+                    texts[text_index].m_texcoords[texcoord_offset + 0] = float(tx2);
+                    texts[text_index].m_texcoords[texcoord_offset + 1] = float(ty1);
+                    break;
+                case 3:
+                    texts[text_index].m_texcoords[texcoord_offset + 0] = float(tx2);
+                    texts[text_index].m_texcoords[texcoord_offset + 1] = float(ty2);
+                    break;
+                default:
+                    break;
                 }
             }
         }
 
+        //set VAO
         const int32_t float_type = GL_FLOAT;
         const int32_t float_size = sizeof(float);
 
-        if (!texts[text_index].m_mesh_handle)
-        {
-            VertexAttributeLayout layout;
-            layout.attributes[(uint32_t)VAO_ATTRIB::POSITION].in_use = true;
-            layout.attributes[(uint32_t)VAO_ATTRIB::POSITION].buffer_id = VAO_ATTRIB::POSITION;
-            layout.attributes[(uint32_t)VAO_ATTRIB::POSITION].element_count = 3;
-            layout.attributes[(uint32_t)VAO_ATTRIB::POSITION].element_type = float_type;
-            layout.attributes[(uint32_t)VAO_ATTRIB::POSITION].offset_in_bytes = 0;
-            layout.attributes[(uint32_t)VAO_ATTRIB::POSITION].stride_in_bytes = 4 * float_size;
-
-            layout.attributes[(uint32_t)VAO_ATTRIB::TEXCOORD0].in_use = true;
-            layout.attributes[(uint32_t)VAO_ATTRIB::TEXCOORD0].buffer_id = VAO_ATTRIB::TEXCOORD0;
-            layout.attributes[(uint32_t)VAO_ATTRIB::TEXCOORD0].element_count = 2;
-            layout.attributes[(uint32_t)VAO_ATTRIB::TEXCOORD0].element_type = float_type;
-            layout.attributes[(uint32_t)VAO_ATTRIB::TEXCOORD0].offset_in_bytes = 0;
-            layout.attributes[(uint32_t)VAO_ATTRIB::TEXCOORD0].stride_in_bytes = 2 * float_size;
-
-            layout.attributes[(uint32_t)VAO_ATTRIB::INDICES].in_use = true;
-            layout.attributes[(uint32_t)VAO_ATTRIB::INDICES].buffer_id = VAO_ATTRIB::INDICES;
-            layout.attributes[(uint32_t)VAO_ATTRIB::INDICES].element_count = 1;
-            layout.attributes[(uint32_t)VAO_ATTRIB::INDICES].element_type = GL_UNSIGNED_INT ;
-            layout.attributes[(uint32_t)VAO_ATTRIB::INDICES].offset_in_bytes = 0;
-            layout.attributes[(uint32_t)VAO_ATTRIB::INDICES].stride_in_bytes = 1 * sizeof(uint32_t);
-
-            texts[text_index].m_mesh_handle = RendererInterface::m_pimpl->CreateMeshHandle(layout);
+        //62.8 - TODO: figure out how to delete an already-allocated mesh handle
+        if (texts[text_index].m_mesh_handle != nullptr) {
+//            RendererInterface::m_pimpl->re
+//            delete texts[text_index].m_mesh_handle;
         }
 
-        if (texts[text_index].m_position_handle == nullptr)
-        {
-            auto buffers = RendererInterface::m_pimpl->GetBufferHandlesForMeshHandle(texts[text_index].m_mesh_handle.get());
+        VertexAttributeLayout layout;
+        layout.attributes[(uint32_t)VAO_ATTRIB::POSITION].in_use = true;
+        layout.attributes[(uint32_t)VAO_ATTRIB::POSITION].buffer_id = VAO_ATTRIB::POSITION;
+        layout.attributes[(uint32_t)VAO_ATTRIB::POSITION].element_count = 3;
+        layout.attributes[(uint32_t)VAO_ATTRIB::POSITION].element_type = float_type;
+        layout.attributes[(uint32_t)VAO_ATTRIB::POSITION].offset_in_bytes = 0;
+        layout.attributes[(uint32_t)VAO_ATTRIB::POSITION].stride_in_bytes = 4 * float_size;
 
-            texts[text_index].m_position_handle = (*buffers)[(GLuint)VAO_ATTRIB::POSITION];
-            RendererInterface::m_pimpl->BindBufferHandle(texts[text_index].m_position_handle.get());
-            RendererInterface::m_pimpl->ConfigureBufferHandleData(texts[text_index].m_position_handle, texts[text_index].glyph_count * vertices_per_glyph * 4 * float_size, texts[text_index].m_positions.data(), BufferHandle::BUFFER_USAGE::STATIC_DRAW);
+        layout.attributes[(uint32_t)VAO_ATTRIB::TEXCOORD0].in_use = true;
+        layout.attributes[(uint32_t)VAO_ATTRIB::TEXCOORD0].buffer_id = VAO_ATTRIB::TEXCOORD0;
+        layout.attributes[(uint32_t)VAO_ATTRIB::TEXCOORD0].element_count = 2;
+        layout.attributes[(uint32_t)VAO_ATTRIB::TEXCOORD0].element_type = float_type;
+        layout.attributes[(uint32_t)VAO_ATTRIB::TEXCOORD0].offset_in_bytes = 0;
+        layout.attributes[(uint32_t)VAO_ATTRIB::TEXCOORD0].stride_in_bytes = 2 * float_size;
 
-            texts[text_index].m_texcoord_handle = (*buffers)[(GLuint)VAO_ATTRIB::TEXCOORD0];
-            RendererInterface::m_pimpl->BindBufferHandle(texts[text_index].m_texcoord_handle.get());
-            RendererInterface::m_pimpl->ConfigureBufferHandleData(texts[text_index].m_texcoord_handle, texts[text_index].glyph_count * vertices_per_glyph * 2 * float_size, texts[text_index].m_texcoords.data(), BufferHandle::BUFFER_USAGE::STATIC_DRAW);
+        layout.attributes[(uint32_t)VAO_ATTRIB::INDICES].in_use = true;
+        layout.attributes[(uint32_t)VAO_ATTRIB::INDICES].buffer_id = VAO_ATTRIB::INDICES;
+        layout.attributes[(uint32_t)VAO_ATTRIB::INDICES].element_count = 1;
+        layout.attributes[(uint32_t)VAO_ATTRIB::INDICES].element_type = GL_UNSIGNED_INT;
+        layout.attributes[(uint32_t)VAO_ATTRIB::INDICES].offset_in_bytes = 0;
+        layout.attributes[(uint32_t)VAO_ATTRIB::INDICES].stride_in_bytes = 1 * sizeof(uint32_t);
 
-            texts[text_index].m_index_handle = (*buffers)[(GLuint)VAO_ATTRIB::INDICES];
-            RendererInterface::m_pimpl->BindBufferHandle(texts[text_index].m_index_handle.get());
-            RendererInterface::m_pimpl->ConfigureBufferHandleData(texts[text_index].m_index_handle, texts[text_index].glyph_count * indices_per_glyph * 1 * sizeof(uint32_t), texts[text_index].m_indices.data(), BufferHandle::BUFFER_USAGE::STATIC_DRAW);
+        texts[text_index].m_mesh_handle = RendererInterface::m_pimpl->CreateMeshHandle(layout);
 
+        //62.8 - TODO: figure out how to delete an already-allocated vertex buffer
+        QVector<std::shared_ptr<BufferHandle>>* buffers = RendererInterface::m_pimpl->GetBufferHandlesForMeshHandle(texts[text_index].m_mesh_handle.get());
 
-        }
-        else
-        {
-            if (position_buffer_dirty)
-            {
-                RendererInterface::m_pimpl->BindBufferHandle(texts[text_index].m_position_handle.get());
-                RendererInterface::m_pimpl->UpdateBufferHandleData(texts[text_index].m_position_handle, 0, texts[text_index].glyph_count * vertices_per_glyph * 4 * float_size, texts[text_index].m_positions.data());
-            }
+        texts[text_index].m_position_handle = (*buffers)[(GLuint)VAO_ATTRIB::POSITION];
+        RendererInterface::m_pimpl->BindBufferHandle(texts[text_index].m_position_handle.get());
+        RendererInterface::m_pimpl->ConfigureBufferHandleData(texts[text_index].m_position_handle, glyph_count * vertices_per_glyph * 4 * float_size, texts[text_index].m_positions.data(), BufferHandle::BUFFER_USAGE::STATIC_DRAW);
 
-            if (texcoord_buffer_dirty)
-            {
-                RendererInterface::m_pimpl->BindBufferHandle(texts[text_index].m_texcoord_handle.get());
-                RendererInterface::m_pimpl->UpdateBufferHandleData(texts[text_index].m_texcoord_handle, 0, texts[text_index].glyph_count * vertices_per_glyph * 2 * float_size, texts[text_index].m_texcoords.data());
-            }
+        texts[text_index].m_texcoord_handle = (*buffers)[(GLuint)VAO_ATTRIB::TEXCOORD0];
+        RendererInterface::m_pimpl->BindBufferHandle(texts[text_index].m_texcoord_handle.get());
+        RendererInterface::m_pimpl->ConfigureBufferHandleData(texts[text_index].m_texcoord_handle, glyph_count * vertices_per_glyph * 2 * float_size, texts[text_index].m_texcoords.data(), BufferHandle::BUFFER_USAGE::STATIC_DRAW);
 
-            if (index_buffer_dirty)
-            {
-                RendererInterface::m_pimpl->BindBufferHandle(texts[text_index].m_index_handle.get());
-                RendererInterface::m_pimpl->UpdateBufferHandleData(texts[text_index].m_index_handle, 0, texts[text_index].glyph_count * indices_per_glyph * 1 * sizeof(uint32_t), texts[text_index].m_indices.data());
-            }
-        }
-    }
-    last_texts.clear();
+        texts[text_index].m_index_handle = (*buffers)[(GLuint)VAO_ATTRIB::INDICES];
+        RendererInterface::m_pimpl->BindBufferHandle(texts[text_index].m_index_handle.get());
+        RendererInterface::m_pimpl->ConfigureBufferHandleData(texts[text_index].m_index_handle, glyph_count * indices_per_glyph * 1 * sizeof(uint32_t), texts[text_index].m_indices.data(), BufferHandle::BUFFER_USAGE::STATIC_DRAW);
+    }    
 }
 
 void TextGeom::DrawSelectedGL(QPointer <AssetShader> shader)
@@ -420,13 +352,14 @@ void TextGeom::DrawSelectedGL(QPointer <AssetShader> shader)
 
     for (int j=0; j<texts.size(); ++j) {
 
-        if (texts[j].text.length() == 0) {
+        const int glyph_count = texts[j].text.length();
+        if (glyph_count == 0) {
             continue;
         }
 
         RendererInterface * renderer = RendererInterface::m_pimpl;
         AbstractRenderCommand a(PrimitiveType::TRIANGLES,
-                                texts[j].glyph_count * 6,
+                                glyph_count * 6,
                                 0,
                                 0,
                                 0,
@@ -474,7 +407,8 @@ void TextGeom::DrawGL(QPointer <AssetShader> shader)
     RendererInterface::m_pimpl->BindTextureHandle(0, RendererInterface::m_pimpl->GetDefaultFontGlyphAtlas());
     for (int j=0; j<texts.size(); ++j) {
 
-        if (texts[j].text.length() == 0) {
+        const int glyph_count = texts[j].text.length();
+        if (glyph_count == 0) {
             continue;
         }
 
@@ -484,7 +418,7 @@ void TextGeom::DrawGL(QPointer <AssetShader> shader)
 
         RendererInterface * renderer = RendererInterface::m_pimpl;
         AbstractRenderCommand a(PrimitiveType::TRIANGLES,
-                                texts[j].glyph_count * 6,
+                                glyph_count * 6,
                                 0,
                                 0,
                                 0,
@@ -508,8 +442,7 @@ void TextGeom::DrawGL(QPointer <AssetShader> shader)
 }
 
 void TextGeom::Clear()
-{    
-    last_texts = texts;
+{        
     texts.clear();
     len = 0.0f;
     vbo_rebuild = true;

@@ -10,13 +10,11 @@
 
 struct TextGeomLine
 {
-    TextGeomLine():
-        glyph_count(0)
+    TextGeomLine()
     {
     }
 
-    QString text;
-    uint32_t glyph_count;
+    QString text;    
     QColor col;
     QVector<float> m_positions;
     QVector<float> m_texcoords;
@@ -70,8 +68,7 @@ private:
 
     void CreateVBO();    
 
-    QVector <TextGeomLine> texts;
-    QVector <TextGeomLine> last_texts;
+    QVector <TextGeomLine> texts;    
 
     bool do_fixed_size;
     float fixed_size;

@@ -2431,8 +2431,8 @@ void AbstractRenderer::FreeTextureHandles()
         MathUtil::glFuncs->glDeleteTextures(1, &(texture_pair.second));
         texture_pair.second = 0;
 
-        // Free memory used by MeshHandle #TODO (Leaking this for now to see if deleting it was causing a crash
-        //delete m_textures_pending_deletion[i];
+        // Free memory used by MeshHandle #TODO (Leaking this for now to see if deleting it was causing a crash)
+        delete m_textures_pending_deletion[i];
     }
     m_textures_pending_deletion.clear();
     m_num_deleted_textures += texture_count;
