@@ -25,6 +25,12 @@ public:
     QString GetVertexURL() const;
     QString GetVertexFullURL() const;
 
+    void SetOverrideTexture(const bool b);
+    bool GetOverrideTexture() const;
+
+    void SetOverrideLightmap(const bool b);
+    bool GetOverrideLightmap() const;
+
     bool GetLoaded() const;
     bool GetFinished() const;
     bool GetCompiled();
@@ -86,6 +92,9 @@ private:
 
     QUrl vertex_src_url;
     QString vertex_src_url_str;
+
+    bool override_texture;
+    bool override_lightmap;
 
     WebAsset vertex_webasset;
 

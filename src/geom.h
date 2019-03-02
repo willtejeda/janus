@@ -233,7 +233,7 @@ public:
 
     void Update();
     bool UpdateGL();
-    void DrawGL(QPointer <AssetShader> shader, const QColor col = QColor(255,255,255), const bool override_texture = false);
+    void DrawGL(QPointer <AssetShader> shader, const QColor col = QColor(255,255,255));
 
     void SetReady(const bool b);
     bool GetReady() const;

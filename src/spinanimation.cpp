@@ -42,7 +42,9 @@ void SpinAnimation::DrawPlaneGL(QPointer <AssetShader> shader, const QColor col)
     }
 
     if (plane_obj) {
-        plane_obj->DrawGL(shader, col, true);
+        shader->SetOverrideTexture(true);
+        plane_obj->DrawGL(shader, col);
+        shader->SetOverrideTexture(false);
     }
 }
 
@@ -78,7 +80,9 @@ void SpinAnimation::DrawIconGL(QPointer <AssetShader> shader, const bool billboa
         shader->UpdateObjectUniforms();
 
         RendererInterface::m_pimpl->BindTextureHandle(0, texture0);
-        plane_obj->DrawGL(shader, color, true);
+        shader->SetOverrideTexture(true);
+        plane_obj->DrawGL(shader, color);
+        shader->SetOverrideTexture(false);
 
         MathUtil::PopModelMatrix();
 

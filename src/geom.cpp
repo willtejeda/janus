@@ -1038,7 +1038,7 @@ void Geom::SetMaterialTexture(const QString & tex_url, const int channel)
     data.SetTextureFilename("0", channel, u.resolved(tex_url).toString());
 }
 
-void Geom::DrawGL(QPointer <AssetShader> shader, const QColor col, const bool override_texture)
+void Geom::DrawGL(QPointer <AssetShader> shader, const QColor col)
 {
 //    qDebug() << "Geom::DrawGL" << path << ready << error << shader;
     if (!ready || error || shader == NULL || !shader->GetCompiled()) {
@@ -1084,7 +1084,7 @@ void Geom::DrawGL(QPointer <AssetShader> shader, const QColor col, const bool ov
         //58.0 - Change diffuse only when lighting is enabled (or some surfaces, menu/websurface, appear dark),
         //later change to restore since it causes inconsistent behaviour
         //changes again, this time to not use it if there's a texture override (this should work ok)
-        if (textures[0].img.isNull() && !override_texture)
+        if (textures[0].img.isNull() && !shader->GetOverrideTexture())
         {
             shader->SetDiffuse(QVector4D(mat.kd.redF(), mat.kd.greenF(), mat.kd.blueF(), mat.kd.alphaF()));
         }
@@ -1117,9 +1117,14 @@ void Geom::DrawGL(QPointer <AssetShader> shader, const QColor col, const bool ov
         }
 
         //iterate over and activate all textures
-        if (!override_texture)
+        if (!shader->GetOverrideTexture())
         {
-//            shader->SetUseTextureAll(false);
+            shader->SetUseTextureAll(false);
+
+            //62.9 - lightmap override
+            if (shader->GetOverrideLightmap()) {
+                shader->SetUseTexture(8, true); //8 - material lightmap channel
+            }
 
             for (int j=0; j<textures.size(); ++j)
             {
@@ -1181,7 +1186,7 @@ void Geom::DrawGL(QPointer <AssetShader> shader, const QColor col, const bool ov
         }
 
         //iterate over and deactivate all textures
-        if (!override_texture)
+        if (!shader->GetOverrideTexture())
         {
             for (int j=0; j<textures.size(); ++j)
             {

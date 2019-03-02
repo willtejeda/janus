@@ -41,7 +41,7 @@ public:
     QPointer <AssetObject> GetEmitterMesh();
 
     void Update(QPointer <DOMNode> props, const double dt_sec);
-    void DrawGL(QPointer <AssetShader> shader, const QVector3D eye_pos, QPointer <AssetObject> obj, const bool override_texture);
+    void DrawGL(QPointer <AssetShader> shader, const QVector3D eye_pos, QPointer <AssetObject> obj);
 
 private:
 

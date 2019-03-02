@@ -236,7 +236,7 @@ void ParticleSystem::Update(QPointer <DOMNode> props, const double dt_sec)
     }
 }
 
-void ParticleSystem::DrawGL(QPointer <AssetShader> shader, const QVector3D eye_pos, QPointer <AssetObject> obj, const bool override_texture)
+void ParticleSystem::DrawGL(QPointer <AssetShader> shader, const QVector3D eye_pos, QPointer <AssetObject> obj)
 {
     //    qDebug() << "ParticleSystem::DrawGL" << vbo_id;
     // draw
@@ -261,7 +261,7 @@ void ParticleSystem::DrawGL(QPointer <AssetShader> shader, const QVector3D eye_p
 
                 MathUtil::PushModelMatrix();
                 MathUtil::MultModelMatrix(mat);                
-                obj->DrawGL(shader, p.col, override_texture);
+                obj->DrawGL(shader, p.col);
                 MathUtil::PopModelMatrix();
             }
         }

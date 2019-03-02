@@ -136,7 +136,7 @@ void AssetObject::Update()
     }
 }
 
-void AssetObject::DrawGL(QPointer <AssetShader> shader, const QColor col, const bool override_texture)
+void AssetObject::DrawGL(QPointer <AssetShader> shader, const QColor col)
 {
 //    qDebug() << "AssetObject::DrawGL" << shader << src_url;
     if (shader == NULL || !shader->GetCompiled()) {
@@ -188,7 +188,7 @@ void AssetObject::DrawGL(QPointer <AssetShader> shader, const QColor col, const 
         shader->SetUseTexture(0, false);
     }
     else {
-        geom->DrawGL(shader, col, override_texture);
+        geom->DrawGL(shader, col);
     }
 }
 

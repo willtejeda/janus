@@ -1,6 +1,8 @@
 #include "assetshader.h"
 
 AssetShader::AssetShader() :
+    override_texture(false),
+    override_lightmap(false),
     m_program_handle(nullptr)
 {       
     props->SetType(TYPE_ASSETSHADER);
@@ -51,6 +53,25 @@ QString AssetShader::GetVertexURL() const
 QString AssetShader::GetVertexFullURL() const
 {
     return vertex_src_url.toString();
+}
+
+void AssetShader::SetOverrideTexture(const bool b)
+{
+    override_texture = b;
+}
+
+bool AssetShader::GetOverrideTexture() const {
+    return override_texture;
+}
+
+void AssetShader::SetOverrideLightmap(const bool b)
+{
+    override_lightmap = b;
+}
+
+bool AssetShader::GetOverrideLightmap() const
+{
+    return override_lightmap;
 }
 
 bool AssetShader::GetLoaded() const

@@ -2096,7 +2096,9 @@ void RoomObject::DrawGL(QPointer <AssetShader> shader, const bool left_eye, cons
 
         MathUtil::PushModelMatrix();
         MathUtil::MultModelMatrix(model_matrix_local);
-        particle_system->DrawGL(shader, player_pos, assetobject, override_texture);
+        shader->SetOverrideTexture(override_texture);
+        particle_system->DrawGL(shader, player_pos, assetobject);
+        shader->SetOverrideTexture(false);
         MathUtil::PopModelMatrix();
 
         if (assetobject.isNull()) {
@@ -2382,20 +2384,22 @@ void RoomObject::DrawGL(QPointer <AssetShader> shader, const bool left_eye, cons
             shader->SetUseTexture(8, true, assetimage_lmap->GetIsHDR());
             QVector4D lmapScale = props->GetLightmapScale()->toQVector4D();
             shader->SetLightmapScale(lmapScale);
-            //62.7 - we do not want to do a texture override just because we have a lightmap
-//            override_texture = true;
+            shader->SetOverrideLightmap(true); //62.9 - AssetShaders now hold a boolean for texture or lightmap overrides
         }
 
         MathUtil::PushModelMatrix();
         MathUtil::MultModelMatrix(model_matrix_local);
 
-        if (obj && obj->GetFinished()) {
-            obj->DrawGL(shader, col, override_texture);
+        shader->SetOverrideTexture(override_texture);
+        if (obj && obj->GetFinished()) {            
+            obj->DrawGL(shader, col);
         }
 
         if (assetobject_teleport && draw_assetobject_teleport && assetobject_teleport->GetFinished()) {
-            assetobject_teleport->DrawGL(shader, col, override_texture);
+            assetobject_teleport->DrawGL(shader, col);
         }
+        shader->SetOverrideTexture(false);
+        shader->SetOverrideLightmap(false);
 
         if (override_texture) {
             RendererInterface::m_pimpl->BindTextureHandle(0, AssetImage::null_image_tex_handle.get());
@@ -2410,7 +2414,8 @@ void RoomObject::DrawGL(QPointer <AssetShader> shader, const bool left_eye, cons
             shader->SetSpecular(QVector3D(0.04f, 0.04f, 0.04f));
             shader->SetShininess(20.0f);
 
-            obj->DrawGL(shader, QColor(128, 255, 128, 64), true);
+            shader->SetOverrideTexture(true);
+            obj->DrawGL(shader, QColor(128, 255, 128, 64));
 
             if (assetobject_collision && assetobject_collision->GetFinished()) {
                 const QVector3D p = props->GetCollisionPos()->toQVector3D();
@@ -2419,10 +2424,11 @@ void RoomObject::DrawGL(QPointer <AssetShader> shader, const bool left_eye, cons
                 MathUtil::PushModelMatrix();
                 MathUtil::ModelMatrix().translate(p);
                 MathUtil::ModelMatrix().scale(s);
-                assetobject_collision->DrawGL(shader, QColor(255, 0, 0, 64), true);
+                assetobject_collision->DrawGL(shader, QColor(255, 0, 0, 64));
                 MathUtil::PopModelMatrix();
             }
 
+            shader->SetOverrideTexture(false);
             shader->SetConstColour(QVector4D(1,1,1,1));
         }
 
