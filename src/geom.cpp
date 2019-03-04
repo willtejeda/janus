@@ -1773,7 +1773,8 @@ QColor Geom::GetColourFromArray(float * c)
 {
     return QColor::fromRgbF(qMax(0.0f, qMin(c[0], 1.0f)),
                      qMax(0.0f, qMin(c[1], 1.0f)),
-                     qMax(0.0f, qMin(c[2], 1.0f)));
+                     qMax(0.0f, qMin(c[2], 1.0f)),
+                     qMax(0.0f, qMin(c[3], 1.0f)));
 }
 
 void Geom::create_material(const struct aiMaterial *mtl, GeomMaterial & mat)
@@ -1791,7 +1792,7 @@ void Geom::create_material(const struct aiMaterial *mtl, GeomMaterial & mat)
     set_float4(c, 0.8f, 0.8f, 0.8f, 1.0f);
     if(AI_SUCCESS == aiGetMaterialColor(mtl, AI_MATKEY_COLOR_DIFFUSE, &diffuse)) {
         color4_to_float4(&diffuse, c);
-        mat.kd = GetColourFromArray(c);
+        mat.kd = GetColourFromArray(c);        
     }
 
     set_float4(c, 0.0f, 0.0f, 0.0f, 1.0f);
@@ -1830,8 +1831,8 @@ void Geom::create_material(const struct aiMaterial *mtl, GeomMaterial & mat)
     {
          mat.kd.setAlphaF(transparency);
     }
- 
-//    qDebug() << base_path << mtl << mat.ka << mat.kd << mat.ks << mat.ke << mat.ns;
+
+//    qDebug() << path << mtl << str.C_Str() << mat.kd << transparency; //mat.ka << mat.kd << mat.ks << mat.ke << mat.ns << transparency;
 
     SetupMaterialPath(mtl, mat, aiTextureType_DIFFUSE, 0);
     SetupMaterialPath(mtl, mat, aiTextureType_SPECULAR, 1);

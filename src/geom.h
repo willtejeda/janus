@@ -330,7 +330,7 @@ private:
     void color4_to_float4(const aiColor4D *c, float f[4]);
     void set_float4(float f[4], float a, float b, float c, float d);
 
-    QColor GetColourFromArray(float * c);
+    QColor GetColourFromArray(float * c);    
 
     QMatrix4x4 aiToQMatrix4x4(const aiMatrix3x3 & m2);
     QMatrix4x4 aiToQMatrix4x4(const aiMatrix4x4 & m2);
