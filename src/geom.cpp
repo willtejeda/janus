@@ -319,6 +319,10 @@ Assimp::IOStream * GeomIOSystem::Open(const char *pFile)
         u = base_path.resolved(QUrl(p.left(p.length()-4)));
 //        qDebug() << "ACTUALLY USING" << u << pFile;
     }
+    else if (fake_extension_added && p.right(5) == ".gltf") {
+        u = base_path.resolved(QUrl(p.left(p.length()-5)));
+//        qDebug() << "ACTUALLY USING" << u << pFile;
+    }
     else if (p.lastIndexOf("http://", -1, Qt::CaseInsensitive) > 0) {
         p = p.right(p.length()-p.lastIndexOf("http://", -1, Qt::CaseInsensitive));
         u = QUrl(p);
@@ -402,6 +406,9 @@ Assimp::IOStream * GeomIOSystem::Open(const char *pFile)
 //            w->ClearData();
 //        }
 //        else if (u_str.right(7).toLower().contains(".obj") && !mtl_file_path.isEmpty()) {
+
+//        qDebug() << "DONE" << w->GetData().size() << base_path;
+
         if (u_str.right(7).toLower().contains(".obj") && !mtl_file_path.isEmpty()) {
             //61.0 mtllib override
             QByteArray b = w->GetData();
@@ -515,7 +522,7 @@ Geom::Geom() :
     time.start();
     skin_joints.resize(ASSETSHADER_MAX_JOINTS);
     final_poses.resize(ASSETSHADER_MAX_JOINTS);
-    iosystem = new GeomIOSystem();
+    iosystem = new GeomIOSystem();    
 }
 
 Geom::~Geom()
@@ -745,6 +752,10 @@ void Geom::Load()
     bool fake_extension = false;
     if (path.contains("content.decentraland.today/contents")) {
         p = p + ".glb"; //
+        fake_extension = true;
+    }
+    if (path.contains("?v=")) {
+        p = p + ".gltf"; //62.9 - TODO make this generic for any geometric extension
         fake_extension = true;
     }
 
@@ -1278,7 +1289,7 @@ void Geom::UpdateAnimation()
                 double new_cur_time = t0 + (((cur_time - t0) + new_time));
                 cur_time = ((new_cur_time < t1) ? new_cur_time : t1);
             }
-//            qDebug() << "GeomFBX::UpdateAnimation()" << geom << t0 << cur_time << t1 << loop << base_path << geom->base_path;
+
             CalculateFinalPoses(); //this call is the FPS killer
         }
     }
@@ -1337,7 +1348,7 @@ void Geom::PrepareVBOs()
         nodes_parent_xforms.push_back(QMatrix4x4());
         node_depth.push_back(0);
 
-        m_globalInverseTransform = aiToQMatrix4x4(scene->mRootNode->mTransformation).inverted();
+        m_globalInverseTransform = aiToQMatrix4x4(scene->mRootNode->mTransformation).inverted();        
     }
 
     //on first pass, set up node hierarchy and node indexes for whole scene
@@ -2012,7 +2023,7 @@ void Geom::CalculateFinalPoses()
     }
 
     QPointer <Geom> geom = (linked_anim ? linked_anim : QPointer<Geom>(this));
-    if (geom->scene == NULL) {
+    if (geom->scene == NULL) {        
         return;
     }
 

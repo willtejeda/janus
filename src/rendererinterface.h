@@ -1377,12 +1377,7 @@ public:
         use_skelanim(false),
         m_index_count(0)
 	{
-        m_aabb_min[0] = FLT_MAX;
-        m_aabb_min[1] = FLT_MAX;
-        m_aabb_min[2] = FLT_MAX;
-        m_aabb_max[0] = FLT_MIN;
-        m_aabb_max[1] = FLT_MIN;
-        m_aabb_max[2] = FLT_MIN;
+
 	}
 
     ~GeomVBOData()
@@ -1410,12 +1405,6 @@ public:
         m_colors.clear();
         m_skel_anim_indices.clear();
         m_skel_anim_weights.clear();
-        m_aabb_min[0] = FLT_MAX;
-        m_aabb_min[1] = FLT_MAX;
-        m_aabb_min[2] = FLT_MAX;
-        m_aabb_max[0] = FLT_MIN;
-        m_aabb_max[1] = FLT_MIN;
-        m_aabb_max[2] = FLT_MIN;
     }
 
     QVector <QMatrix4x4> m_instance_transforms;
@@ -1426,8 +1415,6 @@ public:
     QVector <float> m_colors;
     QVector <uint8_t> m_skel_anim_indices;
     QVector <float> m_skel_anim_weights;
-    QVector3D m_aabb_min;
-    QVector3D m_aabb_max;
 
 	std::shared_ptr<MeshHandle> m_mesh_handle;
 	bool use_skelanim;

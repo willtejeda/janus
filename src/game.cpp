@@ -1546,8 +1546,8 @@ void Game::mouseReleaseEvent(QMouseEvent * e, const int cursor_index, const QSiz
                 QString url_str = websurface_selected[cursor_index]->GetLinkClicked(cursor_index).toString().trimmed();
 
                 if (!(url_str == websurface_selected[cursor_index]->GetURL() || url_str == "")) {
-                    //remove stuff after ? (59.0 - but not if it's a Google link - contains /url?q=)
-                    if (url_str.contains("?") && !url_str.contains("/url?q=")) {
+                    //remove stuff after ? (59.0 - but not if it's a Google link - contains /url?q=)(62.9 - versioning in Vesta)
+                    if (url_str.contains("?") && !url_str.contains("/url?q=") && !url_str.contains("?v=")) {
                         url_str = url_str.left(url_str.indexOf("?"));
                     }
 
@@ -5421,8 +5421,8 @@ void Game::DragAndDropFromWebsurface(const QString drop_or_pin, const int i)
             return;
         }
 
-        //remove stuff after ? (59.0 - but not if it's a Google link - contains /url?q=)
-        if (url_str.contains("?") && !url_str.contains("/url?q=")) {
+        //remove stuff after ? (59.0 - but not if it's a Google link - contains /url?q=) (62.9 - versioning in Vesta)
+        if (url_str.contains("?") && !url_str.contains("/url?q=") && !url_str.contains("?v=")) {
             url_str = url_str.left(url_str.indexOf("?"));
         }
         DragAndDrop(url_str, drop_or_pin, i);
