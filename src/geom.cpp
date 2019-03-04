@@ -849,7 +849,8 @@ void Geom::Update()
 
 //            qDebug() << "Geom::Update()" << path << mat_names[i] << i << mat.textures.size();
             for (int j=0; j<mat.textures.size(); ++j) {
-                QString s = mat.textures[j].filename.trimmed();
+                QString s = mat.textures[j].filename.trimmed();                
+                s = QUrl::toPercentEncoding(s,":/"); // params for exclude/include
                 s = s.replace("\\", "/");
                 s = s.replace("%5C", "/");               
 
@@ -1295,8 +1296,6 @@ QString Geom::GetProcessedNodeName(const QString s)
 
 void Geom::PrepareVBOs()
 {
-    const bool decentraland_model = path.contains("content.decentraland.today/contents");
-
 //    qDebug() << "Geom::PrepareVBOs()" << scene << ready;
     if (scene == NULL)
     {
@@ -1344,7 +1343,6 @@ void Geom::PrepareVBOs()
     //on first pass, set up node hierarchy and node indexes for whole scene
     while (!nodes_to_process.empty())
     {
-
         aiNode * nd = nodes_to_process.back();
         nodes_to_process.pop_back();
 
@@ -1390,9 +1388,9 @@ void Geom::PrepareVBOs()
     {
         aiNode * nd = nodes_to_process.back();
         nodes_to_process.pop_back();
-//        qDebug() << "mName" << mesh->mName.C_Str() << n;
-        //62.7 - ad-hoc code to ignore nodes with name "_collider"
-        if (decentraland_model && QString(nd->mName.C_Str()).contains("_collider")) {
+//        qDebug() << "mName" << mesh->mName.C_Str() << n;        
+        //62.9 - ad-hoc decentraland convention to reserve nodes with name "_collider" for collision only
+        if (QString(nd->mName.C_Str()).contains("_collider")) {
             continue;
         }
 
@@ -1400,7 +1398,7 @@ void Geom::PrepareVBOs()
         nodes_parent_xforms.pop_back();
 
         const QMatrix4x4 m3 = aiToQMatrix4x4(nd->mTransformation);
-        const QMatrix4x4 m = m_p * m3;       
+        const QMatrix4x4 m = m_p * m3;
 
         //process meshes
 //        qDebug() << "Geom::PrepareVBOs()" << nd->mNumMeshes;
@@ -1464,8 +1462,8 @@ void Geom::PrepareVBOs()
             if (mesh_has_been_processed == false)
             {
                 //mesh processing, for now only triangles are supported
-                auto const num_verts = mesh->mNumVertices;
-                uint32_t const indice_offset = vbo_data.m_positions.size() / 4;
+                const uint32_t num_verts = mesh->mNumVertices;
+                const uint32_t indice_offset = vbo_data.m_positions.size() / 4;
                 vbo_data.m_indices.reserve(vbo_data.m_indices.size() + mesh->mNumFaces * 3);
                 vbo_data.m_positions.reserve(vbo_data.m_positions.size() + num_verts * 4);
                 vbo_data.m_normals.reserve(vbo_data.m_normals.size() + num_verts * 4);
@@ -1540,8 +1538,8 @@ void Geom::PrepareVBOs()
                 } // for (uint32_t vertex_index = 0; vertex_index < num_verts; ++vertex_index)
 
                 // Construct Physics Triangles
-                auto const triangle_count = vbo_data.m_indices.size() / 3;
-                for (uint32_t triangle_index = 0; triangle_index < triangle_count; ++triangle_index)
+                const int triangle_count = vbo_data.m_indices.size() / 3;
+                for (int triangle_index = 0; triangle_index < triangle_count; ++triangle_index)
                 {
                     GeomTriangle tri;
                     for (uint32_t vertex_index = 0; vertex_index < 3; ++vertex_index)
@@ -1605,7 +1603,7 @@ void Geom::PrepareVBOs()
                 {
                     QVector<VertexBoneInfo>& bones = bone_info[vertex_index];
 
-                    auto const bone_count = bones.size();
+                    const int bone_count = bones.size();
                     if (bone_count != 0)
                     {
                         vbo_data.use_skelanim = true;
@@ -1614,7 +1612,7 @@ void Geom::PrepareVBOs()
                     uint8_t indices[4] = {0xff, 0xff, 0xff, 0xff};
                     float weights[4] = {0.0f, 0.0f, 0.0f, 0.0f};
 
-                    for (uint32_t bone_index = 0; bone_index < bone_count; ++bone_index)
+                    for (int bone_index = 0; bone_index < bone_count; ++bone_index)
                     {
                         indices[bone_index] = bones[bone_index].bone_index;
                         weights[bone_index] = bones[bone_index].weight;
@@ -1648,6 +1646,8 @@ void Geom::PrepareVBOs()
 
             // Add new transform for this mesh this is the object-space to instance-space transform for this instance
             vbo_data.m_instance_transforms.push_back(m);
+//            qDebug() << "instance xform" << path << mesh->mName.C_Str() << m3 << m;
+
             // Increment nTris by the triangle count of this mesh if we are creating a new instance of it.
             // TODO: Perhaps this should store the number of triangles loaded rather than drawn, as that number will vary
             // when I implement working frustum-culling and/or other triangle culling techniques.
