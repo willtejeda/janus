@@ -56,15 +56,9 @@ struct GeomMaterial
         ka(0,0,0),
         ke(0,0,0),
         kd(255,255,255),
-        ks(10,10,10), // 10/255 is equivalent to ~4% which is the default f0 value
-        tr(1.0f),
-        illum(2),
-        ns(20),
-        material_index(0)
-    {
-        for (int i=0; i<2; ++i) {
-            map_s[i] = QVector2D(1.0f, 1.0f);
-        }
+        ks(10,10,10), // 10/255 is equivalent to ~4% which is the default f0 value       
+        ns(20)
+    {        
         textures = QVector<GeomTexture>(ASSETSHADER_NUM_TEXTURES);
     }
 
@@ -77,41 +71,24 @@ struct GeomMaterial
         return ka == rhs.ka &&
                 ke == rhs.ke &&
                 kd == rhs.kd &&
-                ks == rhs.ks &&
-                tr == rhs.tr &&
-                illum == rhs.illum &&
-                ns == rhs.ns &&
-                map_s[0] == rhs.map_s[0] &&
-                map_s[1] == rhs.map_s[1];
+                ks == rhs.ks &&                
+                ns == rhs.ns;
     }
 
-    QString id;
     QColor ka;
     QColor ke;
     QColor kd;
     QColor ks;
-    float tr;
-    int illum;
     float ns;
-
-    //texture parameters
-    QVector3D o;
-    QVector3D s;
-    QVector3D t;
-    QVector2D mm;
-    float bm;
-    QVector2D map_s[2];
 
     QVector<GeomTexture> textures;
     // Assimp Mesh ID is the lookup here
     // This lets us just store the transforms for instanes
-    // rather than transforming it's verts into object-space and
+    // rather than transforming its verts into object-space and
     // appending to the one mesh.
     QVector <QVector<GeomTriangle>> triangles;
     QVector <GeomVBOData> vbo_data;
     QVector <QPair<uint32_t, int>> mesh_keys;
-
-    int material_index; //hack to fix some broken texture references
 };
 
 class GeomData

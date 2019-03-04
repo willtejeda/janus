@@ -1437,7 +1437,6 @@ void Geom::PrepareVBOs()
                 if (match_name.isEmpty())
                 {
                     GeomMaterial & mat = data.GetMaterial(mat_name);
-                    mat.material_index = mesh->mMaterialIndex;
 //                    qDebug() << "create material" << mat_name << scene->mNumTextures;
                     create_material(mtl, mat);
                 }
