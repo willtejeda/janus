@@ -157,7 +157,7 @@ public:
     ~GeomIOSystem();
 
     void SetGZipped(const bool b);
-    void SetFakeExtensionAdded(const bool b);
+    void SetFakeExtensionAdded(const bool b, const QString s);
     void SetBasePath(QUrl u);
     void 	Close (Assimp::IOStream *pFile);
     bool 	ComparePaths (const char *one, const char *second) const;
@@ -183,6 +183,7 @@ private:
     Assimp::IOStream * Open(const char *pFile);
 
     bool gzipped;
+    QString fake_extension_string;
     bool fake_extension_added;
     QUrl base_path;
     QList <QPointer <GeomIOStream> > streams;
@@ -344,8 +345,8 @@ private:
 
     QString mtl_file_path;
 
-    QHash <QString, uint32_t> bone_to_node; //maps bone names to node indexes
-    QHash <QString, uint32_t> bone_to_boneid; //maps bone names to bone indexes (skips some nodes, since there can only be up to 128 bones)
+    QHash <QString, int> bone_to_node; //maps bone names to node indexes
+    QHash <QString, int> bone_to_boneid; //maps bone names to bone indexes (skips some nodes, since there can only be up to 128 bones)
     QHash <QString, aiNodeAnim *> anims;
     QVector <aiNode *> node_list; //maps indexes to aiNodes
     bool uses_tex_file;
@@ -360,9 +361,9 @@ private:
     QVector<QMatrix4x4> final_poses;
     QVector<QMatrix4x4> skin_joints;
     QHash <QString, QMatrix4x4> bone_offset_matrix;
-    QHash <uint32_t, QMatrix4x4> extra_global_transforms; //bone indexes to xform
-    QHash <uint32_t, QMatrix4x4> extra_global_rotation_transforms; //bone indexes to xform
-    QHash <uint32_t, QMatrix4x4> extra_relative_transforms; //bone indexes to xform
+    QHash <int, QMatrix4x4> extra_global_transforms; //bone indexes to xform
+    QHash <int, QMatrix4x4> extra_global_rotation_transforms; //bone indexes to xform
+    QHash <int, QMatrix4x4> extra_relative_transforms; //bone indexes to xform
     QVector <aiNode *> nodes_to_process;
     QVector <QMatrix4x4> nodes_parent_xforms;
 };

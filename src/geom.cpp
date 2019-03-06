@@ -237,9 +237,10 @@ void GeomIOSystem::SetGZipped(const bool b)
     gzipped = b;
 }
 
-void GeomIOSystem::SetFakeExtensionAdded(const bool b)
+void GeomIOSystem::SetFakeExtensionAdded(const bool b, const QString s)
 {
     fake_extension_added = b;
+    fake_extension_string = s;
 }
 
 void GeomIOSystem::SetBasePath(QUrl u)
@@ -315,13 +316,8 @@ Assimp::IOStream * GeomIOSystem::Open(const char *pFile)
     else if (gzipped && base_path.toString().right(p.length()) == p) {
         u = base_path.resolved(QUrl(p+".gz"));
     }
-    else if (fake_extension_added && p.right(4) == ".glb") {
-        u = base_path.resolved(QUrl(p.left(p.length()-4)));
-//        qDebug() << "ACTUALLY USING" << u << pFile;
-    }
-    else if (fake_extension_added && p.right(5) == ".gltf") {
-        u = base_path.resolved(QUrl(p.left(p.length()-5)));
-//        qDebug() << "ACTUALLY USING" << u << pFile;
+    else if (fake_extension_added && p.right(fake_extension_string.length()) == fake_extension_string) {
+        u = base_path.resolved(QUrl(p.left(p.length()-fake_extension_string.length())));
     }
     else if (p.lastIndexOf("http://", -1, Qt::CaseInsensitive) > 0) {
         p = p.right(p.length()-p.lastIndexOf("http://", -1, Qt::CaseInsensitive));
@@ -478,7 +474,7 @@ bool GeomIOSystem::Exists(const char *pFile) const
     return true;
 }
 
-bool GeomIOSystem::PushDirectory( const std::string &path )
+bool GeomIOSystem::PushDirectory( const std::string & )
 {
     return true;
 }
@@ -741,8 +737,8 @@ void Geom::Load()
     started = true;
 
     //C++ method with IO handlers (load files from network)
-    bool gzipped = false;
     QString p = path;
+    bool gzipped = false;
     if (p.right(3).toLower() == ".gz") {
         p = p.left(p.length()-3);
         gzipped = true;
@@ -750,18 +746,24 @@ void Geom::Load()
 
     //62.7 - necessary to give assimp a .glb filename hint, when they store files without extension/MIME data
     bool fake_extension = false;
+    QString fake_extension_str;
     if (path.contains("content.decentraland.today/contents")) {
-        p = p + ".glb"; //
         fake_extension = true;
+        fake_extension_str = ".glb";
     }
-    if (path.contains("?v=")) {
-        p = p + ".gltf"; //62.9 - TODO make this generic for any geometric extension
+    else if (path.contains("?v=")) {
+        const int ind1 = path.lastIndexOf("?v=");
+        const int ind0 = path.lastIndexOf(".", ind1-5);
         fake_extension = true;
+        fake_extension_str = path.mid(ind0, ind1-ind0);
+    }
+    if (fake_extension) {
+        p += fake_extension_str;
     }
 
     if (iosystem) {
         iosystem->SetGZipped(gzipped);
-        iosystem->SetFakeExtensionAdded(fake_extension);
+        iosystem->SetFakeExtensionAdded(fake_extension, fake_extension_str);
         iosystem->SetBasePath(QUrl(p));
         importer.SetIOHandler(iosystem);
     }
