@@ -123,8 +123,7 @@ public:
 public slots:
 
     void Closed();
-    void TimeOut();
-    void CEFTimeOut();    
+    void TimeOut();    
 
     void ActionNew();
     void ActionOpen();

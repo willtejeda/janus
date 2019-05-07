@@ -18,8 +18,6 @@
 #include "cookiejar.h"
 #ifdef __ANDROID__
     #include "androidwebview.h"
-#else
-    #include "cefwebview.h"
 #endif
 #include "renderer.h"
 #include "rendererinterface.h"

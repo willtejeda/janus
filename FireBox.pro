@@ -97,8 +97,7 @@ SOURCES += \
     src/assetwindow.cpp \
     src/audioutil.cpp \
     src/baseassetdata.cpp \
-    src/bookmarkmanager.cpp \
-    src/cefwebview.cpp \
+    src/bookmarkmanager.cpp \    
     src/codeeditorwindow.cpp \
     src/contentimporter.cpp \
     src/controllermanager.cpp \
@@ -149,8 +148,6 @@ SOURCES += \
     src/webasset.cpp \
     src/virtualmenu.cpp
 
-unix:!android:!macx:SOURCES += ./resources/cef/linux/libcef_dll/base/cef_atomicops_x86_gcc.cc
-
 HEADERS += \
     src/abstracthmdmanager.h \
     src/abstractrenderer.h \    
@@ -173,7 +170,6 @@ HEADERS += \
     src/audioutil.h \
     src/baseassetdata.h \
     src/bookmarkmanager.h \
-    src/cefwebview.h \
     src/codeeditorwindow.h \
     src/contentimporter.h \
     src/controllermanager.h \
@@ -244,7 +240,6 @@ unix:macx:HEADERS -= "src/gamepad.h"
 #Remove dependencies unused by Android
 android:SOURCES -= "src/gamepad.c" \
     "src/vivemanager.cpp" \    
-    "src/cefwebview.cpp" \
     "src/filteredcubemapmanager.cpp" \
     "src/hierarchywindow.cpp" \
     "src/propertieswindow.cpp" \
@@ -253,7 +248,6 @@ android:SOURCES -= "src/gamepad.c" \
     "src/navigationwindow.cpp"
 android:HEADERS -= "src/gamepad.h" \
     "src/vivemanager.h" \    
-    "src/cefwebview.h" \
     "src/filteredcubemapmanager.h" \
     "src/hierarchywindow.h" \
     "src/propertieswindow.h" \
@@ -277,24 +271,8 @@ contains(ANDROID_TARGET_ARCH,armeabi) {
     android:HEADERS += "src/gearmanager.h"
 }
 
-# Chromium Embedded Framework CEF
-win32:INCLUDEPATH += "./resources/cef/windows/"
-unix:!macx:!android:INCLUDEPATH += "./resources/cef/linux"
-
 win32:LIBS += -L"$$PWD/dependencies/windows/"
 unix:!macx:!android:LIBS += -L"$$PWD/dependencies/linux/"
-
-CONFIG(debug) {
-    win32:LIBS += -L"$$PWD/resources/cef/windows/lib/debug/"
-    unix:!macx:!android:LIBS += -L"$$PWD/resources/cef/linux/lib/debug/"
-}
-CONFIG(release) {
-    win32:LIBS += -L"$$PWD/resources/cef/windows/lib/release/"
-    unix:!macx:!android:LIBS += -L"$$PWD/resources/cef/linux/lib/release/"
-}
-
-win32:LIBS += -llibcef -llibcef_dll_wrapper
-unix:!macx:!android:LIBS += -lcef -lcef_dll_wrapper
 
 #GoogleVR
 contains(ANDROID_TARGET_ARCH,armeabi-v7a) {

@@ -14,10 +14,6 @@
 #include <Windows.h>
 #endif
 
-#ifndef __ANDROID__
-#include "include/cef_app.h"
-#endif
-
 //Uncomment to enable Leak debugging in Visual Studio when using Visual Leak Detector
 //#include <vld.h>
 
@@ -239,76 +235,6 @@ extern "C"
 
 int main(int argc, char *argv[])
 {
-//    bool    cefIsInitialized; // for storing the result of calling CefInitialize()
-//    int     cefExecuteResult; // for storing the result of calling CefExecuteProcess()
-
-    //duplicate argv so CEF doesn't modify it, and Janus cmd line parameters continue to work
-    char ** argv_copy = new char *[argc];
-    for (int i=0; i<argc; ++i) {
-        const int len = QString(argv[i]).length()+1; //null-terminated character strings
-        argv_copy[i] = new char[len];
-        memcpy(argv_copy[i], argv[i], len);
-    }
-
-//#ifdef WIN32
-//    CefMainArgs main_args;
-//#elif !defined(__ANDROID__)
-//    CefMainArgs main_args(argc, argv_copy);
-//    //CefMainArgs main_args;
-//#endif
-
-//#ifndef __ANDROID__
-//    CefRefPtr<CEFApp> janusapp = new CEFApp();
-
-//    cefExecuteResult = CefExecuteProcess(main_args, janusapp, nullptr);
-
-//    // checkout CefApp, derive it and set it as second parameter, for more control on
-//    // command args and resources.
-//    if (cefExecuteResult >= 0) // child proccess has endend, so exit.
-//    {
-//        qDebug() << "CefExecuteProcess(): The child has terminated abnormally";
-//        return cefExecuteResult;
-//    }
-//    if (cefExecuteResult == -1)
-//    {
-//        // we are here in the father proccess.
-//        qDebug() << "CefExecuteProcess(): Chromium Embedded Framework Started";
-//    }
-
-
-//// TODO: Move this to its own initialization function
-//    CefSettings settings;
-
-//// Toggle the verbosity of CefEngine output
-//#ifndef QT_DEBUG
-//    settings.log_severity = LOGSEVERITY_DEFAULT;
-//#else
-//    settings.log_severity = LOGSEVERITY_DEBUG;
-//#endif
-
-//    settings.multi_threaded_message_loop = false;
-//    settings.no_sandbox = true;
-//    settings.ignore_certificate_errors = true;
-//    settings.persist_session_cookies = true;
-//    settings.persist_user_preferences = true;
-//    settings.external_message_pump = true;
-
-//    CefString(&settings.cache_path).FromASCII(MathUtil::GetAppDataPath().toLatin1().constData());
-
-//    cefIsInitialized = CefInitialize(main_args, settings, janusapp, nullptr);
-//    // CefInitialize creates a sub-proccess and executes the same executeable, as calling CefInitialize, if not set different in settings.browser_subprocess_path
-//    // if you create an extra program just for the childproccess you only have to call CefExecuteProcess(...) in it.
-//    if (!cefIsInitialized) {
-//        // handle error
-//        qDebug() << "CefInitialize(): Unable to initialize CefEngine";
-//        return -1;
-//    } else {
-//        qDebug() << "CefInitialize(): CefEngine Initialization successful! Starting the message pump...";
-//        CefDoMessageLoopWork();
-////        CefRunMessageLoop();
-//    }
-//#endif
-
     QApplication a(argc, argv);
     a.setStyle(QStyleFactory::create("fusion"));
     a.setStyleSheet("QMenu {background: #2F363B; color: #FFFFFF; border: 2px solid #FFFFFF;}"
@@ -318,13 +244,6 @@ int main(int argc, char *argv[])
                     //59.9 - note: use default (padding: 0px) for non-Android builds
                     "QMenu::item:selected { background: #414A51; }"
                     "QMenu::item:disabled { color: #4A5B68; }");
-
-#ifdef WIN32
-    //    SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
-    SetPriorityClass(GetCurrentProcess(), NORMAL_PRIORITY_CLASS);
-#endif
-
-    int ideal_thread_count = QThread::idealThreadCount();    
 
 #ifdef __ANDROID__
     qDebug() << "JNI initialize";
@@ -408,17 +327,5 @@ int main(int argc, char *argv[])
 
     qDebug() << "main(): writing settings to path" << MathUtil::GetAppDataPath();
     const int ret_val = a.exec();
-
-//#ifndef __ANDROID__
-//    CEFWebView::Shutdown();
-//    qDebug() << "CefShutdown() started";
-//    CefShutdown(); //shut down CEF (any other janusvr.exe processes launched)
-//    qDebug() << "CefShutdown() done";
-//
-//    Possible fix for the CefShutdown() issue:
-//    SetErrorMode(SEM_NOGPFAULTERRORBOX);
-//    CefShutdown();
-//#endif
-
     return ret_val;
 }

@@ -621,11 +621,10 @@ void GLWidget::resizeGL(int w, int h)
 void GLWidget::paintGL()
 {
 //    qDebug() << "GLWidget::paintGL()" << disp_mode;
-    if (game == NULL || game->GetEnvironment() == NULL || game->GetEnvironment()->GetCurRoom() == NULL) {
+    if (game == nullptr || game->GetEnvironment() == nullptr || game->GetEnvironment()->GetCurRoom() == nullptr) {
         return;
     }
 
-    bool make_virtual_menu_visible = game->GetVirtualMenu()->GetVisible();
     if (game->GetVirtualMenu()->GetDoBookmarkAdd() || game->GetVirtualMenu()->GetDoBookmarkRemove()) {
         DoBookmark();
         game->GetVirtualMenu()->SetTakingScreenshot(true);
@@ -642,21 +641,8 @@ void GLWidget::paintGL()
     r->GetPerformanceLogger().StartFrameSample();
 #endif
 
-    //game update/repaint
-    //game->GetMenu().UpdateGL();
-    //REFACTORTODO - call Object's "UpdateGL" here like Asset Manager use to
-
-#ifdef __ANDROID__
-    /*int w = 1280;
-    int h = 720;
-    if (take_screenshot || take_screenshot_cubemap){*/
-        int w = width();
-        int h = height();
-    //}
-#else
     const int w = width();
     const int h = height();
-#endif
     const int w2 = RendererInterface::m_pimpl->GetWindowWidth();
     const int h2 = RendererInterface::m_pimpl->GetWindowHeight();
     const float near_dist = game->GetCurrentNearDist();

@@ -16,27 +16,6 @@ AssetWebSurface::AssetWebSurface() :
     props->SetHeight(800);
 
     cursor_pos = QPoint(500, 400);
-
-//#ifdef __ANDROID__
-//    webview = (AbstractWebView*)new AndroidWebView();
-//#else
-//    webview = (AbstractWebView*)new CEFWebView();
-//#endif
-//    webview->initialize();
-//    webview->initializeMenu();
-
-//    webview->setCookieJar(CookieJar::cookie_jar);
-//    if (CookieJar::cookie_jar) {
-//        CookieJar::cookie_jar->setParent(NULL); //prevem_max_width, m_max_heightnt NAM from taking ownership of cookie jar
-//    }
-
-//    connect(webview, SIGNAL(repaintRequested(QRect)), this, SLOT(UpdateTexture(QRect)));
-//    connect(webview, SIGNAL(scrollRequested(int,int,QRect)), this, SLOT(UpdateTexture())); //49.24 bugfix clicking page anchors
-//    connect(webview, SIGNAL(loadStarted()), this, SLOT(LoadStarted()));
-//    connect(webview, SIGNAL(loadProgress(int)), this, SLOT(LoadProgress(int)));
-//    connect(webview, SIGNAL(loadFinished(bool)), this, SLOT(LoadFinished()));
-//    connect(webview, SIGNAL(urlChanged(QUrl)), this, SLOT(URLChanged(QUrl)));
-
 }
 
 AssetWebSurface::~AssetWebSurface()

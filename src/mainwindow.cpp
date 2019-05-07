@@ -688,17 +688,6 @@ void MainWindow::Update()
     UpdateHands();
 }
 
-void MainWindow::CEFTimeOut()
-{    
-//#ifndef __ANDROID__
-//    if (game && !game->GetDoExit() && SettingsManager::GetUpdateWebsurfaces()) {
-////        qDebug() << "MainWindow::CEFTimeOut() enter";
-//        CefDoMessageLoopWork();
-////        qDebug() << "MainWindow::CEFTimeOut() exit";
-//    }
-//#endif
-}
-
 void MainWindow::TimeOut()
 {    
     if (game && game->GetDoExit()) {       
@@ -939,24 +928,13 @@ void MainWindow::Initialize()
     SoundManager::Load(SettingsManager::GetPlaybackDevice(),
                        SettingsManager::GetCaptureDevice());
 
-//    if (rift_render.GetEnabled()) {
-//        SoundManager::Play3D(SOUND_RIFT, false, game->GetPlayer()->GetPos(), 1.0f);
-//    }
-//    else {
-//        SoundManager::Play3D(SOUND_NORIFT, false, game->GetPlayer()->GetPos(), 1.0f);
-//    }
-
     //initialize controllers
 #if !defined(__APPLE__) && !defined(__ANDROID__)
     GamepadInit();
 #endif
 
-//    glwidget->DoGrabMouseStuff();
-
     if (hmd_manager) {
         glwidget->makeCurrent();
-        //hmd_manager->InitializeGL();
-        //hmd_manager->ReCentre();
 
 #if defined(__ANDROID__)
         if ((GLWidget::GetDisplayMode() == MODE_GEAR && !require_permissions) || (GLWidget::GetDisplayMode() == MODE_GVR)){
@@ -965,17 +943,7 @@ void MainWindow::Initialize()
 #endif
     }
 
-    //use Qt::ConnectionType::QueuedConnection for timeouts, makes VOIP smooth, etc.
-//#ifndef __ANDROID__
-//    connect(&timer2, SIGNAL(timeout()), this, SLOT(CEFTimeOut()), Qt::ConnectionType::QueuedConnection);
-////    connect(&timer2, SIGNAL(timeout()), this, SLOT(CEFTimeOut()));
-//#endif
-//    connect(&timer, SIGNAL(timeout()), this, SLOT(TimeOut()), Qt::ConnectionType::QueuedConnection);
     connect(&timer, SIGNAL(timeout()), this, SLOT(TimeOut()));
-
-//#ifndef __ANDROID__
-//    timer2.start( 10 );
-//#endif
     timer.start( 0 );
 }
 
@@ -1003,7 +971,6 @@ void MainWindow::Closed()
     qDebug() << "MainWindow::Closed()";      
 
     disconnect(&timer, 0, 0, 0);
-//    disconnect(&timer2, 0, 0, 0);
 
     if (social_window) {
         social_window->Shutdown();
@@ -1017,16 +984,7 @@ void MainWindow::Closed()
     JNIUtil::Destroy();
 #endif
 
-//    QApplication::closeAllWindows();
-    QCoreApplication::quit(); //60.0 - important!  Calling QCoreApplication::quit clears the event loop, so no more events go to CEF
-
-//#ifndef __ANDROID__
-//    //shut down CEF
-//    CEFWebView::Shutdown();
-//    qDebug() << "CefShutdown() started";
-//    CefShutdown();
-//    qDebug() << "CefShutdown() done";
-//#endif
+    QCoreApplication::quit(); //60.0 - important!  Calling QCoreApplication::quit clears the event loop
 }
 
 void MainWindow::SetupWidgets()
